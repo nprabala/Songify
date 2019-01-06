@@ -23,3 +23,21 @@ An app for party playlists
 
 
 
+
+
+
+### Useful Links
+
+For iOS to web API interface:
+
+https://github.com/spotify/ios-sdk
+
+
+For App Credentials and Data Management:
+
+https://developer.spotify.com/dashboard/applications
+
+
+
+
+
