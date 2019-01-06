@@ -1,6 +1,10 @@
 # Jukebox
 An app for party playlists
 
+## TBD
+
+* Determine User Music Service. Likely Candidate: Spotify
+* Determine Language Platform. Likely Candidates: iOS native (Swift), React Native
 
 # Project Breakdown
 
@@ -20,8 +24,6 @@ An app for party playlists
 
 * Hosts can poll for guests
 * Guests can send Preferences to Host
-
-
 
 
 
