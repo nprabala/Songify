@@ -43,6 +43,10 @@ App Credentials and Data Management:
 
 https://developer.spotify.com/dashboard/applications
 
+Track Features For Developing Group Preferences:
+
+https://developer.spotify.com/documentation/web-api/reference/tracks/get-audio-features/
+
 React Native Spotify API package:
 
 https://github.com/lufinkey/react-native-spotify
