@@ -28,14 +28,18 @@ An app for party playlists
 
 ### Useful Links
 
-For iOS to web API interface:
+iOS to web API interface:
 
 https://github.com/spotify/ios-sdk
 
 
-For App Credentials and Data Management:
+App Credentials and Data Management:
 
 https://developer.spotify.com/dashboard/applications
+
+React Native Spotify API package:
+
+https://github.com/lufinkey/react-native-spotify
 
 
 
