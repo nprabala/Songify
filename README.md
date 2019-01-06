@@ -31,10 +31,13 @@ An app for party playlists
 
 ### Relevant Links
 
-iOS to web API interface:
+Spotify iOS sdk:
 
 https://github.com/spotify/ios-sdk
 
+Other Spotify (Web) Apps:
+
+https://developer.spotify.com/community/showcase/
 
 App Credentials and Data Management:
 
