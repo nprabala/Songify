@@ -5,6 +5,7 @@ An app for party playlists
 
 * Determine User Music Service. Likely Candidate: Spotify
 * Determine Language Platform. Likely Candidates: iOS native (Swift), React Native
+* Determine Communication Channel. Bluetooth or WiFi
 
 # Project Breakdown
 
@@ -20,7 +21,7 @@ An app for party playlists
 * Generate a Playlist from combined preference Object.
 * Optional: Build the host side as part of the app.
 
-## Build Interphone Networking
+## Build Host-Guest Communications
 
 * Hosts can poll for guests
 * Guests can send Preferences to Host
@@ -28,7 +29,7 @@ An app for party playlists
 
 
 
-### Useful Links
+### Relevant Links
 
 iOS to web API interface:
 
@@ -43,6 +44,12 @@ React Native Spotify API package:
 
 https://github.com/lufinkey/react-native-spotify
 
+
+Info on Mobile Bluetooth Connections:
+
+* This post comes from the mobile game Spaceteam, which does continuous Bluetooth connections (while we only need quick transfers of data), so not all limitations apply equally.
+
+http://spaceteamadmirals.club/blog/the-spaceteam-networking-post/
 
 
 
