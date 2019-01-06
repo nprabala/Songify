@@ -1,2 +1,2 @@
 # Jukebox
-An app for constantly changing party playlists
+An app for party playlists
