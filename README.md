@@ -1,30 +1,44 @@
 # Jukebox
 An app for party playlists
 
-## TBD
 
-* Determine User Music Service. Likely Candidate: Spotify
-* Determine Language Platform. Likely Candidates: iOS native (Swift), React Native
-* Determine Communication Channel. Bluetooth or WiFi
+# Project Status
 
-# Project Breakdown
+## Infrastructure
 
-## Build Guest Side
+* User Music Service: Spotify
+* Language: iOS native (Swift 4)
+* Communication Channel: Bluetooth
 
-* Make an app that can read from user music service
-* Generate some kind of Preferences Object from user music library.
-* Optional: Allow users to select specific playlists to be scanned by the app.
+## Build Guest Side: (Unassigned)
 
-## Build Host Side
+* Make an app that can read user profile from Spotify
+* Extract top songs, artists, and genres from profile
+* Convert extracted items into some combination of Spotify API track features (ie, danceability) and explicit song/artist names.
 
-* Compile Preference Objects into a single Preference Object.
-* Generate a Playlist from combined preference Object.
-* Optional: Build the host side as part of the app.
+Nice To Have:
 
-## Build Host-Guest Communications
+* Allow users to request specific songs for the queue. 
 
-* Hosts can poll for guests
-* Guests can send Preferences to Host
+## Build Host Side: (Unassigned)
+
+* Accomplish same work as guest side for Jukebox Host.
+* Match Preferencs to the user profile that generated them (beginning with host)
+* Compile all Preferences into one seed.
+* Generate a Playlist from seed using Spotify API.
+* Create remove button to remove a user and their Preferences from the collection.
+
+Nice To Have:
+
+* Make playlist features visible to and adjustable by host.
+
+
+## Build Host-Guest Communications: (Unassigned)
+
+* Hosts are listening for guests.
+* Guests can send Preferences to specific host.
+* Create leave button for guests to remove themselves from the collection on this Jukebox
+
 
 
 
@@ -47,6 +61,10 @@ Track Features For Developing Group Preferences:
 
 https://developer.spotify.com/documentation/web-api/reference/tracks/get-audio-features/
 
+Get recommendations based on Track Features:
+
+https://developer.spotify.com/documentation/web-api/reference/browse/get-recommendations/
+
 React Native Spotify API package:
 
 https://github.com/lufinkey/react-native-spotify
@@ -57,6 +75,11 @@ Info on Mobile Bluetooth Connections:
 * This post comes from the mobile game Spaceteam, which does continuous Bluetooth connections (while we only need quick transfers of data), so not all limitations apply equally.
 
 http://spaceteamadmirals.club/blog/the-spaceteam-networking-post/
+
+
+* This post comes from someone who made an iOS app for communicating between many phones. This will likely be a good source of guidance moving forward.
+
+https://itnext.io/whos-there-simple-swift-app-for-chatting-with-colleagues-around-a88ff765736f
 
 
 
