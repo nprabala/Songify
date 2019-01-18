@@ -3,7 +3,7 @@ An app that lets anyone become a songwriter.
 
 ## Overview
 
-Everyone, no matter their musical training, has come up with a song. From silly, childish, rhymes, to angsty love songs, to impromptu rap, to satirical lyricism, and more,
+Everyone, no matter their musical training, has come up with a song. From silly, childish, rhymes, to angsty love songs, to impromptu rap, to parody, and much more,
 we all have a song to sing. But unless you're a highly trained songwriter,
 it's incredibly difficult to take the music in your head and turn it into full music,
 with a real accompaniment and backup music. 
