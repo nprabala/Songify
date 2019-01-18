@@ -5,8 +5,8 @@ An app that lets anyone become a songwriter.
 
 Everyone, no matter their musical training, has come up with a song. From silly, childish, rhymes, to angsty love songs, to impromptu rap, to parody, and much more,
 we all have a song to sing. But unless you're a highly trained songwriter,
-it's incredibly difficult to take the music in your head and turn it into full music,
-with a real accompaniment and backup music. 
+it's incredibly difficult to take the melody in your head and turn it into a real song
+with full accompaniment. 
 
 Mixtape's goal is to let everyone join in the fun of creating music. We train a machine learning algorithm on popular combinations of melody and chord progressions
 so that it can listen to a user's own song, and construct a complimentary accompaniment track.  All you have to do is open, the app, sing, and then Mixtape takes care of the rest! 
