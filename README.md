@@ -34,11 +34,13 @@ Infrastructure: Node JS, Angular JS, ???
 
 ## Server:
 
-Infrastructure: ???
+Infrastructure: Python REST API with Flask
 
-* Collect user melody from web page
-* Break melody into discretized features
-* Pass feature vector to machine learning model. 
+* Accept user GET requests with supplied recording
+* Convert user recording to MIDI melody file
+* Pass created melody to ML model to produce chord progression
+* Combine melody with chords to produce full output
+* Return the full output as well as the chord progressions produced to the user
 
 
 
@@ -91,4 +93,10 @@ https://www.carlostoxtli.com/hum2song/
 Overlay chord and original recording mp3s: 
 
 http://pydub.com
+
+Python + Flask Rest API: 
+
+https://www.codementor.io/sagaragarwal94/building-a-basic-restful-api-in-python-58k02xsiq
+
+https://realpython.com/flask-connexion-rest-api/
 
