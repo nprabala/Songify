@@ -64,3 +64,19 @@ https://cs224d.stanford.edu/reports/allenh.pdf
 Music Data for top songs. Seems to be divided into parts (ie, chorus, versus main vocals). Could be useful source of data.
 https://www.hooktheory.com/theorytab/view/adele/hello
 
+Melody + Chord Progression dataset: 
+
+https://github.com/wayne391/Lead-Sheet-Dataset
+
+Melody to Chord Progression model: 
+
+https://arxiv.org/pdf/1712.01011.pdf
+
+Recording Audio to MIDI model: 
+
+https://web.stanford.edu/class/cs221/restricted/posters/aitan/poster.pdf
+
+http://cs229.stanford.edu/proj2015/137_report.pdf
+
+http://www.justinsalamon.com/news/convert-audio-to-midi-melody-using-melodia (though involves 3rd part software)
+
