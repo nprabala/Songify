@@ -80,3 +80,11 @@ http://cs229.stanford.edu/proj2015/137_report.pdf
 
 http://www.justinsalamon.com/news/convert-audio-to-midi-melody-using-melodia (though involves 3rd part software)
 
+Echonest API for pitch detection:
+
+https://github.com/turian/pitch-detection-echonest
+
+Example of developing accompanying music:
+
+https://www.carlostoxtli.com/hum2song/
+
