@@ -88,3 +88,7 @@ Example of developing accompanying music:
 
 https://www.carlostoxtli.com/hum2song/
 
+Overlay chord and original recording mp3s: 
+
+http://pydub.com
+
