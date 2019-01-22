@@ -29,8 +29,8 @@ Infrastructure: Python, Pytorch, ???
 Infrastructure: Node JS, Angular JS, ???
 
 * Record user audio
-* Pass Frequency to server
-* Share accompaniment track for download
+* Pass audio file to server
+* Return chord audio for download/playback.
 
 ## Server:
 
