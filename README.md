@@ -86,6 +86,10 @@ Echonest API for pitch detection:
 
 https://github.com/turian/pitch-detection-echonest
 
+Audio to Midi: 
+
+https://github.com/aubio/aubio/tree/master/python
+
 Example of developing accompanying music:
 
 https://www.carlostoxtli.com/hum2song/
