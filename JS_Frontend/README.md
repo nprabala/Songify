@@ -16,7 +16,6 @@ Afterwards, be sure to navigate to this folder (JS_frontend) on your local machi
 ``` 
     npm install express
     npm install angular
-    
 ```
 
 
