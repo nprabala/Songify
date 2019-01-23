@@ -13,8 +13,10 @@ https://www.npmjs.com/get-npm
 
 Afterwards, be sure to navigate to this folder (JS_frontend) on your local machine and install angular and express. 
 
-``` npm install express 
+``` 
+    npm install express
     npm install angular
+    
 ```
 
 
