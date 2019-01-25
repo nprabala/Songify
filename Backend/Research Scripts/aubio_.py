@@ -127,9 +127,9 @@ def create_midi(filename, midioutput):
             print("%.6f" % (total_frames/float(samplerate)), new_note)
             delta = frames2tick(total_frames) - last_time
 
-            if between(new_note[0], min_pitch, max_pitch):
-                #if new_note[2] > 0:
-                    #track.append(Message('note_off', note=int(new_note[2]), velocity=127, time=0))
+            if between(new_note[0], min_pitch, max_pitch) or True:
+                if new_note[2] > 0:
+                    track.append(Message('note_off', note=int(new_note[2]), velocity=127, time=0))
                 track.append(Message('note_on',note=int(new_note[0]),velocity=int(new_note[1]),time=delta))
                 last_time = frames2tick(total_frames)
         total_frames += read

@@ -32,6 +32,12 @@ from magenta.music import sequences_lib
 from magenta.protobuf import music_pb2
 import tensorflow as tf
 
+from pydub import AudioSegment
+
+MAX_PITCH = 75
+MIN_pitch = 30
+AMP = -20.0
+
 FLAGS = tf.app.flags.FLAGS
 
 tf.app.flags.DEFINE_string(
@@ -55,6 +61,10 @@ tf.app.flags.DEFINE_string(
     'log', 'INFO',
     'The threshold for what messages will be logged: '
     'DEBUG, INFO, WARN, ERROR, or FATAL.')
+tf.app.flags.DEFINE_bool(
+    'clean_notes', False,
+    'Whether or not to clean the transcribed notes, keeping highest velocity notes \
+    at any time')
 
 
 def create_example(filename, hparams):
@@ -126,6 +136,45 @@ def initialize_session(acoustic_checkpoint, hparams):
         velocity_values_flat=velocity_values_flat,
         hparams=hparams)
 
+def clean_notes(sequence_prediction):
+    def contained_in(note_one, note_two):
+        return note_one.start_time >= note_two.start_time and note_one.end_time < note_two.end_time
+    def starts_before_end(note_one, note_two):
+        return note_one.start_time >= note_two.start_time and note_one.start_time < note_two.end_time
+
+    toRemove = []
+    for note_one in sequence_prediction.notes:
+        if note_one.pitch > MAX_PITCH or note_one.pitch < MIN_pitch:
+            toRemove.append(note_one)
+            continue
+        for note_two in sequence_prediction.notes:
+            if note_one != note_two:
+                # contained in another note and less velocity = most likey noise
+                if contained_in(note_one, note_two) and note_one.velocity < note_two.velocity:
+                    toRemove.append(note_one)
+                    break
+
+    for note in toRemove:
+        sequence_prediction.notes.remove(note)
+
+    for note_one in sequence_prediction.notes:
+        for note_two in sequence_prediction.notes:
+            if note_one != note_two:
+                # note one starts before note two ends
+                if starts_before_end(note_one, note_two):
+                    note_two.end_time = note_one.start_time
+
+def normalize(filename):
+    def match_target_amplitude(sound, target_dBFS):
+        change_in_dBFS = target_dBFS - sound.dBFS
+        return sound.apply_gain(change_in_dBFS)
+
+    new_filename = 'normalized_' + filename
+    file_format = filename.split('.')[-1]
+    sound = AudioSegment.from_file(filename, file_format)
+    normalized_sound = match_target_amplitude(sound, AMP)
+    normalized_sound.export(new_filename, file_format)
+    return new_filename
 
 def transcribe_audio(transcription_session, filename, frame_threshold,
                      onset_threshold):
@@ -157,6 +206,9 @@ def transcribe_audio(transcription_session, filename, frame_threshold,
   for note in sequence_prediction.notes:
     note.pitch += constants.MIN_MIDI_PITCH
 
+  if FLAGS.clean_notes:
+      clean_notes(sequence_prediction)
+
   return sequence_prediction
 
 
@@ -177,17 +229,20 @@ def main(argv):
 
   transcription_session = initialize_session(acoustic_checkpoint, hparams)
 
-  for filename in argv[1:]:
-    tf.logging.info('Starting transcription for %s...', filename)
+  filename = argv[1]
+  if FLAGS.clean_notes:
+      filename = normalize(filename)
 
-    sequence_prediction = transcribe_audio(
-        transcription_session, filename, FLAGS.frame_threshold,
-        FLAGS.onset_threshold)
+  tf.logging.info('Starting transcription for %s...', filename)
 
-    midi_filename = filename + '.midi'
-    midi_io.sequence_proto_to_midi_file(sequence_prediction, midi_filename)
+  sequence_prediction = transcribe_audio(
+      transcription_session, filename, FLAGS.frame_threshold,
+      FLAGS.onset_threshold)
 
-    tf.logging.info('Transcription written to %s.', midi_filename)
+  midi_filename = filename + '.midi'
+  midi_io.sequence_proto_to_midi_file(sequence_prediction, midi_filename)
+
+  tf.logging.info('Transcription written to %s.', midi_filename)
 
 
 def console_entry_point():
