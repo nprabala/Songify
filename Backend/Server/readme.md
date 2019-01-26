@@ -39,4 +39,10 @@ To use Sanic: pip install sanic and then run python ModelServer.py.
 
 At the moment, you can go to localhost:8000/?filename=name_of_file.mp3 to test the transcription. 
 
+To help with live reloading for development, pip install hupper and run 
+
+> hupper -m \<app name\> 
+
+so it can track your changes and reload the server. 
+
 The Constants file will be used to store server info such as IP addresses and ports so we can easily make changes for running locally or on the cloud. 
