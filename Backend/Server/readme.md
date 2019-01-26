@@ -26,12 +26,10 @@ The arguments for the script can be viewed using --help, but the general argumen
 
 where acoustic_run_dir specifies the directory of the file you want to transcribe, clean_notes specifies whether you want to apply our cleaning/normalization methods, and the first system argument is the file you want to transcribe. 
 
+## Issues
+
+Bus Error: 10. To handle this, pip uninstall numpy and then conda install numpy instead
+
 ## More info
 
 More information about Magenta can be found on their gitub: https://github.com/tensorflow/magenta/tree/master/magenta/
-
-# Aubio
-
-Not much is needed to set up Aubio: just pip install aubio, mido, and numpy. Likewise, a few other libraries might be needed that the script will alert you to if they are not present. To run the script: 
-
-<blockquote> python aubio_.py input_file output_file.midi </blockquote> 
