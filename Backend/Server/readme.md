@@ -28,4 +28,6 @@ More information about Magenta can be found on their gitub: https://github.com/t
 
 ## Sanic
 
-To use Sanic: pip install sanic. The Constants file will be used to store server info such as IP addresses and ports so we can easily make changes for running locally or on the cloud. 
+To use Sanic: pip install sanic and then run python ModelServer.py. 
+
+The Constants file will be used to store server info such as IP addresses and ports so we can easily make changes for running locally or on the cloud. 
