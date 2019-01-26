@@ -12,19 +12,9 @@ I recommend downloading conda for python 2.7 (https://conda.io/en/master/) and s
 
 After conda is installed, you will need to pip install magenta, librosa, tensorflow which are needed for the script. In addition, magenta may require a few other libraries that aren't listed such as numpy, but it'll alert you which ones you will need when you try to run the script. 
 
-In addition, a few normalization methods were added, so you will need to pip install pydub. 
-
 ### Magenta Checkpoint
 
 In order to use the checkpoint file that google provides, you will need to download it from here https://storage.googleapis.com/magentadata/models/onsets_frames_transcription/maestro_checkpoint.zip. Once unzipped, the resulting train folder needs to be put into the same directory as the onsets script.
-
-## Arguments
-
-The arguments for the script can be viewed using --help, but the general arguments are: 
-
-<blockquote> python onsets_frames_transcription_transcribe.py --acoustic_run_dir directory --clean_notes=boolean input_file </blockquote>
-
-where acoustic_run_dir specifies the directory of the file you want to transcribe, clean_notes specifies whether you want to apply our cleaning/normalization methods, and the first system argument is the file you want to transcribe. 
 
 ## Issues
 
@@ -33,3 +23,9 @@ Bus Error: 10. To handle this, pip uninstall numpy and then conda install numpy 
 ## More info
 
 More information about Magenta can be found on their gitub: https://github.com/tensorflow/magenta/tree/master/magenta/
+
+# Server 
+
+## Sanic
+
+To use Sanic: pip install sanic. The Constants file will be used to store server info such as IP addresses and ports so we can easily make changes for running locally or on the cloud. 
