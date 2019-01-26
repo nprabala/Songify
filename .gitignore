@@ -7,3 +7,6 @@ Backend/.DS_Store
 Backend/Research Scripts/train/checkpoint
 *.data-00000-of-00001
 *.index
+*.DS_Store
+*.pyc
+Backend/Server/train/checkpoint
