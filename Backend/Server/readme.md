@@ -6,7 +6,7 @@ In order to run the onsets script, you will need to set up a few things for Goog
 
 ### Conda
 
-I recommend downloading conda for python 2.7 (https://conda.io/en/master/) and setting up a conda virtual environment (https://uoa-eresearch.github.io/eresearch-cookbook/recipe/2014/11/20/conda/):
+I recommend downloading conda for (https://conda.io/en/master/) and setting up a conda virtual environment (https://uoa-eresearch.github.io/eresearch-cookbook/recipe/2014/11/20/conda/):
 
 > conda create -n \<env name\> python=3.6
 
