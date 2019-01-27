@@ -112,38 +112,84 @@ class Transcriber:
             velocity_values_flat=velocity_values_flat,
             hparams=hparams)
 
-    def clean_notes(self, sequence_prediction):
+    def clean_notes(self, notes):
         def contained_in(note_one, note_two):
             return note_one.start_time >= note_two.start_time and note_one.end_time < note_two.end_time
+
         def starts_before_end(note_one, note_two):
             return note_one.start_time > note_two.start_time and note_one.start_time < note_two.end_time
 
+        def remove_from_notes(toRemove):
+            for note in toRemove:
+                notes.remove(note)
 
-        toRemove = []
-        for note_one in sequence_prediction.notes:
-            # try to ignore non human voice elements
-            if note_one.pitch > self.max_pitch or note_one.pitch < self.min_pitch:
-                toRemove.append(note_one)
-                continue
+        # try to ignore non human voice elements
+        def ignore_noise():
+            toRemove = []
+            for note_one in notes:
+                if note_one.pitch > self.max_pitch or note_one.pitch < self.min_pitch:
+                    toRemove.append(note_one)
+            remove_from_notes(toRemove)
 
-            # if given two notes and one is contained in the other note or they both
-            # start at the same time, the note with the lower velocity is removed
-            for note_two in sequence_prediction.notes:
-                if note_one != note_two:
-                    if (contained_in(note_one, note_two) or note_one.start_time == note_two.start_time) \
-                        and note_one.velocity < note_two.velocity:
+        # try to reduce notes that overlap
+        def reduce_overlapping_notes():
+            toRemove = []
+            for note_one in notes:
+                for note_two in notes:
+                    if note_one != note_two:
+
+                        # one contained fully in two
+                        if contained_in(note_one, note_two):
+                            toRemove.append(note_one)
+                            break
+
+                        # same start time, choose the longer one
+                        elif note_one.start_time == note_two.start_time:
+                            one_dur = note_one.end_time - note_one.start_time
+                            two_dur = note_two.end_time - note_two.start_time
+
+                            if (one_dur < two_dur):
+                                toRemove.append(note_one)
+                                break
+
+            remove_from_notes(toRemove)
+
+        # clearly define start and end times, don't allow overlap
+        def remove_overlap():
+            for note_one in notes:
+                for note_two in notes:
+                    if note_one != note_two:
+                        if starts_before_end(note_one, note_two):
+                            note_two.end_time = note_one.start_time
+
+        # concat repeated notes that touch
+        def concat_notes():
+            toRemove = []
+            for note_one in notes:
+                for note_two in notes:
+                    if note_one != note_two:
+                        if note_one.start_time == note_two.end_time and note_one.pitch == note_two.pitch:
+                            toRemove.append(note_one)
+                            note_two.end_time = note_one.end_time
+                            break
+            remove_from_notes(toRemove)
+
+        def remove_short_notes():
+            toRemove = []
+            for note_one in notes:
+                if note_one not in toRemove:
+                    if note_one.end_time - note_one.start_time < 0.1:
                         toRemove.append(note_one)
-                        break
+                        continue
+            remove_from_notes(toRemove)
 
-        for note in toRemove:
-            sequence_prediction.notes.remove(note)
+        ignore_noise()
+        reduce_overlapping_notes()
+        remove_overlap()
+        concat_notes()
+        remove_short_notes()
 
-        for note_one in sequence_prediction.notes:
-            for note_two in sequence_prediction.notes:
-                if note_one != note_two:
-                    # note one starts before note two ends
-                    if starts_before_end(note_one, note_two):
-                        note_two.end_time = note_one.start_time
+
 
     def transcribe_audio(self, transcription_session, filename, frame_threshold,
                          onset_threshold):
@@ -175,12 +221,11 @@ class Transcriber:
       for note in sequence_prediction.notes:
         note.pitch += constants.MIN_MIDI_PITCH
 
-      self.clean_notes(sequence_prediction)
+      self.clean_notes(sequence_prediction.notes)
 
       return sequence_prediction
 
     def init(self):
-        print(self.max_pitch)
         tf.logging.set_verbosity(self.log)
 
         acoustic_checkpoint = tf.train.latest_checkpoint(
