@@ -30,7 +30,6 @@ Frontend.zip in this repository should always contain the latest stable release 
 
 I am currently figuring out the right way to install and configure redeployment and management from a CLI tool. Will post more details as they are forthcoming.
 
-
 ### Local
 
 You need to make sure that you have Node JS configured on your system along with the package manager npm. If you have them already, great! 
