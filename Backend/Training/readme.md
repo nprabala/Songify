@@ -7,3 +7,5 @@ Run python parse.py passing in the directory of the data containing the midi fil
 ## Reading Data
 
 To read the data from the pickle file, import read_pickle_file (assuming read_pickle_file.py is in the same directory), and call read_pickle_file(pickle_notes), where pickle_notes is the filename of the pickle notes to read. An example can be found in test_read_pickle_file.py. 
+
+all_keys_notes is the current pickle file containing our data that has already been read from midi files. 
