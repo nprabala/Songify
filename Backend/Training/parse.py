@@ -4,6 +4,8 @@ import os
 import pickle
 
 dir_ = sys.argv[1]
+pickle_file = sys.argv[2]
+
 all_melody = []
 all_chords = []
 eighth = 0.25 # 16th note: 1 = quarter note, 0.5 = 8th note
@@ -70,5 +72,5 @@ harmony = {}
 harmony['melody'] = all_melody
 harmony['chords'] = all_chords
 
-with open('all_keys_notes', 'wb') as filepath:
+with open(pickle_file, 'wb') as filepath:
     pickle.dump(harmony, filepath)
