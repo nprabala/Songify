@@ -36,9 +36,9 @@ class Transcriber:
     max_pitch = 75
     min_pitch = 30
     acoustic_run_dir = '.'
-    hparams = 'onset_mode=length_ms,onset_length=32'
-    frame_threshold = 0.5
-    onset_threshold = 0.5
+    hparams = 'onset_overlap=False'
+    frame_threshold = 0.55
+    onset_threshold = 0.55
     log = 'INFO'
 
     TranscriptionSession = collections.namedtuple(
@@ -113,7 +113,7 @@ class Transcriber:
             hparams=hparams)
 
     def clean_notes(self, notes):
-        def contained_in(note_one, note_two):
+        def played_during(note_one, note_two):
             return note_one.start_time >= note_two.start_time and note_one.end_time < note_two.end_time
 
         def starts_before_end(note_one, note_two):
@@ -138,13 +138,8 @@ class Transcriber:
                 for note_two in notes:
                     if note_one != note_two:
 
-                        # one contained fully in two
-                        if contained_in(note_one, note_two):
-                            toRemove.append(note_one)
-                            break
-
-                        # same start time, choose the longer one
-                        elif note_one.start_time == note_two.start_time:
+                        # one is played during note two
+                        if played_during(note_one, note_two) or note_one.start_time == note_two.start_time:
                             one_dur = note_one.end_time - note_one.start_time
                             two_dur = note_two.end_time - note_two.start_time
 
@@ -187,7 +182,7 @@ class Transcriber:
         reduce_overlapping_notes()
         remove_overlap()
         concat_notes()
-        remove_short_notes()
+        #remove_short_notes()
 
 
 
@@ -234,6 +229,7 @@ class Transcriber:
         default_hparams = tf_utils.merge_hparams(
             constants.DEFAULT_HPARAMS, model.get_default_hparams())
         default_hparams.parse(self.hparams)
+        print(default_hparams)
 
         self.transcription_session = self.initialize_session(acoustic_checkpoint, default_hparams)
 
