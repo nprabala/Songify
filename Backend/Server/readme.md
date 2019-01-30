@@ -17,13 +17,11 @@ To test ModelServer locally, download postman (API tool for sending requests),
 insert localhost:8000/chord_progressions as the URL, make it a POST request,
 and insert notes in the following format:
 
-<quote>
     [{"note":"A", "duration":2},
     {"note":"B", "duration":1},
     {"note":"C", "duration":0.25},
     {"note":"D", "duration":0.5},
     {"note":"A", "duration":1}]
-</quote>
 
 The server will return chords in a similar format (just with 'chords' instead
 of notes).
