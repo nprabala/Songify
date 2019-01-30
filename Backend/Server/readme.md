@@ -15,7 +15,7 @@ so it can track your changes and reload the server.
 
 To test ModelServer locally, download postman (API tool for sending requests),
 insert localhost:8000/chord_progressions as the URL, make it a POST request,
-and insert notes in the following format:
+and insert notes as the request body in the following format:
 
     [{"note":"A", "duration":2},
     {"note":"B", "duration":1},
