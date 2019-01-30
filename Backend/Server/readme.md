@@ -1,8 +1,41 @@
-# Magenta
+# Server
+
+## Sanic
+
+To use Sanic: pip install sanic and then run python ModelServer.py.
+
+
+To help with live reloading for development, pip install hupper and run
+
+> hupper -m \<app name\>
+
+so it can track your changes and reload the server.
+
+## ModelServer
+
+To test ModelServer locally, download postman (API tool for sending requests),
+insert localhost:8000/chord_progressions as the URL, make it a POST request,
+and insert notes in the following format:
+
+<quote>
+    [{"note":"A", "duration":2},
+    {"note":"B", "duration":1},
+    {"note":"C", "duration":0.25},
+    {"note":"D", "duration":0.5},
+    {"note":"A", "duration":1}]
+</quote>
+
+The server will return chords in a similar format (just with 'chords' instead
+of notes).
+
+Until the model is finished, the server just sends back some dummy chords.
+
+
+# Magenta (transcription)
 
 ## Setup
 
-In order to run the onsets script, you will need to set up a few things for Google Magenta to work. 
+In order to run the onsets script, you will need to set up a few things for Google Magenta to work.
 
 ### Conda
 
@@ -10,13 +43,13 @@ I recommend downloading conda for (https://conda.io/en/master/) and setting up a
 
 > conda create -n \<env name\> python=3.6
 
-Activate the environment with 
+Activate the environment with
 
 > source activate \<env name\>
 
 ### Modules
 
-After conda is installed, you will need to pip install magenta, librosa, tensorflow which are needed for the script. In addition, magenta may require a few other libraries that aren't listed such as numpy, but it'll alert you which ones you will need when you try to run the script. 
+After conda is installed, you will need to pip install magenta, librosa, tensorflow which are needed for the script. In addition, magenta may require a few other libraries that aren't listed such as numpy, but it'll alert you which ones you will need when you try to run the script.
 
 ### Magenta Checkpoint
 
@@ -30,19 +63,3 @@ In order to use the checkpoint file that google provides, you will need to downl
 ## More info
 
 More information about Magenta can be found on their gitub: https://github.com/tensorflow/magenta/tree/master/magenta/
-
-# Server 
-
-## Sanic
-
-To use Sanic: pip install sanic and then run python ModelServer.py. 
-
-At the moment, you can go to localhost:8000/?filename=name_of_file.mp3 to test the transcription. 
-
-To help with live reloading for development, pip install hupper and run 
-
-> hupper -m \<app name\> 
-
-so it can track your changes and reload the server. 
-
-The Constants file will be used to store server info such as IP addresses and ports so we can easily make changes for running locally or on the cloud. 

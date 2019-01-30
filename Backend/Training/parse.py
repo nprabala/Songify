@@ -8,7 +8,7 @@ pickle_file = sys.argv[2]
 
 all_melody = []
 all_chords = []
-eighth = 0.25 # 16th note: 1 = quarter note, 0.5 = 8th note
+sixteenth = 0.25 # 16th note: 1 = quarter note, 0.5 = 8th note
 
 for file in os.listdir(dir_):
     try:
@@ -27,7 +27,7 @@ for file in os.listdir(dir_):
         cur_chords = []
         all_notes = midi.recurse().getElementsByOffsetInHierarchy(
                                     offset,
-                                    offsetEnd=offset+eighth,
+                                    offsetEnd=offset+sixteenth,
                                     mustBeginInSpan=False,
                                     includeElementsThatEndAtStart=False).notes
 
@@ -62,7 +62,7 @@ for file in os.listdir(dir_):
                     song_melody.append(n)
                     song_chords.append(c)
 
-        offset += eighth
+        offset += sixteenth
 
     all_melody.append(song_melody)
     all_chords.append(song_chords)
