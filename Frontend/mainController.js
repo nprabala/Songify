@@ -8,17 +8,15 @@ mixTapeApp.config(['$routeProvider',
             when('/info', {
                 templateUrl: 'components/documentation/about-us.html',
                 controller: 'AboutUsController'
+            }).
+            when('/record', {
+                templateUrl: 'components/record/record.html',
+                controller: 'RecordController'
             });
     }]);
 
 mixTapeApp.controller('MainController', ['$scope',
     function ($scope) {
         $scope.main = {};
-        $scope.main.header = "E1"
-        $scope.FetchModel = function(url, doneCallback) {
-            var request = new XMLHttpRequest();
-            request.onreadystatechange = doneCallback;
-            request.open('GET',url,true);
-            request.send();
-     };
+        $scope.main.header = "E1";
     }]);
