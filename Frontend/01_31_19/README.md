@@ -2,6 +2,11 @@ Part of this code so far is taken from this following webpage:
 
 https://randolphburt.co.uk/2014/11/20/writing-an-html5-game-with-no-game-engine-just-angularjs-and-the-html5-canvas/
 
+To run this code: 
+-The code currently has a local library for angular files. I put this folder in the Google Drive -> Frontend -> lib. Download the 'lib' folder and put it in the same folder as 'css', 'js', etc. 
+
+About the code:
+
 I went through and scrapped all of the miscellaneous features that drove the game to play, and kept the game loop. 
 
 Of course the server.js is still pulled from Nikhil's first iteration of code. 
