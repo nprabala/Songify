@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<!--[if gt IE 8]><!--> <html lang="en" ng-app="mixTapeApp" class="no-js"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Mixtape</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="mixTapeApp.css">
+</head>
+<body>
+  <ul class="menu">
+    <li><a href="#!/main">Main Page</a></li>
+    <li><a href="#!/record">Record Audio</a></li>
+  </ul>
+
+  <div ng-view></div>
+
+  <!-- <link href="node_modules/angular-material/angular-material.css" rel="stylesheet" /> -->
+    
+  <script src="node_modules/angular/angular.js" type="text/javascript" ></script>
+<!--   <script src="node_modules/angular-animate/angular-animate.js" type="text/javascript" ></script>
+  <script src="node_modules/angular-aria/angular-aria.js" type="text/javascript" ></script> -->
+  <script src="node_modules/angular-route/angular-route.js"></script>
+  <script src="http://code.createjs.com/createjs-2014.12.12.min.js"></script>
+  <script src="mixTapeApp.js"></script>
+  <script src="components/main/main.js"></script>
+  <script src="components/record/record.js"></script>
+</body>
+</html>
