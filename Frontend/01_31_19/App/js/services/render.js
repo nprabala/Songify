@@ -1,6 +1,6 @@
 angular.module("mixTapeApp")
-    .factory("renderService", ["graphicsEngineService", "globalSettings", "coordinateSystem",
-        function(graphicsEngineService, globalSettings, coordinateSystem) {
+    .factory("renderService", ["graphicsEngineService", "globalSettings",
+        function(graphicsEngineService, globalSettings) {
             "use strict";
 
             function blankScreen() {

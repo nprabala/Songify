@@ -1,5 +1,5 @@
 angular.module("mixTapeApp")
-    .factory("graphicsEngineService", ["globalSettings", "coordinateSystem", function(globalSettings, coordinateSystem) {
+    .factory("graphicsEngineService", ["globalSettings", function(globalSettings) {
        "use strict";
         return {
             initialise: function(canvasContext) {
