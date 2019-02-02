@@ -43,11 +43,11 @@ angular.module("mixTapeApp")
     },
 
     drawStaff: function() {
-        var staffGap = 10;
+        this.staffGap = 10;
                 // Generate each line
                 for (var j = 0; j < globalSettings.numLines; j++){
 
-                    var barTop = j*this.staffHeight + staffGap;
+                    var barTop = j*this.staffHeight + this.staffGap;
                     // Generate all the measures in each line
                     for (var k = 0; k < globalSettings.numMeasures; k++){
                         this.drawVerticalLine(this.staffOffset + k*this.measureLength, barTop, this.staffHeight - this.lineHeight);

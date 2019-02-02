@@ -1,8 +1,12 @@
 angular.module("mixTapeApp", [])
-    .controller("mixTapeController", ["$scope", "utilsService", function($scope, utilsService) {
+    .controller("mixTapeController", ["$scope", "graphicsEngineService", "utilsService", function($scope,graphicsEngineService, utilsService) {
         $scope.hello = "Welcome To Mixtape";
         $scope.getNote = function(event){
-            return utilsService.getNote(event.originalEvent.screenY, $scope);
+            var lineHeight = graphicsEngineService.lineHeight;
+            var staffHeight = graphicsEngineService.staffHeight;
+            var canvasHeight = graphicsEngineService.canvas_height;
+            var staffGap = graphicsEngineService.staffGap;
+            return utilsService.getNote(event.originalEvent.screenY, lineHeight, staffHeight, canvasHeight, staffGap);
         };
     }])
 
@@ -15,6 +19,7 @@ angular.module("mixTapeApp", [])
                 var intervalPromise;
                 var canvas = element.find('canvas')[0].getContext("2d");
                 graphicsEngineService.initialise(canvas);
+
 
                 function gameLoop() {
                     renderService.draw();
