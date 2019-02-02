@@ -1,7 +1,7 @@
 angular.module("mixTapeApp")
 .factory("graphicsEngineService", ["globalSettings", function(globalSettings) {
-   "use strict";
-   return {
+ "use strict";
+ return {
     initialise: function(canvasContext) {
 
         //Collect basic data from canvas
@@ -33,6 +33,12 @@ angular.module("mixTapeApp")
         this.canvas.moveTo(x, y);
         this.canvas.lineTo(x + length, y);
         this.canvas.stroke();
+    },
+
+    drawNote: function(x,y){
+        var base_image = new Image();
+        base_image.src = 'App/images/quarter_note.png';
+        this.canvas.drawImage(base_image,x,y,this.lineHeight,this.lineHeight);
     },
 
     drawVerticalLine: function(x, y, length) {
