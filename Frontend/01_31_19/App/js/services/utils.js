@@ -2,7 +2,8 @@ angular.module("mixTapeApp")
     .factory("utilsService", ["globalSettings",function(globalSettings) {
     	"use strict"
         return {
-        	getNote: function(y){
+        	getNote: function(y, scope){
+        		console.log(scope);
         		var full_step = globalSettings.lineHeight;
         		var half_step = globalSettings.lineHeight/2;
         		var staff_position = y - globalSettings.padding;

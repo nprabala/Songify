@@ -2,7 +2,7 @@ angular.module("mixTapeApp", [])
     .controller("mixTapeController", ["$scope", "utilsService", function($scope, utilsService) {
         $scope.hello = "Welcome To Mixtape";
         $scope.getNote = function(event){
-            return utilsService.getNote(event.originalEvent.screenY);
+            return utilsService.getNote(event.originalEvent.screenY, $scope);
         };
     }])
 
