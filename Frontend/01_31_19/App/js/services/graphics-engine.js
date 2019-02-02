@@ -1,7 +1,7 @@
 angular.module("mixTapeApp")
 .factory("graphicsEngineService", ["globalSettings", function(globalSettings) {
- "use strict";
- return {
+   "use strict";
+   return {
     initialise: function(canvasContext) {
 
         //Collect basic data from canvas
@@ -42,20 +42,24 @@ angular.module("mixTapeApp")
         this.canvas.stroke();
     },
 
-            drawStaff: function() {
-                var staffGap = 10;
+    drawStaff: function() {
+        var staffGap = 10;
                 // Generate each line
                 for (var j = 0; j < globalSettings.numLines; j++){
-                    var barTop = j*this.staffHeight + staffGap;
-                    // Generate a staff for each measure
-                    for (var i = 0; i < globalSettings.staffLines; i++) {
-                        this.drawHorizontalLine(this.staffOffset, 
-                            i * this.lineHeight + barTop, this.canvas_width);
-                    }
-                    for (var k = 0; k < globalSettings.numMeasures + 1; k++){
-                        // Generate all the measures in each line
 
-                        this.drawVerticalLine(this.staffOffset + k*this.measureLength, barTop - staffGap, this.staffHeight);
+                    var barTop = j*this.staffHeight + staffGap;
+                    // Generate all the measures in each line
+                    for (var k = 0; k < globalSettings.numMeasures; k++){
+                        this.drawVerticalLine(this.staffOffset + k*this.measureLength, barTop, this.staffHeight - this.lineHeight);
+                        for (var i = 0; i < globalSettings.staffLines; i++) {
+                            // Generate a staff for each measure
+
+                            this.drawHorizontalLine(this.staffOffset + k*this.measureLength, 
+                                i * this.lineHeight + barTop, this.measureLength);
+                        }
+                        //Draw end of system(line)
+                        this.drawVerticalLine(this.staffOffset + (k+1)*this.measureLength, barTop, this.staffHeight - this.lineHeight);
+
 
                     }
 
