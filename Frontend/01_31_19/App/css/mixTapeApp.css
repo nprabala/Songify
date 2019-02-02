@@ -1,0 +1,14 @@
+#gameCanvas{
+    border: 1px solid #000000;
+    display: flex;
+    padding: 0;
+    margin: auto;
+    display: block;
+    width: inherit;
+    height: 600px;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
