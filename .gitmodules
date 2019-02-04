@@ -1,3 +1,0 @@
-[submodule "Backend/Model"]
-	path = Backend/Model
-	url = https://github.com/suetAndTie/pytorch-template
