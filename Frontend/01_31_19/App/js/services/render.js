@@ -8,7 +8,6 @@ angular.module("mixTapeApp")
             }
 
             function drawNote(x, y) {
-                console.log("drawing note from render");
                 graphicsEngineService.drawNote(x, y);
             }
 

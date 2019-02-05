@@ -14,35 +14,37 @@ angular.module("mixTapeApp", [])
     .directive("mixtapeApp", ["$interval", "renderService", "graphicsEngineService", "utilsService", function($interval, renderService, graphicsEngineService, utilsService) {
         return {
             restrict: 'A',
-            template: '<canvas id="musicCanvas" width="2000" height="1000"></canvas>',
+            template: '<canvas id="musicCanvas"></canvas>',
 
             link: function(scope, element) {
                 var intervalPromise;
                 var canvas = element.find('canvas')[0];
                 var canvasContext = canvas.getContext("2d");
 
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                canvasContext.scale(1,1);
+
                 function canvasMouseMove(e) {
-                    var rect = canvas.getBoundingClientRect();
-                    scaleX = canvas.width / rect.width,
-                    scaleY = canvas.height / rect.height;
-                    renderService.drawNote((e.clientX - rect.left) * scaleX, e.y);
+                    renderService.drawNote(e.x, e.y);
                 }
 
                 window.addEventListener('mousemove', canvasMouseMove);
 
                 graphicsEngineService.initialise(canvasContext);
+                renderService.draw();
+                
+                // function gameLoop() {
+                //     renderService.draw();
+                // }
 
-                function gameLoop() {
-                    renderService.draw();
-                }
-
-                intervalPromise = $interval(gameLoop, 50);
-                scope.$on("$destroy", function() {
-                    if (intervalPromise) {
-                        $interval.cancel(intervalPromise);
-                        intervalPromise = undefined;
-                    }
-                });
+                // intervalPromise = $interval(gameLoop, 50);
+                // scope.$on("$destroy", function() {
+                //     if (intervalPromise) {
+                //         $interval.cancel(intervalPromise);
+                //         intervalPromise = undefined;
+                //     }
+                // });
             }
         }
     }]);

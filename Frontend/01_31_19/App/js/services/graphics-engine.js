@@ -37,10 +37,17 @@ angular.module("mixTapeApp")
 
     drawNote: function(x, y) {
         console.log("drawing note from graphics engine: " + x + ", " + y);
+        this.canvas.save();
         this.canvas.beginPath();
-        this.canvas.arc(x, y, 5, 0, 2 * Math.PI, false);
-        this.canvas.fillStyle = 'black';
+
+        this.canvas.translate(this.canvas.width / 2, this.canvas.height / 2);
+        this.canvas.scale(3, 2);
+        this.canvas.arc((x * 2) / 3, y, 5, 0, 2 * Math.PI, false);
+        this.canvas.fillStyle = "#373737";
         this.canvas.fill();
+
+        this.canvas.restore();
+        this.canvas.stroke();
     },
 
     drawStaff: function() {
