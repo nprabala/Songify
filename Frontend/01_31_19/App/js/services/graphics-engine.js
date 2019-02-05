@@ -13,21 +13,14 @@ angular.module("mixTapeApp")
         //Generate staff centric variables
         this.canvas_vertical_padding = this.canvas_attributes['offsetTop'];
         this.canvas_horizontal_padding = this.canvas_attributes['offsetLeft'];
-        this.staffHeight = Math.floor((.9*this.canvas_height)/ globalSettings.numLines);
+        this.staffHeight = Math.floor((.9 * this.canvas_height) / globalSettings.numLines);
         this.staffOffset = Math.floor(this.canvas_width / 20);
-        this.measureLength = Math.floor((this.canvas_width - 2*this.staffOffset) / globalSettings.numMeasures)
+        this.measureLength = Math.floor((this.canvas_width - 2 * this.staffOffset) / globalSettings.numMeasures);
 
-        this.lineHeight = Math.floor(this.staffHeight / 5)
+        this.lineHeight = Math.floor(this.staffHeight / 5);
         this.canvas.strokeStyle = "black";
-
-
     },
     
-    blankScreen: function() {
-        this.canvas.fillStyle = globalSettings.gameBoardBackgroundColour;
-        this.canvas.fillRect(0, 0, globalSettings.gameBoardWidth, globalSettings.gameBoardHeight);
-    },
-
     drawHorizontalLine: function(x, y, length) {
         this.canvas.beginPath();
         this.canvas.moveTo(x, y);
@@ -42,8 +35,16 @@ angular.module("mixTapeApp")
         this.canvas.stroke();
     },
 
+    drawNote: function(x, y) {
+        console.log("drawing note from graphics engine: " + x + ", " + y);
+        this.canvas.beginPath();
+        this.canvas.arc(x, y, 5, 0, 2 * Math.PI, false);
+        this.canvas.fillStyle = 'black';
+        this.canvas.fill();
+    },
+
     drawStaff: function() {
-        this.staffGap = 10;
+        this.staffGap = 30;
                 // Generate each line
                 for (var j = 0; j < globalSettings.numLines; j++){
 

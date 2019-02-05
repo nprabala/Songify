@@ -3,18 +3,22 @@ angular.module("mixTapeApp")
         function(graphicsEngineService, globalSettings) {
             "use strict";
 
-            function blankScreen() {
-                graphicsEngineService.blankScreen();
-            }
-
             function drawStaff() {
                 graphicsEngineService.drawStaff();
             }
 
+            function drawNote(x, y) {
+                console.log("drawing note from render");
+                graphicsEngineService.drawNote(x, y);
+            }
+
+
             return {
                 draw: function() {
-                    blankScreen();
                     drawStaff();
+                },
+                drawNote: function(x, y) {
+                    drawNote(x, y);
                 }
             }
         }]);

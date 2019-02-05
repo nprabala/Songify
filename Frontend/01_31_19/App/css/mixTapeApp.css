@@ -1,5 +1,4 @@
-#gameCanvas{
-    border: 1px solid #000000;
+#gameCanvas {
     display: flex;
     padding: 0;
     margin: auto;
