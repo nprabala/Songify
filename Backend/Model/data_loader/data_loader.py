@@ -2,7 +2,7 @@ from torchvision import datasets, transforms
 from base import BaseDataLoader
 
 
-class DataLoader(BaseDataLoader):
+class MusicDataLoader(BaseDataLoader):
     """
     Dataloader class
     """

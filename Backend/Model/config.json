@@ -1,13 +1,17 @@
 {
-    "name": "Mnist_LeNet",
+    "name": "Music_LSTM",
     "n_gpu": 1,
 
     "model": {
-        "name": "MnistModel",
-        "args": {}
+        "name": "LSTM",
+        "args": {
+            "input_size": 1,
+            "hidden_size": 2,
+            "num_layers": 2
+        }
     },
     "data_loader": {
-        "name": "MnistDataLoader",
+        "name": "MusicDataLoader",
         "args":{
             "data_dir": "data/",
             "batch_size": 128,
@@ -17,7 +21,7 @@
         }
     },
     "val_data_loader": {
-        "name": "MnistDataLoader",
+        "name": "MusicDataLoader",
         "args":{
             "data_dir": "data/",
             "batch_size": 128,
@@ -34,7 +38,7 @@
             "amsgrad": true
         }
     },
-    "loss": "nll_loss",
+    "loss": "binary_cross_entropy",
     "metrics": [
         "my_metric", "my_metric2"
     ],

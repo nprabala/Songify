@@ -1,4 +1,9 @@
 import torch
+import skelarn.metrics
+
+def accuracy(output, target):
+    with torch.no_grad():
+        return accuracy_score(target, output)
 
 
 def my_metric(output, target):

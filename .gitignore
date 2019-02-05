@@ -4,6 +4,7 @@
 Backend/Research Scripts/.DS_Store
 Backend/.DS_Store
 *.midi
+*.mid
 Backend/Research Scripts/train/checkpoint
 *.data-00000-of-00001
 *.index
