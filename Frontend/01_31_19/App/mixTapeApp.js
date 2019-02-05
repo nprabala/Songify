@@ -14,12 +14,21 @@ angular.module("mixTapeApp", [])
     .directive("mixtapeApp", ["$interval", "renderService", "graphicsEngineService", "utilsService", function($interval, renderService, graphicsEngineService, utilsService) {
         return {
             restrict: 'A',
-            template: '<canvas id="gameCanvas" ng-click="getNote($event)" width="2000" height="1000"></canvas>',
+            template: '<canvas id="musicCanvas" width="2000" height="1000"></canvas>',
 
             link: function(scope, element) {
                 var intervalPromise;
                 var canvas = element.find('canvas')[0];
                 var canvasContext = canvas.getContext("2d");
+
+                function canvasMouseMove(e) {
+                    var rect = canvas.getBoundingClientRect();
+                    scaleX = canvas.width / rect.width,
+                    scaleY = canvas.height / rect.height;
+                    renderService.drawNote((e.clientX - rect.left) * scaleX, e.y);
+                }
+
+                window.addEventListener('mousemove', canvasMouseMove);
 
                 graphicsEngineService.initialise(canvasContext);
 
