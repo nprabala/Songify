@@ -1,11 +1,13 @@
 angular.module("mixTapeApp")
     .constant("globalSettings", {
-        staffLines: 5,
+        debug: 1,
         lineHeight: 30,
-        staffHeight: 120,
-        measureLength: 300,
-        padding: 200,
-        trebleStaff: ["C","D","E","F","G","A","B","C","D","E","F","G","A","B","C"],
+        measureLength: 400,
         numLines: 4,
-        numMeasures: 4
+        numMeasures: 4,
+        noteRadius: 8,
+        padding: 200,
+        staffHeight: 120,
+        staffLines: 5,
+        trebleStaff: ["C","D","E","F","G","A","B","C","D","E","F","G","A","B","C"],
     });
