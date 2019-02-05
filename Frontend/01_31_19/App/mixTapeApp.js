@@ -14,7 +14,7 @@ angular.module("mixTapeApp", [])
     .directive("mixtapeApp", ["$interval", "renderService", "graphicsEngineService", "utilsService", function($interval, renderService, graphicsEngineService, utilsService) {
         return {
             restrict: 'A',
-            template: '<canvas id="musicCanvas"></canvas>',
+            template: '<button id="clear">Clear</button><canvas id="musicCanvas"></canvas>',
 
             link: function(scope, element) {
                 var intervalPromise;
@@ -24,6 +24,12 @@ angular.module("mixTapeApp", [])
                 canvas.width = window.innerWidth;
                 canvas.height = window.innerHeight;
                 canvasContext.scale(1,1);
+
+                var clearBtn = document.getElementById("clear");
+                clearBtn.onclick = function() {
+                    canvasContext.clearRect(0, 0, canvas.width, canvas.height);
+                    renderService.clearObjects();
+                };
 
                 function canvasMouseMove(e) {
                     renderService.drawNote(e.x, e.y);

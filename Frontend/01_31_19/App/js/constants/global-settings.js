@@ -4,7 +4,8 @@ angular.module("mixTapeApp")
         lineHeight: 30,
         measureLength: 400,
         numLines: 4,
-        numMeasures: 4
+        numMeasures: 4,
+        noteRadius: 8,
         padding: 200,
         staffHeight: 120,
         staffLines: 5,

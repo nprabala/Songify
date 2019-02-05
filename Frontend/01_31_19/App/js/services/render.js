@@ -11,13 +11,37 @@ angular.module("mixTapeApp")
                 graphicsEngineService.drawNote(x, y);
             }
 
+            function getObjects() {
+                graphicsEngineService.getObjects();
+            }
+
+            function addObject(x, y, length) {
+                graphicsEngineService.addObject(x, y, length);
+            }
+
+            function drawObjects() {
+                graphicsEngineService.drawObjects();
+            }
+
+            function clearObjects() {
+                graphicsEngineService.clearObjects();
+                graphicsEngineService.drawObjects();
+            } 
 
             return {
                 draw: function() {
                     drawStaff();
                 },
                 drawNote: function(x, y) {
-                    drawNote(x, y);
+                    addObject(x, y, 100);
+                    drawObjects();
+                },
+                getObjects: function() {
+                    getObjects();
+                },
+                clearObjects: function() {
+                    clearObjects();
+                    drawStaff();
                 }
             }
         }]);
