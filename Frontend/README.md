@@ -7,7 +7,8 @@
 
 Known issues:
 -When canvas is resized, add note functionality does not work. Easy fix would be to add function that rescales canvas when window is resized. 
-
+-I feel like the lines aren't being drawn to the correct scale. Right now everything is pretty blown up 
+-We need to snap the drawn notes to the corresponding location on the staff
 
 01/30/19 (lfu2)
 

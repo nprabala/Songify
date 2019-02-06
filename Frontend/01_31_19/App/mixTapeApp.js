@@ -11,7 +11,8 @@ angular.module("mixTapeApp", [])
         };
     }])
 
-    .directive("mixtapeApp", ["$interval", "renderService", "graphicsEngineService", "utilsService", function($interval, renderService, graphicsEngineService, utilsService) {
+    .directive("mixtapeApp", ["$interval", "renderService", "graphicsEngineService", "utilsService", "globalSettings",
+        function($interval, renderService, graphicsEngineService, utilsService, globalSettings) {
         return {
             restrict: 'A',
             template: '<button id="clear">Clear</button><canvas id="musicCanvas"></canvas>',
@@ -25,23 +26,47 @@ angular.module("mixTapeApp", [])
                 canvas.height = window.innerHeight;
                 canvasContext.scale(1,1);
 
+                canvas.style.width = canvas.width;
+                canvas.style.height = canvas.height;
+
                 var clearBtn = document.getElementById("clear");
                 clearBtn.onclick = function() {
                     canvasContext.clearRect(0, 0, canvas.width, canvas.height);
                     renderService.clearObjects();
                 };
 
-                function canvasMouseMove(e) {
-                    renderService.drawNote(e.x, e.y);
+                graphicsEngineService.initialise(canvasContext);
+
+                function canvasMouseClick(e) {
+                    console.log("mouse click: " + e.x + ", " + e.y);
+                    // renderService.drawNote(e.x / 2, e.y / 2 - 2*globalSettings.noteRadius);
                 }
 
-                window.addEventListener('mousemove', canvasMouseMove);
+                function canvasResize(e) {
+                    console.log("resizing canvas");
+                    var width = window.innerWidth;
+                    var height = window.innerHeight;
+                    canvas.width = width;
+                    canvas.height = height;
+                    canvas.style.width = width;
+                    canvas.style.height = height;
+                    graphicsEngineService.initialise(canvasContext);
+                    canvasContext.clearRect(0, 0, canvas.width, canvas.height);
+                    renderService.draw();
+                }
 
-                graphicsEngineService.initialise(canvasContext);
+                window.addEventListener('mousedown', canvasMouseClick);
+                window.addEventListener('resize', canvasResize, true);
+
                 renderService.draw();
                 
                 // function gameLoop() {
-                //     renderService.draw();
+                //     var width = window.innerWidth;
+                //     var height = window.innerHeight;
+                //     if (canvas.width != width || canvas.height != height) {
+                //         canvas.width = width;
+                //         canvas.height = height;
+                //    }
                 // }
 
                 // intervalPromise = $interval(gameLoop, 50);

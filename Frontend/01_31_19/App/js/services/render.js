@@ -24,12 +24,14 @@ angular.module("mixTapeApp")
             }
 
             function clearObjects() {
+                console.log("clearing objects");
                 graphicsEngineService.clearObjects();
                 graphicsEngineService.drawObjects();
             } 
 
             return {
                 draw: function() {
+                    console.log("REDRAW");
                     drawStaff();
                 },
                 drawNote: function(x, y) {

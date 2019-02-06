@@ -10,8 +10,8 @@ angular.module("mixTapeApp")
         //Collect basic data from canvas
         this.canvas = canvasContext;
         this.canvas_attributes  = this.canvas['canvas'];
-        this.canvas_height = this.canvas_attributes['height'];
-        this.canvas_width = this.canvas_attributes['width'];
+        this.canvas_height = this.canvas_attributes['height'] / 2;
+        this.canvas_width = this.canvas_attributes['width'] / 2;
 
         //Generate staff centric variables
         this.canvas_vertical_padding = this.canvas_attributes['offsetTop'];
@@ -88,45 +88,50 @@ angular.module("mixTapeApp")
         this.canvas.stroke();
     },
 
-    // drawNote: function(x, y) {
-    //     if (globalSettings.debug) {
-    //         console.log("drawing note from graphics engine: " + x + ", " + y);
-    //     }
-    //     this.canvas.save();
-    //     this.canvas.beginPath();
-
-    //     this.canvas.translate(this.canvas.width / 2, this.canvas.height / 2);
-    //     this.canvas.scale(3, 2);
-    //     this.canvas.arc((x * 2) / 3, y, globalSettings.noteRadius, 0, 2 * Math.PI, false);
-    //     this.canvas.fillStyle = "#373737";
-    //     this.canvas.fill();
-
-    //     this.canvas.restore();
-    //     this.canvas.stroke();
-    // },
+    drawMeasures: function(xOffset, yOffset) {
+        var measureWidth = globalSettings.numMeasures * this.canvas_width * globalSettings.measureWidth;
+        var paddingLeft = globalSettings.paddingX * this.canvas_width;
+        var paddingTop = globalSettings.paddingY * this.canvas_height;
+        var lineSpacing = globalSettings.lineHeight * this.canvas_height;
+        var measureHeight = lineSpacing * globalSettings.numSpaces;
+        for (var i = 0; i < globalSettings.numLines; i++) {
+            this.drawHorizontalLine(xOffset + paddingLeft, yOffset + paddingTop + (i * lineSpacing), measureWidth);    
+        }
+        for (var j = 0; j < globalSettings.numMeasures + 1; j++) {
+            this.drawVerticalLine(xOffset + paddingLeft + (j * (measureWidth / globalSettings.numMeasures)), yOffset + paddingTop, measureHeight);
+        }
+    },
 
     drawStaff: function() {
-        this.staffGap = 30;
-                // Generate each line
-                for (var j = 0; j < globalSettings.numLines; j++){
+        console.log("canvas dims: " + this.canvas_width + ", " + this.canvas_height);
+        for (var i = 0; i < globalSettings.numMeasureLines; i++) {
+            this.drawMeasures(0, i * (this.canvas_height * globalSettings.measureLineSpacing));    
+        }
+        
+    }
 
-                    var barTop = j*this.staffHeight + this.staffGap;
-                    // Generate all the measures in each line
-                    for (var k = 0; k < globalSettings.numMeasures; k++){
-                        this.drawVerticalLine(this.staffOffset + k*this.measureLength, barTop, this.staffHeight - this.lineHeight);
-                        for (var i = 0; i < globalSettings.staffLines; i++) {
-                            // Generate a staff for each measure
+    // drawStaff: function() {
+    //     this.staffGap = 30;
+    //             // Generate each line
+    //             for (var j = 0; j < globalSettings.numLines; j++){
 
-                            this.drawHorizontalLine(this.staffOffset + k*this.measureLength, 
-                                i * this.lineHeight + barTop, this.measureLength);
-                        }
-                        //Draw end of system(line)
-                        this.drawVerticalLine(this.staffOffset + (k+1)*this.measureLength, barTop, this.staffHeight - this.lineHeight);
+    //                 var barTop = j*(this.staffHeight + this.staffGap);
+    //                 // Generate all the measures in each line
+    //                 for (var k = 0; k < globalSettings.numMeasures; k++){
+    //                     this.drawVerticalLine(this.staffOffset + k*this.measureLength, barTop, this.staffHeight - this.lineHeight);
+    //                     for (var i = 0; i < globalSettings.staffLines; i++) {
+    //                         // Generate a staff for each measure
+
+    //                         this.drawHorizontalLine(this.staffOffset + k*this.measureLength, 
+    //                             i * this.lineHeight + barTop, this.measureLength);
+    //                     }
+    //                     //Draw end of system(line)
+    //                     this.drawVerticalLine(this.staffOffset + (k+1)*this.measureLength, barTop, this.staffHeight - this.lineHeight);
 
 
-                    }
+    //                 }
 
-                }
-            }
+    //             }
+    //         }
         }   
     }]);
