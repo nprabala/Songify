@@ -1,12 +1,12 @@
 angular.module("mixTapeApp")
 .factory("graphicsEngineService", ["globalSettings", function(globalSettings) {
    return {
-    initialise: function(canvasContext) {
+    initialise: function(canvasContext, objs, locs) {
         if (globalSettings.debug) {
             console.log("initialising canvas");
         }
-        this.canvasObjects = [];
-        this.canvasLocations = [];
+        this.canvasObjects = objs;
+        this.canvasLocations = locs;
         //Collect basic data from canvas
         this.canvas = canvasContext;
         this.canvas_attributes  = this.canvas['canvas'];
@@ -49,16 +49,22 @@ angular.module("mixTapeApp")
             console.log("number of objects: " + this.canvasObjects.length);
             console.log("current objects: " + this.canvasObjects);    
         }
+        return this.canvasObjects;
     },
 
-    addObject: function(x, y, z) {
+    getLocations: function() {
+        return this.canvasLocations;
+    },
+
+    addNote: function(x, y) {
         this.canvasObjects.push(this.note);
-        this.canvasLocations.push([x, y, z]);
-        if (globalSettings.debug) console.log("adding to canvas locs: " + x + ", " + y + ", " + z);
+        this.canvasLocations.push([x, y]);
+        if (globalSettings.debug) console.log("adding to canvas locs: " + x + ", " + y);
+        this.drawObjects();
     },
 
     drawObjects: function() {
-        if (globalSettings.debug) console.log("drawing objects!");
+        if (globalSettings.debug) console.log("drawing objects! " + this.canvasObjects.length);
         for (var i = 0; i < this.canvasObjects.length; i++) {
             var locs = this.canvasLocations[i];
             console.log("drawing at " + locs[0]);
@@ -72,6 +78,7 @@ angular.module("mixTapeApp")
         this.canvasObjects = [];
         this.canvasLocations = [];
         this.canvas.clearRect(0, 0, this.canvas.width, this.canvas.height); 
+        return;
     },
     
     drawHorizontalLine: function(x, y, length) {
@@ -109,29 +116,5 @@ angular.module("mixTapeApp")
         }
         
     }
-
-    // drawStaff: function() {
-    //     this.staffGap = 30;
-    //             // Generate each line
-    //             for (var j = 0; j < globalSettings.numLines; j++){
-
-    //                 var barTop = j*(this.staffHeight + this.staffGap);
-    //                 // Generate all the measures in each line
-    //                 for (var k = 0; k < globalSettings.numMeasures; k++){
-    //                     this.drawVerticalLine(this.staffOffset + k*this.measureLength, barTop, this.staffHeight - this.lineHeight);
-    //                     for (var i = 0; i < globalSettings.staffLines; i++) {
-    //                         // Generate a staff for each measure
-
-    //                         this.drawHorizontalLine(this.staffOffset + k*this.measureLength, 
-    //                             i * this.lineHeight + barTop, this.measureLength);
-    //                     }
-    //                     //Draw end of system(line)
-    //                     this.drawVerticalLine(this.staffOffset + (k+1)*this.measureLength, barTop, this.staffHeight - this.lineHeight);
-
-
-    //                 }
-
-    //             }
-    //         }
-        }   
-    }]);
+}   
+}]);

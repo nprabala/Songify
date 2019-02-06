@@ -35,22 +35,23 @@ angular.module("mixTapeApp", [])
                     renderService.clearObjects();
                 };
 
-                graphicsEngineService.initialise(canvasContext);
+                graphicsEngineService.initialise(canvasContext, [], []);
 
                 function canvasMouseClick(e) {
                     console.log("mouse click: " + e.x + ", " + e.y);
-                    // renderService.drawNote(e.x / 2, e.y / 2 - 2*globalSettings.noteRadius);
+                    renderService.addNote(e.x, e.y);
                 }
 
                 function canvasResize(e) {
-                    console.log("resizing canvas");
+                    var canvasObjs = graphicsEngineService.getObjects();
+                    var canvasLocs = graphicsEngineService.getLocations();
                     var width = window.innerWidth;
                     var height = window.innerHeight;
                     canvas.width = width;
                     canvas.height = height;
                     canvas.style.width = width;
                     canvas.style.height = height;
-                    graphicsEngineService.initialise(canvasContext);
+                    graphicsEngineService.initialise(canvasContext, canvasObjs, canvasLocs);
                     canvasContext.clearRect(0, 0, canvas.width, canvas.height);
                     renderService.draw();
                 }
@@ -59,23 +60,6 @@ angular.module("mixTapeApp", [])
                 window.addEventListener('resize', canvasResize, true);
 
                 renderService.draw();
-                
-                // function gameLoop() {
-                //     var width = window.innerWidth;
-                //     var height = window.innerHeight;
-                //     if (canvas.width != width || canvas.height != height) {
-                //         canvas.width = width;
-                //         canvas.height = height;
-                //    }
-                // }
-
-                // intervalPromise = $interval(gameLoop, 50);
-                // scope.$on("$destroy", function() {
-                //     if (intervalPromise) {
-                //         $interval.cancel(intervalPromise);
-                //         intervalPromise = undefined;
-                //     }
-                // });
             }
         }
     }]);

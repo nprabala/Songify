@@ -1,14 +1,13 @@
 02/05/19 (lfu2)
 
 -Added draw note functionality in graphics-engine.js, click on screen draws a correpsonding note
--Changed canvas so that scaling issues were fixed
+-Changed canvas so that scaling issues were fixed (the canvas is now drawn based on percentages and not pixels)
 -Created array/global variable that keeps state of all drawn variables (currently notes so far)
 -Ability to clear notes that are drawn to the screen
 
 Known issues:
--When canvas is resized, add note functionality does not work. Easy fix would be to add function that rescales canvas when window is resized. 
--I feel like the lines aren't being drawn to the correct scale. Right now everything is pretty blown up 
 -We need to snap the drawn notes to the corresponding location on the staff
+-We need to save canvas object locations corresponding a percentage instead of pixels
 
 01/30/19 (lfu2)
 

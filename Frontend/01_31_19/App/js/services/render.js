@@ -7,8 +7,8 @@ angular.module("mixTapeApp")
                 graphicsEngineService.drawStaff();
             }
 
-            function drawNote(x, y) {
-                graphicsEngineService.drawNote(x, y);
+            function addNote(x, y) {
+                graphicsEngineService.addNote(x, y);
             }
 
             function getObjects() {
@@ -29,14 +29,18 @@ angular.module("mixTapeApp")
                 graphicsEngineService.drawObjects();
             } 
 
+            function addNote(x, y) {
+                graphicsEngineService.addNote(x, y);
+            }
+
             return {
                 draw: function() {
-                    console.log("REDRAW");
                     drawStaff();
-                },
-                drawNote: function(x, y) {
-                    addObject(x, y, 100);
                     drawObjects();
+                },
+                addNote: function(x, y) {
+                    console.log("calling addnote: " + x + ", " + y);
+                    addNote(x, y);
                 },
                 getObjects: function() {
                     getObjects();
