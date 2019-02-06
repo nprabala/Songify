@@ -9,8 +9,10 @@ angular.module("mixTapeApp")
         numSpaces: 4, // Number of spaces in a staff
         numMeasures: 4,
         numMeasureLines: 4,
-        noteRadius: 7,
+        noteRadius: 0.01,
         paddingX: 0.2,
         paddingY: 0.2,
+        noteOffsetX: 0.4,
+        noteOffsetY: 2.1,
         trebleStaff: ["C","D","E","F","G","A","B","C","D","E","F","G","A","B","C"],
     });

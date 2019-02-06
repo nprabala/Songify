@@ -38,8 +38,9 @@ angular.module("mixTapeApp", [])
                 graphicsEngineService.initialise(canvasContext, [], []);
 
                 function canvasMouseClick(e) {
-                    console.log("mouse click: " + e.x + ", " + e.y);
-                    renderService.addNote(e.x, e.y);
+                    renderService.addNote(
+                        (e.x / 2) - (globalSettings.noteOffsetX * canvas.width * globalSettings.noteRadius), 
+                        (e.y / 2) - (globalSettings.noteOffsetY * canvas.height * globalSettings.noteRadius));
                 }
 
                 function canvasResize(e) {

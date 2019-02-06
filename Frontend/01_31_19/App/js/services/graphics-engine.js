@@ -24,31 +24,24 @@ angular.module("mixTapeApp")
         this.canvas.strokeStyle = "black";
     },
 
-    note: function(ctx, x, y, length) {
-        function draw(ctx, x, y, length) {
-            if (globalSettings.debug) {
-                console.log("drawing note from graphics engine: " + x + ", " + y);
-            }
+    note: function(ctx, x, y, rad) {
+        function draw(ctx, x, y, rad) {
             ctx.save();
             ctx.beginPath();
 
             ctx.translate(ctx.width / 2, ctx.height / 2);
             ctx.scale(3, 2);
-            ctx.arc((x * 2) / 3, y, globalSettings.noteRadius, 0, 2 * Math.PI, false);
+            ctx.arc((x * 2) / 3, y, rad, 0, 2 * Math.PI, false);
             ctx.fillStyle = "#373737";
             ctx.fill();
 
             ctx.restore();
             ctx.stroke();  
         }
-        this.draw = draw(ctx, x, y, length);
+        this.draw = draw(ctx, x, y, rad);
     },
 
     getObjects: function() {
-        if (globalSettings.debug) {
-            console.log("number of objects: " + this.canvasObjects.length);
-            console.log("current objects: " + this.canvasObjects);    
-        }
         return this.canvasObjects;
     },
 
@@ -63,10 +56,10 @@ angular.module("mixTapeApp")
     },
 
     drawObjects: function() {
-        if (globalSettings.debug) console.log("drawing objects! " + this.canvasObjects.length);
+        var noteRad = globalSettings.noteRadius * this.canvas_height;
         for (var i = 0; i < this.canvasObjects.length; i++) {
             var locs = this.canvasLocations[i];
-            this.canvasObjects[i](this.canvas, locs[0] * this.canvas_width, locs[1] * this.canvas_height);
+            this.canvasObjects[i](this.canvas, locs[0] * this.canvas_width, locs[1] * this.canvas_height, noteRad);
             this.canvasObjects[i].draw;
         }
     },

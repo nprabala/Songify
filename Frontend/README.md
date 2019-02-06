@@ -5,6 +5,7 @@
 -Created array/global variable that keeps state of all drawn variables (currently notes so far)
 -Ability to clear notes that are drawn to the screen
 -Fixed draw note functionality so that note locations correspond to a percentage instead of pixels
+-Added offset variables in global setting so that when a note is drawn onto the staff, it is centered on where the cursor is 
 
 Known issues:
 -We need to snap the drawn notes to the corresponding location on the staff
