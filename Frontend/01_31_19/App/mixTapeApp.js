@@ -2,20 +2,23 @@ angular.module("mixTapeApp", [])
     .controller("mixTapeController", ["$scope", "graphicsEngineService", "utilsService", "renderService", 
         function($scope,graphicsEngineService, utilsService, renderService) {
         $scope.hello = "Welcome To Mixtape";
-        $scope.getNote = function(event) {
-            var lineHeight = graphicsEngineService.lineHeight;
-            var staffHeight = graphicsEngineService.staffHeight;
-            var canvasHeight = graphicsEngineService.canvas_height;
-            var staffGap = graphicsEngineService.staffGap;
-            return utilsService.getNote(event.originalEvent.screenY, lineHeight, staffHeight, canvasHeight, staffGap);
-        };
+        // $scope.getNote = function(event) {
+        //     var lineHeight = graphicsEngineService.lineHeight;
+        //     var staffHeight = graphicsEngineService.staffHeight;
+        //     var canvasHeight = graphicsEngineService.canvas_height;
+        //     var staffGap = graphicsEngineService.staffGap;
+        //     return utilsService.getNote(event.originalEvent.screenY, lineHeight, staffHeight, canvasHeight, staffGap);
+        // };
     }])
 
     .directive("mixtapeApp", ["$interval", "renderService", "graphicsEngineService", "utilsService", "globalSettings",
         function($interval, renderService, graphicsEngineService, utilsService, globalSettings) {
         return {
             restrict: 'A',
-            template: '<button id="clear">Clear</button><canvas id="musicCanvas"></canvas>',
+            template: '<button id="clear">Clear</button>' + 
+            '<button id="melody">Get Melody</button>' + 
+            '<div id="debug">Debug state: Ready</div>' + 
+            '<canvas id="musicCanvas"></canvas>',
 
             link: function(scope, element) {
                 var intervalPromise;
@@ -33,6 +36,13 @@ angular.module("mixTapeApp", [])
                 clearBtn.onclick = function() {
                     canvasContext.clearRect(0, 0, canvas.width, canvas.height);
                     renderService.clearObjects();
+                    document.getElementById("debug").innerHTML = "Debug state: Cleared";
+                };
+
+                var melodyBtn = document.getElementById("melody");
+                melodyBtn.onclick = function() {
+                    var melody = utilsService.getMelody();
+                    document.getElementById("debug").innerHTML = "Melody: " + melody;
                 };
 
                 graphicsEngineService.initialise(canvasContext, [], []);
@@ -40,7 +50,7 @@ angular.module("mixTapeApp", [])
                 function canvasMouseClick(e) {
                     renderService.addNote(
                         (e.x / 2) - (globalSettings.noteOffsetX * canvas.width * globalSettings.noteRadius), 
-                        (e.y / 2) - (globalSettings.noteOffsetY * canvas.height * globalSettings.noteRadius));
+                        (e.y / 2) - (globalSettings.noteOffsetY * canvas.height * globalSettings.noteRadius));    
                 }
 
                 function canvasResize(e) {

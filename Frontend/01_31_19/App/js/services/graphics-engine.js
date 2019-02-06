@@ -2,9 +2,6 @@ angular.module("mixTapeApp")
 .factory("graphicsEngineService", ["globalSettings", function(globalSettings) {
    return {
     initialise: function(canvasContext, objs, locs) {
-        if (globalSettings.debug) {
-            console.log("initialising canvas");
-        }
         this.canvasObjects = objs;
         this.canvasLocations = locs;
         //Collect basic data from canvas
@@ -13,14 +10,6 @@ angular.module("mixTapeApp")
         this.canvas_height = this.canvas_attributes['height'] / 2;
         this.canvas_width = this.canvas_attributes['width'] / 2;
 
-        //Generate staff centric variables
-        this.canvas_vertical_padding = this.canvas_attributes['offsetTop'];
-        this.canvas_horizontal_padding = this.canvas_attributes['offsetLeft'];
-        this.staffHeight = Math.floor((.9 * this.canvas_height) / globalSettings.numLines);
-        this.staffOffset = Math.floor(this.canvas_width / 20);
-        this.measureLength = Math.floor((this.canvas_width - 2 * this.staffOffset) / globalSettings.numMeasures);
-
-        this.lineHeight = Math.floor(this.staffHeight / 5);
         this.canvas.strokeStyle = "black";
     },
 
@@ -45,13 +34,29 @@ angular.module("mixTapeApp")
         return this.canvasObjects;
     },
 
+    getCanvasHeight: function() {
+        return this.canvas_height;
+    },
+
+    getCanvasWidth: function() {
+        return this.canvas_width;
+    },
+
     getLocations: function() {
         return this.canvasLocations;
     },
 
+    getYOffset: function(staffNum) {
+        return (this.canvas_height * globalSettings.paddingY) + staffNum * (this.canvas_height * globalSettings.measureLineSpacing);
+    },
+
+    getLineSpacing: function() {
+        return (this.canvas_height * globalSettings.lineHeight) / globalSettings.numSpaces;
+    },
+
     addNote: function(x, y) {
         this.canvasObjects.push(this.note);
-        this.canvasLocations.push([x / this.canvas_width, y / this.canvas_height]);
+        this.canvasLocations.push([(x / this.canvas_width), (y / this.canvas_height)]);
         this.drawObjects();
     },
 
@@ -65,7 +70,6 @@ angular.module("mixTapeApp")
     },
 
     clearObjects: function() {
-        console.log("clearing objects");
         this.canvasObjects = [];
         this.canvasLocations = [];
         this.canvas.clearRect(0, 0, this.canvas.width, this.canvas.height); 
@@ -101,7 +105,6 @@ angular.module("mixTapeApp")
     },
 
     drawStaff: function() {
-        console.log("canvas dims: " + this.canvas_width + ", " + this.canvas_height);
         for (var i = 0; i < globalSettings.numMeasureLines; i++) {
             this.drawMeasures(0, i * (this.canvas_height * globalSettings.measureLineSpacing));    
         }

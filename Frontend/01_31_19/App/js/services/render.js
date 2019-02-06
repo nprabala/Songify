@@ -24,14 +24,9 @@ angular.module("mixTapeApp")
             }
 
             function clearObjects() {
-                console.log("clearing objects");
                 graphicsEngineService.clearObjects();
                 graphicsEngineService.drawObjects();
             } 
-
-            function addNote(x, y) {
-                graphicsEngineService.addNote(x, y);
-            }
 
             return {
                 draw: function() {
@@ -39,7 +34,6 @@ angular.module("mixTapeApp")
                     drawObjects();
                 },
                 addNote: function(x, y) {
-                    console.log("calling addnote: " + x + ", " + y);
                     addNote(x, y);
                 },
                 getObjects: function() {
