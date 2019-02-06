@@ -4,10 +4,10 @@
 -Changed canvas so that scaling issues were fixed (the canvas is now drawn based on percentages and not pixels)
 -Created array/global variable that keeps state of all drawn variables (currently notes so far)
 -Ability to clear notes that are drawn to the screen
+-Fixed draw note functionality so that note locations correspond to a percentage instead of pixels
 
 Known issues:
 -We need to snap the drawn notes to the corresponding location on the staff
--We need to save canvas object locations corresponding a percentage instead of pixels
 
 01/30/19 (lfu2)
 

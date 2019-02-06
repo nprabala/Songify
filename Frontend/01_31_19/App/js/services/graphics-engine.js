@@ -58,8 +58,7 @@ angular.module("mixTapeApp")
 
     addNote: function(x, y) {
         this.canvasObjects.push(this.note);
-        this.canvasLocations.push([x, y]);
-        if (globalSettings.debug) console.log("adding to canvas locs: " + x + ", " + y);
+        this.canvasLocations.push([x / this.canvas_width, y / this.canvas_height]);
         this.drawObjects();
     },
 
@@ -67,8 +66,7 @@ angular.module("mixTapeApp")
         if (globalSettings.debug) console.log("drawing objects! " + this.canvasObjects.length);
         for (var i = 0; i < this.canvasObjects.length; i++) {
             var locs = this.canvasLocations[i];
-            console.log("drawing at " + locs[0]);
-            this.canvasObjects[i](this.canvas, locs[0], locs[1], locs[2]);
+            this.canvasObjects[i](this.canvas, locs[0] * this.canvas_width, locs[1] * this.canvas_height);
             this.canvasObjects[i].draw;
         }
     },
@@ -114,7 +112,6 @@ angular.module("mixTapeApp")
         for (var i = 0; i < globalSettings.numMeasureLines; i++) {
             this.drawMeasures(0, i * (this.canvas_height * globalSettings.measureLineSpacing));    
         }
-        
     }
 }   
 }]);
