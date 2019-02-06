@@ -15,8 +15,10 @@ angular.module("mixTapeApp", [])
         function($interval, renderService, graphicsEngineService, utilsService, globalSettings) {
         return {
             restrict: 'A',
-            template: '<button id="clear">Clear</button>' + 
+            template: '<audio id="B4"><source src="App/aud/B4.wav" type="audio/wav"></audio>' + 
+            '<button id="clear">Clear</button>' + 
             '<button id="melody">Get Melody</button>' + 
+            '<button id="playback">Play Melody</button>' + 
             '<div id="debug">Debug state: Ready</div>' + 
             '<canvas id="musicCanvas"></canvas>',
 
@@ -43,6 +45,22 @@ angular.module("mixTapeApp", [])
                 melodyBtn.onclick = function() {
                     var melody = utilsService.getMelody();
                     document.getElementById("debug").innerHTML = "Melody: " + melody;
+                };
+
+                // TODO: need to fix
+                var audioBtn = document.getElementById("playback");
+                audioBtn.onclick = function() {
+                    var melody = utilsService.getMelody();
+                    var note;
+                    var audio;
+                    document.getElementById("debug").innerHTML = "Playing: " + melody;
+                    for (var i = 0; i < melody.length; i++) {
+                        note = melody[i];
+                        audio = new Audio("App/aud/" + note + ".wav");
+                        window.setTimeout(function () {
+                            audio.play();
+                        }, 1000);
+                    }
                 };
 
                 graphicsEngineService.initialise(canvasContext, [], []);

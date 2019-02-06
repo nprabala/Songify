@@ -2,9 +2,10 @@ angular.module("mixTapeApp")
 .factory("graphicsEngineService", ["globalSettings", function(globalSettings) {
    return {
     initialise: function(canvasContext, objs, locs) {
-        this.canvasObjects = objs;
-        this.canvasLocations = locs;
-        //Collect basic data from canvas
+        this.canvasObjects = objs; // This stores all of the canvas objects to be rendered (except the staff)
+        this.canvasLocations = locs; // This stores all the locations of the canvas objects, corresponding to canvasObjects in 1:1
+        
+        // Collect basic data from canvas
         this.canvas = canvasContext;
         this.canvas_attributes  = this.canvas['canvas'];
         this.canvas_height = this.canvas_attributes['height'] / 2;
@@ -46,6 +47,7 @@ angular.module("mixTapeApp")
         return this.canvasLocations;
     },
 
+    // Returns the y-value of the top left corner of each staff. Param staffNum = 0 is the first row, staffNum = 1 is 2nd row, etc.
     getYOffset: function(staffNum) {
         return (this.canvas_height * globalSettings.paddingY) + staffNum * (this.canvas_height * globalSettings.measureLineSpacing);
     },

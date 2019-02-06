@@ -7,14 +7,13 @@
 -Fixed draw note functionality so that note locations correspond to a percentage instead of pixels
 -Added offset variables in global setting so that when a note is drawn onto the staff, it is centered on where the cursor is 
 -Added function to convert current notes on screen to melody (very lightweight and not robust at all, only works for first row of staff.)
+-Added in skeleton code for being able to play back music!
 
 Known issues:
 -We need to snap the drawn notes to the corresponding location on the staff
 -I think resizing vertically may still pose some issues with rescaling 
 -Need to make sure melody converter is scalable to other notes
-
-Still Need to Implement:
--Audio playback?
+-Audio playback needs to be revised 
 
 01/30/19 (lfu2)
 

@@ -16,10 +16,10 @@ angular.module("mixTapeApp")
                     var diff = yOffset - (locs[i][1] * height).toFixed(2);
                     diff = Math.round(diff / lineSpacing);
                     if (diff >= -8 && diff <= 3) {
-                        melody.push(globalSettings.trebleStaff[(diff * -1) + 3]);
+                        melody.push([globalSettings.trebleStaff[(diff * -1) + 3]]);
                     }
                 }
-                return melody.toString();
+                return melody;
             }
         }
     }]);
