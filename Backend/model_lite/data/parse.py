@@ -3,14 +3,28 @@ import sys
 import os
 import pickle
 
-dir_ = sys.argv[1]          # location of data
-pickle_file = sys.argv[2]   # location for where to put pickle file
+dir_ = './model_lite/data/all_key'
+pickle_file = './model_lite/data/all_keys_notes'
 
 all_melody = []
 all_chords = []
 sixteenth = 0.25 # 16th note: 1 = quarter note, 0.5 = 8th note
 
+# convert certain notes to other notes (same note but one is more common)
+norm = {'A-':'G#',
+        'A#':'B-',
+        'B#':'C',
+        'C-':'B',
+        'D-':'C#',
+        'D#':'E-',
+        'E#':'F',
+        'F-':'E',
+        'G-':'F#'}
+
 for file in os.listdir(dir_):
+    if file.split('.')[-1] != 'mid':
+        continue
+
     try:
         midi = converter.parseFile(dir_ + '/' + file)
     except:
@@ -34,9 +48,19 @@ for file in os.listdir(dir_):
         # gather notes and cur_chords played at offset
         for element in all_notes:
             if isinstance(element, note.Note):
-                cur_melody.append(str(element.pitch.name))
+                note_name = str(element.pitch.name)
+                if note_name in norm.keys():
+                    cur_melody.append(norm[note_name])
+                else :
+                    cur_melody.append(note_name)
+
             elif isinstance(element, chord.Chord):
-                cur_chords.append('.'.join(sorted([str(p.name) for p in element.pitches])))
+                chord_name = sorted([str(p.name) for p in element.pitches])
+                for i in range(0, len(chord_name)):
+                    c = chord_name[i]
+                    if c in norm:
+                        chord_name[i] = norm[c]
+                cur_chords.append('.'.join(chord_name))
 
         # nothing playing at offset
         if len(cur_melody) == 0 and len(cur_chords) == 0:
