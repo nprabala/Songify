@@ -37,6 +37,23 @@ Music Files:
 * And then I modified them with Audacity to cut them to around 1sec wav files.
 * Note: To run this code, please download the folder in Google Drive -> Frontend -> aud, and place it in the same folder as 'css', js', etc. :) 
 
+
+
+02/01/19 (nprabala)
+
+* Added tags to make manual redownload of node libraries unnecessary.
+
+* Removed hardcoding from graphics-engine
+
+* Now can draw multiple measures and multiple systems dynamically
+
+* Created get pitch utility function that generates pitch based on mouse click
+
+Known Issues:
+
+* Math is off for get pitch. I need to revisit how these coordinate systems are working.
+
+
 01/30/19 (lfu2)
 
 Part of this code so far is taken from this following webpage: 
