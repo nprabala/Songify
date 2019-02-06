@@ -15,6 +15,12 @@ Known issues:
 -Need to make sure melody converter is scalable to other notes
 -Audio playback needs to be revised 
 
+Music Files:
+-I downloaded clips from youtube for the piano keys (so far only A4 and B4):
+-A4: https://www.youtube.com/watch?v=xF6qfxMHXVs
+-B4: https://www.youtube.com/watch?v=KUsepGHpizQ
+-And then I modified them with Audacity to cut them to around 1sec wav files
+
 01/30/19 (lfu2)
 
 Part of this code so far is taken from this following webpage: 
