@@ -6,10 +6,13 @@ def midi_loss(output, target, extra=None):
     melody_y = target['melody_y']
     chord_y = target['chord_y']
 
-    return nll_loss(melody_out, melody_y) + binary_cross_entropy_loss(chord_out, chord_y)
+    batch_size, seq_len, vocab_size = melody_out.shape
 
-def binary_cross_entropy_loss(output, target):
-    return F.binary_cross_entropy(output, target)
+    # flatten (batchsize, seq_len, vocab_size) -> (batchsize * seq_len, vocab_size)
+    # contiguous returns tensor with same data
+    melody_out = melody_out.contiguous().view(-1, vocab_size)
+    chord_out = chord_out.contiguous().view(-1, vocab_size)
+    melody_y = melody_y.flatten()
+    chord_y = chord_y.view(-1, vocab_size)
 
-def nll_loss(output, target):
-    return F.nll_loss(output, target)
+    return F.nll_loss(melody_out, melody_y) + F.binary_cross_entropy(chord_out, chord_y)

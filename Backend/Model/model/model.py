@@ -26,45 +26,63 @@ class MidiLSTM(BaseModel):
         self.lstm = nn.LSTM(embed_size, hidden_size, num_layers=num_layers)
         self.melody_classifier = nn.Linear(hidden_size, vocab_size)
         self.chord_classifier = nn.Linear(hidden_size, vocab_size)
-        self.hidden = self.init_hidden()
 
-    def init_hidden(self):
+    def init_hidden(self, batch_size):
         """
         Initialize hidden input for LSTM
             (num_layers, batch_size, hidden_size)
         """
-        return (torch.zeros(self.num_layers, 1, self.hidden_size),
-                torch.zeros(self.num_layers, 1, self.hidden_size))
+        return (torch.zeros(self.num_layers, batch_size, self.hidden_size),
+                torch.zeros(self.num_layers, batch_size, self.hidden_size))
 
     def forward(self, data, extra=None):
         """
         Forward pass through LSTM
         Parameters
         ----------
-        x : torch.tensor (sequence_len, batch_size, vocab_size)
-            input to model
+        data:
+            melody_x : torch.tensor (batch_size, sequence_len)
+                input to model
         Returns
         -------
-        melody_out : torch.tensor (sequence_len, batch_size, vocab_size)
-            Melody softmax output (only want one note)
-        chord_out : torch.tensor (sequence_len, batch_size, vocab_size)
-            Chord sigmoid output (want chords)
+        output:
+            melody_out : torch.tensor (batch_size, sequence_len, vocab_size)
+                Melody softmax output (only want one note)
+            chord_out : torch.tensor (batch_size, sequence_len, vocab_size)
+                Chord sigmoid output (want chords)
         """
         x = data['melody_x']
         seq_lengths = extra['seq_lengths']
+        batch_size, max_seq_len  = x.shape
+
+        # transpose from (batch_size, seq_len, ...) -> (seq_len, batch_size, ...)
+        x = x.transpose(0, 1)
+
+        self.hidden = self.init_hidden(batch_size)
         embed = self.embed(x)
 
         # pack up sequences by length
         packed_embed = pack_padded_sequence(embed, seq_lengths)
-
         out, self.hidden = self.lstm(packed_embed, self.hidden)
-        melody_out = F.softmax(self.melody_classifier(out))
+        out, out_lengths = pad_packed_sequence(out)
+
+        melody_out = F.log_softmax(self.melody_classifier(out), dim=2)
         chord_out = F.sigmoid(self.chord_classifier(out))
+
+        # transpose from (seq_len, batch_size, ...) -> (batch_size, seq_len, ...)
+        melody_out = melody_out.transpose(0, 1)
+        chord_out = chord_out.transpose(0, 1)
 
         output = {
             'melody_out': melody_out,
             'chord_out': chord_out
         }
+        print("max seq", max_seq_len)
+        print('batch', batch_size)
+        print('out', out.shape)
+        print('hidden', self.hidden[0].shape, self.hidden[1].shape)
+        print('melody out', melody_out.shape)
+        print('chord out', chord_out.shape)
 
         return output
 

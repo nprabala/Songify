@@ -14,10 +14,10 @@ def midi_collate_fn(data):
             - chord_y: torch tensor (sequence_len,)
     Returns:
         data:
-            - melody_x: torch tensor of shape (sequence_len, batch_size)
+            - melody_x: torch tensor of shape (batch_size, sequence_len)
         target:
-            - melody_y: torch tensor of shape (sequence_len, batch_size)
-            - chord_y_onehot: torch tensor of shape (sequence_len, batch_size, vocab_size)
+            - melody_y: torch tensor of shape (batch_size, sequence_len)
+            - chord_y_onehot: torch tensor of shape (batch_size, sequence_len, vocab_size)
         extra:
             - seq_lengths: torch tensor of sequence lengths of batch
     """
@@ -39,7 +39,7 @@ def midi_collate_fn(data):
         seq_melody_y[idx, :seq_len] = torch.tensor(my)
 
     # make onehot chord tensor
-    chord_y_onehot = torch.zeros(batch_size, seq_lengths.max(), vocab_size).long()
+    chord_y_onehot = torch.zeros(batch_size, seq_lengths.max(), vocab_size)
     for idx, (c, seq_len) in enumerate(zip(chord_y, seq_lengths)):
         for j, notes in enumerate(c):
             chord_y_onehot[idx, j, notes] = 1
@@ -49,11 +49,6 @@ def midi_collate_fn(data):
     seq_melody_x = seq_melody_x[perm_idx]
     seq_melody_y = seq_melody_y[perm_idx]
     chord_y_onehot = chord_y_onehot[perm_idx]
-
-    # transpose from (batch_size, seq_len, ...) -> (seq_len, batch_size, ...)
-    seq_melody_x = seq_melody_x.transpose(0, 1)
-    seq_melody_y = seq_melody_y.transpose(0, 1)
-    chord_y_onehot = chord_y_onehot.transpose(0, 1)
 
     # package in dictionary
     data = {'melody_x': seq_melody_x}

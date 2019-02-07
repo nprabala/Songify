@@ -2,14 +2,14 @@ import torch
 import sklearn.metrics as metrics
 
 def melody_accuracy(output, target, extra=None):
-    melody_out = output['melody_out']
+    melody_out = output['melody_out'].detach().numpy()
     melody_y = target['melody_y']
     with torch.no_grad():
         return metrics.accuracy_score(melody_y, melody_out)
 
 def chord_accuracy(output, target, extra=None):
-    chord_out = output['chord_out']
-    chord_y = target['chord_y']
+    chord_out = output['chord_out'].detach().numpy().flatten()
+    chord_y = target['chord_y'].flatten()
     with torch.no_grad():
         return metrics.accuracy_score(chord_y, chord_out)
 

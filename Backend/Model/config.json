@@ -43,7 +43,7 @@
     },
     "loss": "midi_loss",
     "metrics": [
-        "my_metric", "my_metric2"
+        "melody_accuracy", "chord_accuracy"
     ],
     "lr_scheduler": {
         "name": "StepLR",
