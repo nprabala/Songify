@@ -1,12 +1,57 @@
 02/05/19 (lfu2)
 
--Added draw note functionality in graphics-engine.js, click on screen draws a correpsonding note
--Changed canvas so that scaling issues were fixed
--Created array/global variable that keeps state of all drawn variables (currently notes so far)
--Ability to clear notes that are drawn to the screen
+* Added draw note functionality in graphics-engine.js, click on screen draws a correpsonding note
+
+* Changed canvas so that scaling issues were fixed (the canvas is now drawn based on percentages and not pixels)
+
+* Created array/global variable that keeps state of all drawn variables (currently notes so far)
+
+* Ability to clear notes that are drawn to the screen
+
+* Fixed draw note functionality so that note locations correspond to a percentage instead of pixels
+
+* Added offset variables in global setting so that when a note is drawn onto the staff, it is centered on where the cursor is 
+
+* Added function to convert current notes on screen to melody (very lightweight and not robust at all, only works for first row of staff.)
+
+* Added in skeleton code for being able to play back music!
 
 Known issues:
--When canvas is resized, add note functionality does not work. Easy fix would be to add function that rescales canvas when window is resized. 
+
+* We need to snap the drawn notes to the corresponding location on the staff
+
+* I think resizing vertically may still pose some issues with rescaling 
+
+* Need to make sure melody converter is scalable to other notes
+
+* Audio playback needs to be revised 
+
+Music Files:
+
+* I downloaded clips from youtube for the piano keys (so far only A4 and B4):
+
+* A4: https://www.youtube.com/watch?v=xF6qfxMHXVs
+
+* B4: https://www.youtube.com/watch?v=KUsepGHpizQ
+
+* And then I modified them with Audacity to cut them to around 1sec wav files.
+* Note: To run this code, please download the folder in Google Drive -> Frontend -> aud, and place it in the same folder as 'css', js', etc. :) 
+
+
+
+02/01/19 (nprabala)
+
+* Added tags to make manual redownload of node libraries unnecessary.
+
+* Removed hardcoding from graphics-engine
+
+* Now can draw multiple measures and multiple systems dynamically
+
+* Created get pitch utility function that generates pitch based on mouse click
+
+Known Issues:
+
+* Math is off for get pitch. I need to revisit how these coordinate systems are working.
 
 
 01/30/19 (lfu2)

@@ -2,19 +2,25 @@ angular.module("mixTapeApp", [])
     .controller("mixTapeController", ["$scope", "graphicsEngineService", "utilsService", "renderService", 
         function($scope,graphicsEngineService, utilsService, renderService) {
         $scope.hello = "Welcome To Mixtape";
-        $scope.getNote = function(event) {
-            var lineHeight = graphicsEngineService.lineHeight;
-            var staffHeight = graphicsEngineService.staffHeight;
-            var canvasHeight = graphicsEngineService.canvas_height;
-            var staffGap = graphicsEngineService.staffGap;
-            return utilsService.getNote(event.originalEvent.screenY, lineHeight, staffHeight, canvasHeight, staffGap);
-        };
+        // $scope.getNote = function(event) {
+        //     var lineHeight = graphicsEngineService.lineHeight;
+        //     var staffHeight = graphicsEngineService.staffHeight;
+        //     var canvasHeight = graphicsEngineService.canvas_height;
+        //     var staffGap = graphicsEngineService.staffGap;
+        //     return utilsService.getNote(event.originalEvent.screenY, lineHeight, staffHeight, canvasHeight, staffGap);
+        // };
     }])
 
-    .directive("mixtapeApp", ["$interval", "renderService", "graphicsEngineService", "utilsService", function($interval, renderService, graphicsEngineService, utilsService) {
+    .directive("mixtapeApp", ["$interval", "renderService", "graphicsEngineService", "utilsService", "globalSettings",
+        function($interval, renderService, graphicsEngineService, utilsService, globalSettings) {
         return {
             restrict: 'A',
-            template: '<button id="clear">Clear</button><canvas id="musicCanvas"></canvas>',
+            template: '<audio id="B4"><source src="App/aud/B4.wav" type="audio/wav"></audio>' + 
+            '<button id="clear">Clear</button>' + 
+            '<button id="melody">Get Melody</button>' + 
+            '<button id="playback">Play Melody</button>' + 
+            '<div id="debug">Debug state: Ready</div>' + 
+            '<canvas id="musicCanvas"></canvas>',
 
             link: function(scope, element) {
                 var intervalPromise;
@@ -25,32 +31,74 @@ angular.module("mixTapeApp", [])
                 canvas.height = window.innerHeight;
                 canvasContext.scale(1,1);
 
+                canvas.style.width = canvas.width;
+                canvas.style.height = canvas.height;
+
                 var clearBtn = document.getElementById("clear");
                 clearBtn.onclick = function() {
                     canvasContext.clearRect(0, 0, canvas.width, canvas.height);
                     renderService.clearObjects();
+                    document.getElementById("debug").innerHTML = "Debug state: Cleared";
                 };
 
-                function canvasMouseMove(e) {
-                    renderService.drawNote(e.x, e.y);
+                var melodyBtn = document.getElementById("melody");
+                melodyBtn.onclick = function() {
+                    var melody = utilsService.getMelody();
+                    document.getElementById("debug").innerHTML = "Melody: " + melody;
+                };
+
+                // TODO: need to fix
+                var audioBtn = document.getElementById("playback");
+                audioBtn.onclick = function() {
+                    var audio = new Audio();
+                    var i = 0;
+                    var melody = utilsService.getMelody();
+                    var note;
+                    var audio;
+                    document.getElementById("debug").innerHTML = "Playing: " + melody;
+                    var audioArray = [];
+                    for (var i = 0; i < melody.length; i++) {
+                        note = melody[i];
+                        audioArray.push("App/aud/" + note + ".wav");
+                    }
+                    audio.addEventListener('ended', function () {
+                        i = ++i < audioArray.length ? i : 0;
+                        console.log("playing: " + i);
+                        audio.src = audioArray[i];
+                        audio.play();
+                    }, true);
+                    audio.volume = 0.3;
+                    audio.loop = false;
+                    audio.src = audioArray[0];
+                    audio.play();
+                };
+
+                graphicsEngineService.initialise(canvasContext, [], []);
+
+                function canvasMouseClick(e) {
+                    renderService.addNote(
+                        (e.x / 2) - (globalSettings.noteOffsetX * canvas.width * globalSettings.noteRadius), 
+                        (e.y / 2) - (globalSettings.noteOffsetY * canvas.height * globalSettings.noteRadius));    
                 }
 
-                window.addEventListener('mousemove', canvasMouseMove);
+                function canvasResize(e) {
+                    var canvasObjs = graphicsEngineService.getObjects();
+                    var canvasLocs = graphicsEngineService.getLocations();
+                    var width = window.innerWidth;
+                    var height = window.innerHeight;
+                    canvas.width = width;
+                    canvas.height = height;
+                    canvas.style.width = width;
+                    canvas.style.height = height;
+                    graphicsEngineService.initialise(canvasContext, canvasObjs, canvasLocs);
+                    canvasContext.clearRect(0, 0, canvas.width, canvas.height);
+                    renderService.draw();
+                }
 
-                graphicsEngineService.initialise(canvasContext);
+                window.addEventListener('mousedown', canvasMouseClick);
+                window.addEventListener('resize', canvasResize, true);
+
                 renderService.draw();
-                
-                // function gameLoop() {
-                //     renderService.draw();
-                // }
-
-                // intervalPromise = $interval(gameLoop, 50);
-                // scope.$on("$destroy", function() {
-                //     if (intervalPromise) {
-                //         $interval.cancel(intervalPromise);
-                //         intervalPromise = undefined;
-                //     }
-                // });
             }
         }
     }]);
