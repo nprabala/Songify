@@ -1,9 +1,17 @@
 import torch
-import skelarn.metrics
+import sklearn.metrics as metrics
 
-def accuracy(output, target):
+def melody_accuracy(output, target, extra=None):
+    melody_out = output['melody_out']
+    melody_y = target['melody_y']
     with torch.no_grad():
-        return accuracy_score(target, output)
+        return metrics.accuracy_score(melody_y, melody_out)
+
+def chord_accuracy(output, target, extra=None):
+    chord_out = output['chord_out']
+    chord_y = target['chord_y']
+    with torch.no_grad():
+        return metrics.accuracy_score(chord_y, chord_out)
 
 
 def my_metric(output, target):

@@ -3,6 +3,7 @@ import json
 import argparse
 import torch
 import data_loader.data_loaders as module_data_loader
+import data_loader.collate as module_collate
 import model.loss as module_loss
 import model.metric as module_metric
 import model.model as module_model
@@ -13,8 +14,11 @@ from utils import Logger, get_instance
 def main(config, resume):
     train_logger = Logger()
 
+    # setup collate function
+    collate_fn = getattr(module_collate, config['collate_fn'])
+
     # setup data_loader instances
-    data_loader = get_instance(module_data_loader, 'data_loader', config)
+    data_loader = get_instance(module_data_loader, 'data_loader', config, collate_fn=collate_fn)
     valid_data_loader = data_loader.split_validation()
 
     # build model architecture

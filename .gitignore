@@ -1,4 +1,4 @@
-
+*.pkl
 *.wav
 *.mp3
 Backend/Research Scripts/.DS_Store
@@ -11,3 +11,4 @@ Backend/Research Scripts/train/checkpoint
 *.DS_Store
 *.pyc
 Backend/Server/train/checkpoint
+Backend/Model/saved

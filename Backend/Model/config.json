@@ -3,33 +3,36 @@
     "n_gpu": 1,
 
     "model": {
-        "name": "LSTM",
+        "name": "MidiLSTM",
         "args": {
-            "input_size": 1,
-            "hidden_size": 2,
-            "num_layers": 2
+            "vocab_size": 14,
+            "embed_size":10,
+            "hidden_size": 64,
+            "num_layers": 1
         }
     },
     "data_loader": {
-        "name": "MusicDataLoader",
+        "name": "MidiDataLoader",
         "args":{
-            "data_dir": "data/",
+            "data_path": "data/out.pkl",
             "batch_size": 128,
             "shuffle": true,
             "validation_split": 0.1,
-            "num_workers": 2
+            "num_workers":2
         }
     },
+    "collate_fn": "midi_collate_fn",
     "val_data_loader": {
-        "name": "MusicDataLoader",
+        "name": "MidiDataLoader",
         "args":{
-            "data_dir": "data/",
+            "data_path": "data/out.pkl",
             "batch_size": 128,
             "shuffle": false,
             "validation_split": 0.0,
             "num_workers": 2
         }
     },
+    "val_collate_fn": "midi_collate_fn",
     "optimizer": {
         "name": "Adam",
         "args":{
@@ -38,7 +41,7 @@
             "amsgrad": true
         }
     },
-    "loss": "binary_cross_entropy",
+    "loss": "midi_loss",
     "metrics": [
         "my_metric", "my_metric2"
     ],
