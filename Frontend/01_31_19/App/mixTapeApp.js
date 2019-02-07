@@ -50,17 +50,27 @@ angular.module("mixTapeApp", [])
                 // TODO: need to fix
                 var audioBtn = document.getElementById("playback");
                 audioBtn.onclick = function() {
+                    var audio = new Audio();
+                    var i = 0;
                     var melody = utilsService.getMelody();
                     var note;
                     var audio;
                     document.getElementById("debug").innerHTML = "Playing: " + melody;
+                    var audioArray = [];
                     for (var i = 0; i < melody.length; i++) {
                         note = melody[i];
-                        audio = new Audio("App/aud/" + note + ".wav");
-                        window.setTimeout(function () {
-                            audio.play();
-                        }, 1000);
+                        audioArray.push("App/aud/" + note + ".wav");
                     }
+                    audio.addEventListener('ended', function () {
+                        i = ++i < audioArray.length ? i : 0;
+                        console.log("playing: " + i);
+                        audio.src = audioArray[i];
+                        audio.play();
+                    }, true);
+                    audio.volume = 0.3;
+                    audio.loop = false;
+                    audio.src = audioArray[0];
+                    audio.play();
                 };
 
                 graphicsEngineService.initialise(canvasContext, [], []);
