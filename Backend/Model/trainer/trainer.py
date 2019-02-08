@@ -61,9 +61,9 @@ class Trainer(BaseTrainer):
             total_loss += loss.item()
 
             for k in data.keys():
-                data[k] = data[k].to('cpu')
+                data[k] = data[k].cpu()
             for k in target.keys():
-                target[k] = target[k].to('cpu')
+                target[k] = target[k].cpu()
             total_metrics += self._eval_metrics(output, target, extra=extra)
 
             if self.verbosity >= 2 and batch_idx % self.log_step == 0:
@@ -114,9 +114,9 @@ class Trainer(BaseTrainer):
                 total_val_loss += loss.item()
 
                 for k in data.keys():
-                    data[k] = data[k].to('cpu')
+                    data[k] = data[k].cpu()
                 for k in target.keys():
-                    target[k] = target[k].to('cpu')
+                    target[k] = target[k].cpu()
                 total_val_metrics += self._eval_metrics(output, target, extra=extra)
                 # self.writer.add_image('input', make_grid(data.cpu(), nrow=8, normalize=True))
 
