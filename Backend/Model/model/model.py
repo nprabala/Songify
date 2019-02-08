@@ -110,7 +110,7 @@ class MidiLSTM(BaseModel):
 
 class BigMidiLSTM(MidiLSTM):
     def __init__(self, *args, **kwargs):
-        super(BigMidiLSTM, self).__init__()
+        super(BigMidiLSTM, self).__init__(*args, **kwargs)
         self.hidden_network =  nn.Sequential()
         self.melody_classifier = nn.Sequential(
             nn.Dropout(self.dropout),
