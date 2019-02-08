@@ -6,9 +6,10 @@
         "name": "MidiLSTM",
         "args": {
             "vocab_size": 14,
-            "embed_size":10,
-            "hidden_size": 64,
-            "num_layers": 1
+            "embed_size": 8,
+            "hidden_size": 128,
+            "num_layers": 4,
+            "dropout": 0.1
         }
     },
     "data_loader": {
@@ -44,7 +45,7 @@
     "loss": "midi_loss",
     "metrics": [
         "melody_accuracy", "melody_accuracy_topk", "chord_multilabel_accuracy",
-        "chord_average_precision", "chord_auc"
+        "chord_average_precision", "chord_auc", "chord_precision", "chord_recall"
     ],
     "lr_scheduler": {
         "name": "StepLR",

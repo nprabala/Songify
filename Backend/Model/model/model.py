@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from base import BaseModel
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
+from data_loader.dataset import MidiDataset
 
 class MidiLSTM(BaseModel):
     def __init__(self, vocab_size, embed_size, hidden_size, num_layers=1, dropout=0.1):
@@ -23,9 +24,18 @@ class MidiLSTM(BaseModel):
         self.num_layers = num_layers
 
         self.embed = nn.Embedding(vocab_size, embed_size)
-        self.lstm = nn.LSTM(embed_size, hidden_size, num_layers=num_layers)
-        self.melody_classifier = nn.Linear(hidden_size, vocab_size)
-        self.chord_classifier = nn.Linear(hidden_size, vocab_size)
+        self.lstm = nn.LSTM(embed_size, hidden_size, num_layers=num_layers, dropout=dropout)
+        self.hidden_network = nn.Sequential(
+            nn.Dropout(dropout),
+            nn.Linear(hidden_size, hidden_size//2),
+            nn.ReLU(),
+            nn.Dropout(dropout),
+            nn.Linear(hidden_size//2, hidden_size//4),
+            nn.ReLU(),
+            nn.Dropout(dropout),
+        )
+        self.melody_classifier = nn.Linear(hidden_size//4, vocab_size)
+        self.chord_classifier = nn.Linear(hidden_size//4, vocab_size)
 
     def init_hidden(self, batch_size):
         """
@@ -66,6 +76,7 @@ class MidiLSTM(BaseModel):
         out, self.hidden = self.lstm(packed_embed, self.hidden)
         out, out_lengths = pad_packed_sequence(out)
 
+        out = self.hidden_network(out)
         melody_out = F.log_softmax(self.melody_classifier(out), dim=2)
         chord_out = torch.sigmoid(self.chord_classifier(out))
 
@@ -77,14 +88,13 @@ class MidiLSTM(BaseModel):
             'melody_out': melody_out,
             'chord_out': chord_out
         }
-        # print("max seq", max_seq_len)
-        # print('batch', batch_size)
-        # print('out', out.shape)
-        # print('hidden', self.hidden[0].shape, self.hidden[1].shape)
-        # print('melody out', melody_out.shape)
-        # print('chord out', chord_out.shape)
 
         return output
+
+    def save_output(self, output, thresh=0.5):
+        melody_out = output['melody_out'].detach().numpy().argmax(dim=-1)
+        chord_out = output['chord_out'].detach().numpy() > thresh
+
 
 
 

@@ -30,6 +30,7 @@ class MidiDataset(Dataset):
         'B':13, 'C-':13,
     }
     NUM_NOTES = max(NOTES_TO_INT.values()) + 1
+    INT_TO_NOTES = {v:k for k,v in NOTES_TO_INT.items()}
 
     def __init__(self, data_path, transform=None, target_transform=None):
         """
@@ -51,10 +52,12 @@ class MidiDataset(Dataset):
         self.transform = transform
         self.target_transform = target_transform
 
-    def convert_note(self, note):
-        return self.NOTES_TO_INT[note]
+    @classmethod
+    def convert_note_to_int(cls, note):
+        return cls.NOTES_TO_INT[note]
 
-    def convert_chord(self, chord):
+    @classmethod
+    def convert_chord_to_int(cls, chord):
         """
         converts chord into list of ints
         Parameters
@@ -70,9 +73,22 @@ class MidiDataset(Dataset):
         notes = chord.split('.')
 
         for n in notes:
-            note_list.append(self.NOTES_TO_INT[n])
+            note_list.append(cls.NOTES_TO_INT[n])
 
         return note_list
+
+    @classmethod
+    def convert_int_to_note(cls, int):
+        return cls.INT_TO_NOTES[int]
+
+    def convert_onehot_to_chord(cls, onehot_list):
+        notes = np.argmax(onehot_list)
+        chord = '.'.join(convert_int_to_note(n) for n in notes)
+
+        return chord
+
+
+
 
 
     def __len__(self):
@@ -87,10 +103,10 @@ class MidiDataset(Dataset):
         """
         row = self.df.iloc[idx]
 
-        notes = [self.convert_note(n) for n in row['melody']]
+        notes = [self.convert_note_to_int(n) for n in row['melody']]
         melody_x = notes[:-1] # all but last note
         melody_y = notes[1:] # all but first note
-        chord_y = [self.convert_chord(c) for c in row['chords']][:-1] # all but last
+        chord_y = [self.convert_chord_to_int(c) for c in row['chords']][:-1] # all but last
 
         if self.transform:
             melody_x = self.transform(melody_x)

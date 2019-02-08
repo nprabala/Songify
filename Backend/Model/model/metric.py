@@ -1,6 +1,9 @@
 import torch
 import sklearn.metrics as metrics
 
+"""
+Melody metrics
+"""
 
 def melody_accuracy(output, target, extra=None):
     melody_out = output['melody_out'].contiguous().view(-1, output['melody_out'].size(-1))
@@ -12,10 +15,24 @@ def melody_accuracy_topk(output, target, extra=None):
     melody_y = target['melody_y'].flatten()
     return accuracy_topk(melody_out, melody_y)
 
-def chord_multilabel_accuracy(output, target, extra=None):
+"""
+Chord metrics
+"""
+
+def chord_multilabel_accuracy(output, target, extra=None, thresh=0.5):
     chord_out = output['chord_out'].flatten()
     chord_y = target['chord_y'].flatten()
-    return multilabel_accuracy(chord_out, chord_y)
+    return multilabel_accuracy(chord_out, chord_y, thresh=thresh)
+
+def chord_precision(output, target, extra=None, thresh=0.5):
+    chord_out = output['chord_out'].detach().numpy().flatten() > thresh
+    chord_y = target['chord_y'].detach().numpy().flatten()
+    return metrics.precision_score(chord_y, chord_out)
+
+def chord_recall(output, target, extra=None, thresh=0.5):
+    chord_out = output['chord_out'].detach().numpy().flatten() > thresh
+    chord_y = target['chord_y'].detach().numpy().flatten()
+    return metrics.recall_score(chord_y, chord_out)
 
 def chord_average_precision(output, target, extra=None):
     chord_out = output['chord_out'].detach().numpy().flatten()
