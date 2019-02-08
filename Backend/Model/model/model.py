@@ -33,9 +33,12 @@ class MidiLSTM(BaseModel):
             nn.Linear(hidden_size//2, hidden_size//4),
             nn.ReLU(),
             nn.Dropout(dropout),
+            nn.Linear(hidden_size//4, hidden_size//8),
+            nn.ReLU(),
+            nn.Dropout(dropout)
         )
-        self.melody_classifier = nn.Linear(hidden_size//4, vocab_size)
-        self.chord_classifier = nn.Linear(hidden_size//4, vocab_size)
+        self.melody_classifier = nn.Linear(hidden_size//8, vocab_size)
+        self.chord_classifier = nn.Linear(hidden_size//8, vocab_size)
 
     def init_hidden(self, batch_size):
         """
