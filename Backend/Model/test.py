@@ -11,10 +11,10 @@ from utils import get_instance
 
 def main(config, resume):
     # setup collate function
-    collate_fn = getattr(module_collate, config['val_collate_fn'])
+    collate_fn = getattr(module_collate, config['test_collate_fn'])
 
     # setup data_loader instances
-    data_loader = get_instance(module_data_loader, 'val_data_loader', config, collate_fn=collate_fn)
+    data_loader = get_instance(module_data_loader, 'test_data_loader', config, collate_fn=collate_fn)
 
     # build model architecture
     model = get_instance(module_model, 'model', config)

@@ -67,7 +67,7 @@ class MidiLSTM(BaseModel):
         out, out_lengths = pad_packed_sequence(out)
 
         melody_out = F.log_softmax(self.melody_classifier(out), dim=2)
-        chord_out = F.sigmoid(self.chord_classifier(out))
+        chord_out = torch.sigmoid(self.chord_classifier(out))
 
         # transpose from (seq_len, batch_size, ...) -> (batch_size, seq_len, ...)
         melody_out = melody_out.transpose(0, 1)
@@ -77,12 +77,12 @@ class MidiLSTM(BaseModel):
             'melody_out': melody_out,
             'chord_out': chord_out
         }
-        print("max seq", max_seq_len)
-        print('batch', batch_size)
-        print('out', out.shape)
-        print('hidden', self.hidden[0].shape, self.hidden[1].shape)
-        print('melody out', melody_out.shape)
-        print('chord out', chord_out.shape)
+        # print("max seq", max_seq_len)
+        # print('batch', batch_size)
+        # print('out', out.shape)
+        # print('hidden', self.hidden[0].shape, self.hidden[1].shape)
+        # print('melody out', melody_out.shape)
+        # print('chord out', chord_out.shape)
 
         return output
 

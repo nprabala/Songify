@@ -73,7 +73,7 @@ class Trainer(BaseTrainer):
             'metrics': (total_metrics / len(self.data_loader)).tolist()
         }
 
-        if self.do_validation:
+        if self.do_validation and len(self.valid_data_loader) > 0:
             val_log = self._valid_epoch(epoch)
             log = {**log, **val_log}
 

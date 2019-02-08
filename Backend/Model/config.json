@@ -22,7 +22,7 @@
         }
     },
     "collate_fn": "midi_collate_fn",
-    "val_data_loader": {
+    "test_data_loader": {
         "name": "MidiDataLoader",
         "args":{
             "data_path": "data/out.pkl",
@@ -32,7 +32,7 @@
             "num_workers": 2
         }
     },
-    "val_collate_fn": "midi_collate_fn",
+    "test_collate_fn": "midi_collate_fn",
     "optimizer": {
         "name": "Adam",
         "args":{
@@ -43,7 +43,8 @@
     },
     "loss": "midi_loss",
     "metrics": [
-        "melody_accuracy", "chord_accuracy"
+        "melody_accuracy", "melody_accuracy_topk", "chord_multilabel_accuracy",
+        "chord_average_precision", "chord_auc"
     ],
     "lr_scheduler": {
         "name": "StepLR",

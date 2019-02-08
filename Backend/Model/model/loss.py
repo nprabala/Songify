@@ -15,4 +15,4 @@ def midi_loss(output, target, extra=None):
     melody_y = melody_y.flatten()
     chord_y = chord_y.view(-1, vocab_size)
 
-    return F.nll_loss(melody_out, melody_y) + F.binary_cross_entropy(chord_out, chord_y)
+    return F.nll_loss(melody_out, melody_y) + F.multilabel_soft_margin_loss(chord_out, chord_y)
