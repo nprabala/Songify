@@ -5,7 +5,7 @@ from model_lite.predict import Predict
 app = Sanic()
 predict = Predict()
 IP = '0.0.0.0'
-PORT = 8000
+PORT = 8080
 sixteenth = 0.25 # 16th note: 1 = quarter note, 0.5 = 8th note
 
 def get_notes_timesteps(notes):
@@ -65,6 +65,10 @@ async def post_chord_progressions(request):
     notes = request.json
     notes_timestamps = get_notes_timesteps(notes)
     return json(get_chord_progressions(notes_timestamps))
+
+@app.route("/", methods=["GET"])
+async def hello(request):
+    return(json({"hello":"world"}))
 
 if __name__ == "__main__":
     app.run(host=IP, port=PORT)
