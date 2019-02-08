@@ -59,6 +59,11 @@ class Trainer(BaseTrainer):
             self.writer.set_step((epoch - 1) * len(self.data_loader) + batch_idx)
             self.writer.add_scalar('loss', loss.item())
             total_loss += loss.item()
+
+            for k in data.keys():
+                data[k] = data[k].to('cpu')
+            for k in target.keys():
+                target[k] = target[k].to('cpu')
             total_metrics += self._eval_metrics(output, target, extra=extra)
 
             if self.verbosity >= 2 and batch_idx % self.log_step == 0:
@@ -107,6 +112,11 @@ class Trainer(BaseTrainer):
                 self.writer.set_step((epoch - 1) * len(self.valid_data_loader) + batch_idx, 'valid')
                 self.writer.add_scalar('loss', loss.item())
                 total_val_loss += loss.item()
+
+                for k in data.keys():
+                    data[k] = data[k].to(self.device)
+                for k in target.keys():
+                    target[k] = target[k].to(self.device)
                 total_val_metrics += self._eval_metrics(output, target, extra=extra)
                 # self.writer.add_image('input', make_grid(data.cpu(), nrow=8, normalize=True))
 
