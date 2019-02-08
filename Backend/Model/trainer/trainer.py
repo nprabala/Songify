@@ -114,9 +114,9 @@ class Trainer(BaseTrainer):
                 total_val_loss += loss.item()
 
                 for k in data.keys():
-                    data[k] = data[k].to(self.device)
+                    data[k] = data[k].to('cpu')
                 for k in target.keys():
-                    target[k] = target[k].to(self.device)
+                    target[k] = target[k].to('cpu')
                 total_val_metrics += self._eval_metrics(output, target, extra=extra)
                 # self.writer.add_image('input', make_grid(data.cpu(), nrow=8, normalize=True))
 
