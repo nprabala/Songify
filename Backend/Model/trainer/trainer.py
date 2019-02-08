@@ -60,8 +60,8 @@ class Trainer(BaseTrainer):
             self.writer.add_scalar('loss', loss.item())
             total_loss += loss.item()
 
-            for k in data.keys():
-                data[k] = data[k].cpu()
+            for k in output.keys():
+                output[k] = output[k].cpu()
             for k in target.keys():
                 target[k] = target[k].cpu()
             total_metrics += self._eval_metrics(output, target, extra=extra)
@@ -113,8 +113,8 @@ class Trainer(BaseTrainer):
                 self.writer.add_scalar('loss', loss.item())
                 total_val_loss += loss.item()
 
-                for k in data.keys():
-                    data[k] = data[k].cpu()
+                for k in output.keys():
+                    output[k] = output[k].cpu()
                 for k in target.keys():
                     target[k] = target[k].cpu()
                 total_val_metrics += self._eval_metrics(output, target, extra=extra)
