@@ -80,7 +80,7 @@ class MidiLSTM(BaseModel):
 
         # transpose from (batch_size, seq_len, ...) -> (seq_len, batch_size, ...)
         x = x.transpose(0, 1)
-        
+
         self.hidden = self.init_hidden(batch_size, device=x.device)
         embed = self.embed(x)
 
@@ -122,11 +122,11 @@ class BigMidiLSTM(MidiLSTM):
             nn.Dropout(self.dropout),
             nn.Linear(self.hidden_size//4, self.hidden_size//8),
             nn.ReLU(),
-            nn.Dropout(self.dropout)
-            nn.Linear(self.hidden_size//8, self.hidden_size//16)
+            nn.Dropout(self.dropout),
+            nn.Linear(self.hidden_size//8, self.hidden_size//16),
             nn.ReLU(),
             nn.Dropout(self.dropout),
-            nn.Linear(self.hidden_size//16, self.hidden_size//32)
+            nn.Linear(self.hidden_size//16, self.hidden_size//32),
             nn.ReLU(),
             nn.Dropout(self.dropout),
             nn.Linear(self.hidden_size//32, self.vocab_size)
@@ -141,11 +141,11 @@ class BigMidiLSTM(MidiLSTM):
             nn.Dropout(self.dropout),
             nn.Linear(self.hidden_size//4, self.hidden_size//8),
             nn.ReLU(),
-            nn.Dropout(self.dropout)
-            nn.Linear(self.hidden_size//8, self.hidden_size//16)
+            nn.Dropout(self.dropout),
+            nn.Linear(self.hidden_size//8, self.hidden_size//16),
             nn.ReLU(),
             nn.Dropout(self.dropout),
-            nn.Linear(self.hidden_size//16, self.hidden_size//32)
+            nn.Linear(self.hidden_size//16, self.hidden_size//32),
             nn.ReLU(),
             nn.Dropout(self.dropout),
             nn.Linear(self.hidden_size//32, self.vocab_size)
