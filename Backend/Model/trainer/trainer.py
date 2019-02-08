@@ -47,7 +47,7 @@ class Trainer(BaseTrainer):
         for batch_idx, (data, target, extra) in enumerate(self.data_loader):
             for k in data.keys():
                 data[k] = data[k].to(self.device)
-            for k in target.keys()
+            for k in target.keys():
                 target[k] = target[k].to(self.device)
 
             self.optimizer.zero_grad()
@@ -98,7 +98,7 @@ class Trainer(BaseTrainer):
             for batch_idx, (data, target, extra) in enumerate(self.valid_data_loader):
                 for k in data.keys():
                     data[k] = data[k].to(self.device)
-                for k in target.keys()
+                for k in target.keys():
                     target[k] = target[k].to(self.device)
 
                 output = self.model(data, extra=extra)
