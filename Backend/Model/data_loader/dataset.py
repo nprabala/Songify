@@ -31,6 +31,7 @@ class MidiDataset(Dataset):
     }
     NUM_NOTES = max(NOTES_TO_INT.values()) + 1
     INT_TO_NOTES = {v:k for k,v in NOTES_TO_INT.items()}
+    # SEQUENCE_LENGTH = 1
 
     def __init__(self, data_path, transform=None, target_transform=None):
         """
@@ -102,6 +103,17 @@ class MidiDataset(Dataset):
             sample : melody_x, melody_y, chord_y
         """
         row = self.df.iloc[idx]
+
+        # notes = [self.convert_note_to_int(n) for n in row['melody']]
+        # chords = [self.convert_chord_to_int(c) for c in row['chords']]
+        # melody_x = []
+        # melody_y = []
+        # chord_y = []
+        # for i in range(len(notes) - self.SEQUENCE_LENGTH):
+        #     melody_x.append(notes[i:i + self.SEQUENCE_LENGTH])
+        #     melody_y.append(notes[i + self.SEQUENCE_LENGTH:]) # next note
+        #     chord_y.append(chords[i + self.SEQUENCE_LENGTH - 1]) # chord belonging to last note played
+
 
         notes = [self.convert_note_to_int(n) for n in row['melody']]
         melody_x = notes[:-1] # all but last note

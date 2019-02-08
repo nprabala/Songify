@@ -2,6 +2,7 @@ from music21 import converter, instrument, note, chord, stream, interval, pitch
 import sys
 import os
 import pickle
+from tqdm import tqdm
 
 dir_ = sys.argv[1]
 pickle_file = sys.argv[2]
@@ -11,7 +12,7 @@ all_melody = []
 all_chords = []
 sixteenth = 0.25 # 16th note: 1 = quarter note, 0.5 = 8th note
 
-for file in os.listdir(dir_):
+for file in tqdm(os.listdir(dir_)):
     try:
         midi = converter.parseFile(dir_ + '/' + file)
     except:

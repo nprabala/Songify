@@ -5,6 +5,15 @@ from base import BaseModel
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 from data_loader.dataset import MidiDataset
 
+'''
+Example models
+https://towardsdatascience.com/how-to-generate-music-using-a-lstm-neural-network-in-keras-68786834d4c5
+https://github.com/claravania/lstm-pytorch/blob/master/model.py
+https://github.com/yunjey/pytorch-tutorial/blob/master/tutorials/03-advanced/image_captioning/model.py
+https://gist.github.com/Tushar-N/dfca335e370a2bc3bc79876e6270099e
+https://github.com/warmspringwinds/pytorch-rnn-sequence-generation-classification/blob/master/notebooks/music_generation_training_nottingham.ipynb
+'''
+
 class MidiLSTM(BaseModel):
     def __init__(self, vocab_size, embed_size, hidden_size, num_layers=1, dropout=0.1):
         """
