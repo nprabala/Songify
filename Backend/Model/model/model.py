@@ -49,13 +49,13 @@ class MidiLSTM(BaseModel):
         self.melody_classifier = nn.Linear(hidden_size//8, vocab_size)
         self.chord_classifier = nn.Linear(hidden_size//8, vocab_size)
 
-    def init_hidden(self, batch_size):
+    def init_hidden(self, batch_size, device='cpu'):
         """
         Initialize hidden input for LSTM
             (num_layers, batch_size, hidden_size)
         """
-        return (torch.zeros(self.num_layers, batch_size, self.hidden_size),
-                torch.zeros(self.num_layers, batch_size, self.hidden_size))
+        return (torch.zeros(self.num_layers, batch_size, self.hidden_size).to(device),
+                torch.zeros(self.num_layers, batch_size, self.hidden_size).to(device))
 
     def forward(self, data, extra=None):
         """
@@ -80,7 +80,7 @@ class MidiLSTM(BaseModel):
         # transpose from (batch_size, seq_len, ...) -> (seq_len, batch_size, ...)
         x = x.transpose(0, 1)
 
-        self.hidden = self.init_hidden(batch_size)
+        self.hidden = self.init_hidden(batch_size, device=x.device)
         embed = self.embed(x)
 
         # pack up sequences by length

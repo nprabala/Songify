@@ -88,10 +88,6 @@ class MidiDataset(Dataset):
 
         return chord
 
-
-
-
-
     def __len__(self):
         return len(self.df)
 
