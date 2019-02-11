@@ -2,14 +2,27 @@ angular.module("mixTapeApp", [])
     .controller("mixTapeController", ["$scope", "graphicsEngineService", "utilsService", "renderService", 
         function($scope,graphicsEngineService, utilsService, renderService) {
         $scope.hello = "Welcome To Mixtape";
-        // $scope.getNote = function(event) {
-        //     var lineHeight = graphicsEngineService.lineHeight;
-        //     var staffHeight = graphicsEngineService.staffHeight;
-        //     var canvasHeight = graphicsEngineService.canvas_height;
-        //     var staffGap = graphicsEngineService.staffGap;
-        //     return utilsService.getNote(event.originalEvent.screenY, lineHeight, staffHeight, canvasHeight, staffGap);
-        // };
-    }])
+        var url = window.location;
+        var hostName = url.hostname;
+        
+        //Sample JSON to send. Will format notes object later.
+        $scope.melody =     [{"note":"A", "duration":2},
+    {"note":"B", "duration":1},
+    {"note":"C", "duration":0.25},
+    {"note":"D", "duration":0.5},
+    {"note":"A", "duration":1}]
+    
+        $scope.sendNote = function(){
+        var req = new XMLHttpRequest();
+        req.open("POST","http://" + hostName + ":8081/chord_progressions");
+        req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        req.send(JSON.stringify($scope.melody));
+        req.onreadystatechange = function() {
+        // Typical action to be performed when the document is ready:
+            console.log(req.response);
+        };
+    };
+}])
 
     .directive("mixtapeApp", ["$interval", "renderService", "graphicsEngineService", "utilsService", "globalSettings",
         function($interval, renderService, graphicsEngineService, utilsService, globalSettings) {
@@ -19,6 +32,7 @@ angular.module("mixTapeApp", [])
             '<button id="clear">Clear</button>' + 
             '<button id="melody">Get Melody</button>' + 
             '<button id="playback">Play Melody</button>' + 
+            '<button id="playback" ng-click="sendNote()">Send Melody</button>' + 
             '<div id="debug">Debug state: Ready</div>' + 
             '<canvas id="musicCanvas"></canvas>',
 
