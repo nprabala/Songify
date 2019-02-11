@@ -4,23 +4,27 @@ angular.module("mixTapeApp", [])
         $scope.hello = "Welcome To Mixtape";
         var url = window.location;
         var hostName = url.hostname;
-        
         //Sample JSON to send. Will format notes object later.
-        $scope.melody =     [{"note":"A", "duration":2},
-    {"note":"B", "duration":1},
-    {"note":"C", "duration":0.25},
-    {"note":"D", "duration":0.5},
-    {"note":"A", "duration":1}]
-    
-        $scope.sendNote = function(){
+        $scope.noteTypes = ["sixteenth","eighth","quarter","half","whole"];
+        $scope.currentType = "quarter";
+        $scope.sendMelody = function(){
+        var notes =   utilsService.getMelody();
+        var durations = graphicsEngineService.durations;
+        var melody = [];
+        for (var i =0; i < notes.length; i++){
+            melody.push({"note":notes[i][0].charAt(0), "duration":durations[i]})
+        }
         var req = new XMLHttpRequest();
         req.open("POST","http://" + hostName + ":8081/chord_progressions");
         req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        req.send(JSON.stringify($scope.melody));
+        req.send(JSON.stringify(melody));
         req.onreadystatechange = function() {
         // Typical action to be performed when the document is ready:
             console.log(req.response);
         };
+    };
+    $scope.updateGraphics = function(){
+      graphicsEngineService.currentType = $scope.currentType;
     };
 }])
 
@@ -32,7 +36,8 @@ angular.module("mixTapeApp", [])
             '<button id="clear">Clear</button>' + 
             '<button id="melody">Get Melody</button>' + 
             '<button id="playback">Play Melody</button>' + 
-            '<button id="playback" ng-click="sendNote()">Send Melody</button>' + 
+            '<button id="playback" ng-click="sendMelody()">Send Melody</button>' + 
+            '<select ng-model="currentType" ng-options="x for x in noteTypes" ng-change="updateGraphics()"></select>'+
             '<div id="debug">Debug state: Ready</div>' + 
             '<canvas id="musicCanvas"></canvas>',
 
@@ -87,9 +92,10 @@ angular.module("mixTapeApp", [])
                     audio.play();
                 };
 
-                graphicsEngineService.initialise(canvasContext, [], []);
+                graphicsEngineService.initialise(canvasContext, [], [],[], "quarter");
 
                 function canvasMouseClick(e) {
+                    
                     renderService.addNote(
                         (e.x / 2) - (globalSettings.noteOffsetX * canvas.width * globalSettings.noteRadius), 
                         (e.y / 2) - (globalSettings.noteOffsetY * canvas.height * globalSettings.noteRadius));    
@@ -98,13 +104,15 @@ angular.module("mixTapeApp", [])
                 function canvasResize(e) {
                     var canvasObjs = graphicsEngineService.getObjects();
                     var canvasLocs = graphicsEngineService.getLocations();
+                    var durs = graphicsEngineService.durations;
+                    var curType = graphicsEngineService.currentType;
                     var width = window.innerWidth;
                     var height = window.innerHeight;
                     canvas.width = width;
                     canvas.height = height;
                     canvas.style.width = width;
                     canvas.style.height = height;
-                    graphicsEngineService.initialise(canvasContext, canvasObjs, canvasLocs);
+                    graphicsEngineService.initialise(canvasContext, canvasObjs, canvasLocs, durs, curType);
                     canvasContext.clearRect(0, 0, canvas.width, canvas.height);
                     renderService.draw();
                 }

@@ -1,7 +1,7 @@
 angular.module("mixTapeApp")
 .factory("graphicsEngineService", ["globalSettings", function(globalSettings) {
    return {
-    initialise: function(canvasContext, objs, locs) {
+    initialise: function(canvasContext, objs, locs,durs, curType) {
         this.canvasObjects = objs; // This stores all of the canvas objects to be rendered (except the staff)
         this.canvasLocations = locs; // This stores all the locations of the canvas objects, corresponding to canvasObjects in 1:1
         
@@ -10,7 +10,8 @@ angular.module("mixTapeApp")
         this.canvas_attributes  = this.canvas['canvas'];
         this.canvas_height = this.canvas_attributes['height'] / 2;
         this.canvas_width = this.canvas_attributes['width'] / 2;
-
+        this.durations = durs;
+        this.currentType = curType;
         this.canvas.strokeStyle = "black";
     },
 
@@ -18,7 +19,6 @@ angular.module("mixTapeApp")
         function draw(ctx, x, y, rad) {
             ctx.save();
             ctx.beginPath();
-
             ctx.translate(ctx.width / 2, ctx.height / 2);
             ctx.scale(3, 2);
             ctx.arc((x * 2) / 3, y, rad, 0, 2 * Math.PI, false);
@@ -58,6 +58,20 @@ angular.module("mixTapeApp")
 
     addNote: function(x, y) {
         this.canvasObjects.push(this.note);
+        var time_duration = 1;
+        if (this.currentType == "sixteenth"){
+            time_duration = .25;
+        } 
+        if(this.currentType == "eighth"){
+            time_duration = .5;
+        }
+        if(this.currentType == "half"){
+            time_duration = 2;
+        }
+        if(this.currentType == "whole"){
+            time_duration = 4;
+        }
+        this.durations.push(time_duration);
         this.canvasLocations.push([(x / this.canvas_width), (y / this.canvas_height)]);
         this.drawObjects();
     },
