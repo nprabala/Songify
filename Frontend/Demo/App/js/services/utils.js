@@ -45,12 +45,11 @@ angular.module("mixTapeApp")
                     }
 
                 } else {
-                    var durations = graphicsEngineService.durations;
                     for (var i = 0; i < sequence.length; i++) {
                         var file = 'App/aud/' + sequence[i] + '.wav';
                         var howl = new Howl({ src: [file], volume: 0.4});
                         howl.play();
-                        await sleep(durations[i]*1000); // currently duration is 1
+                        await sleep(1000); // currently duration is 1
                     }
                 }
             },
