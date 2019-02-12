@@ -99,10 +99,16 @@ class MidiLSTM(BaseModel):
         melody_out = melody_out.transpose(0, 1)
         chord_out = chord_out.transpose(0, 1)
 
-        output = {
-            'melody_out': melody_out,
-            'chord_out': chord_out
-        }
+        if MidiDataset.USE_SEQUENCE:
+            output = {
+                'melody_out': melody_out[:, -1],
+                'chord_out': chord_out[:, -1]
+            }
+        else:
+            output = {
+                'melody_out': melody_out,
+                'chord_out': chord_out
+            }
 
         return output
 

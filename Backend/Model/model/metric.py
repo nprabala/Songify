@@ -1,6 +1,6 @@
 import torch
 import sklearn.metrics as metrics
-
+from data_loader.dataset import MidiDataset
 
 """
 Melody metrics
@@ -18,11 +18,15 @@ def melody_preprocess(output, target, extra=None):
 
     batch_size = len(seq_lengths)
 
-    flat_melody_out = torch.tensor([])
-    flat_melody_y = torch.tensor([]).long()
-    for i in range(batch_size):
-        flat_melody_out = torch.cat((flat_melody_out, melody_out[i, :seq_lengths[i]]))
-        flat_melody_y = torch.cat((flat_melody_y, melody_y[i, :seq_lengths[i]].long()))
+    if MidiDataset.USE_SEQUENCE:
+        flat_melody_out = melody_out
+        flat_melody_y = melody_y
+    else:
+        flat_melody_out = torch.tensor([])
+        flat_melody_y = torch.tensor([]).long()
+        for i in range(batch_size):
+            flat_melody_out = torch.cat((flat_melody_out, melody_out[i, :seq_lengths[i]]))
+            flat_melody_y = torch.cat((flat_melody_y, melody_y[i, :seq_lengths[i]].long()))
 
     return flat_melody_out, flat_melody_y
 
@@ -50,11 +54,15 @@ def chord_preprocess(output, target, extra=None):
 
     batch_size = len(seq_lengths)
 
-    flat_chord_out = torch.tensor([])
-    flat_chord_y = torch.tensor([])
-    for i in range(batch_size):
-        flat_chord_out = torch.cat((flat_chord_out, chord_out[i, :seq_lengths[i]]))
-        flat_chord_y = torch.cat((flat_chord_y, chord_y[i, :seq_lengths[i]].float()))
+    if MidiDataset.USE_SEQUENCE:
+        flat_chord_out = chord_out
+        flat_chord_y = chord_y
+    else:
+        flat_chord_out = torch.tensor([])
+        flat_chord_y = torch.tensor([])
+        for i in range(batch_size):
+            flat_chord_out = torch.cat((flat_chord_out, chord_out[i, :seq_lengths[i]]))
+            flat_chord_y = torch.cat((flat_chord_y, chord_y[i, :seq_lengths[i]].float()))
 
     flat_chord_out = flat_chord_out.flatten()
     flat_chord_y = flat_chord_y.flatten()
