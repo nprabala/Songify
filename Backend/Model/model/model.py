@@ -15,7 +15,7 @@ https://github.com/warmspringwinds/pytorch-rnn-sequence-generation-classificatio
 '''
 
 class MidiLSTM(BaseModel):
-    def __init__(self, vocab_size, embed_size, hidden_size, num_layers=1, dropout=0.1):
+    def __init__(self, vocab_size, embed_size, hidden_size, num_layers=1, dropout=0.1, bidirectional=False):
         """
         Parameters
         ----------
@@ -32,9 +32,10 @@ class MidiLSTM(BaseModel):
         self.hidden_size = hidden_size
         self.num_layers = num_layers
         self.dropout = dropout
+        self.bidirectional = bidirectional
 
         self.embed = nn.Embedding(self.vocab_size, self.embed_size)
-        self.lstm = nn.LSTM(self.embed_size, self.hidden_size, num_layers=self.num_layers, dropout=self.dropout)
+        self.lstm = nn.LSTM(self.embed_size, self.hidden_size, num_layers=self.num_layers, dropout=self.dropout, bidirectional=self.bidirectional)
         self.hidden_network = nn.Sequential(
             nn.Dropout(self.dropout),
             nn.Linear(self.hidden_size, self.hidden_size//2),

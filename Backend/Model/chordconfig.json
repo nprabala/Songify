@@ -1,5 +1,5 @@
 {
-    "name": "Chord_Music_LSTM",
+    "name": "Chord_Music_LSTM_bidirectional",
     "n_gpu": 1,
 
     "model": {
