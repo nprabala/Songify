@@ -26,7 +26,7 @@ class MidiLSTM(BaseModel):
         num_layers : int
             Number of LSTMs stacked on each other
         """
-        super(MidiLSTM, self).__init__()
+        super().__init__()
         self.vocab_size = vocab_size
         self.embed_size = embed_size
         self.hidden_size = hidden_size
@@ -88,7 +88,7 @@ class MidiLSTM(BaseModel):
 
         # pack up sequences by length
         packed_embed = pack_padded_sequence(embed, seq_lengths)
-        out, self.hidden = self.lstm(packed_embed, self.hidden)
+        out, self.hidden = self.lstm(packed_embed, self.hidden, dropout=self.dropout)
         out, out_lengths = pad_packed_sequence(out)
 
         out = self.hidden_network(out)
@@ -116,9 +116,23 @@ class MidiLSTM(BaseModel):
         melody_out = output['melody_out'].detach().numpy().argmax(dim=-1)
         chord_out = output['chord_out'].detach().numpy() > thresh
 
+class SmallMiddiLSTM(MidiLSTM):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.hidden_network = nn.Sequential()
+        self.melody_classifier = nn.Sequential(
+            nn.Dropout(self.dropout),
+            nn.Linear(self.hidden_size, self.vocab_size)
+        )
+        self.chord_classifier = nn.Sequential(
+            nn.Dropout(self.dropout),
+            nn.Linear(self.hidden_size, self.vocab_size)
+        )
+
+
 class BigMidiLSTM(MidiLSTM):
     def __init__(self, *args, **kwargs):
-        super(BigMidiLSTM, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.hidden_network =  nn.Sequential()
         self.melody_classifier = nn.Sequential(
             nn.Dropout(self.dropout),
