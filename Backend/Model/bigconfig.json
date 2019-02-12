@@ -7,7 +7,7 @@
         "args": {
             "vocab_size": 14,
             "embed_size": 16,
-            "hidden_size": 512,
+            "hidden_size": 256,
             "num_layers": 8,
             "dropout": 0.1
         }
