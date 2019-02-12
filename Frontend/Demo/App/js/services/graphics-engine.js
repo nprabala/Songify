@@ -71,11 +71,17 @@ angular.module("mixTapeApp")
         if(this.currentType == "whole"){
             time_duration = 4;
         }
-        this.durations.push(time_duration);
-        this.canvasLocations.push([(x / this.canvas_width), (y / this.canvas_height)]);
-        this.drawObjects();
+        var height = this.getCanvasHeight();
+        var lineSpacing = this.getLineSpacing();
+        var yOffset = (this.getYOffset(0) / 2).toFixed(2);
+        var diff = yOffset - ((y / this.canvas_height)* height).toFixed(2);
+        diff = Math.round(diff / lineSpacing);
+            if (diff >= -8 && diff <= 3) {
+                this.durations.push(time_duration);
+                this.canvasLocations.push([(x / this.canvas_width), (y / this.canvas_height)]);
+                this.drawObjects();
+            }
     },
-
     drawObjects: function() {
         var noteRad = globalSettings.noteRadius * this.canvas_height;
         for (var i = 0; i < this.canvasObjects.length; i++) {
@@ -88,6 +94,7 @@ angular.module("mixTapeApp")
     clearObjects: function() {
         this.canvasObjects = [];
         this.canvasLocations = [];
+        this.durations = [];
         this.canvas.clearRect(0, 0, this.canvas.width, this.canvas.height); 
         return;
     },
