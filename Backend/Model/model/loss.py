@@ -9,13 +9,14 @@ def midi_loss(output, target, extra=None):
 
     batch_size, seq_len, vocab_size = melody_out.shape
     seq_lengths = extra['seq_lengths']
+    device = extra['device']
 
     # flatten (batchsize, seq_len, vocab_size) -> (batchsize * seq_len, vocab_size)
     # contiguous returns tensor with same data
-    flat_melody_out = torch.tensor([])
-    flat_chord_out = torch.tensor([])
-    flat_melody_y = torch.tensor([]).long()
-    flat_chord_y = torch.tensor([])
+    flat_melody_out = torch.tensor([]).to(device)
+    flat_chord_out = torch.tensor([]).to(device)
+    flat_melody_y = torch.tensor([]).long().to(device)
+    flat_chord_y = torch.tensor([]).to(device)
     for i in range(batch_size):
         flat_melody_out = torch.cat((flat_melody_out, melody_out[i, :seq_lengths[i]]))
         flat_chord_out = torch.cat((flat_chord_out, chord_out[i, :seq_lengths[i]]))

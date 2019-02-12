@@ -53,7 +53,7 @@ def midi_collate_fn(data):
         seq_melody_y[idx, :seq_len] = torch.tensor(my)
 
     # make onehot chord tensor
-    chord_y_onehot = torch.zeros(batch_size, seq_lengths.max(), vocab_size).long()
+    chord_y_onehot = torch.zeros(batch_size, seq_lengths.max(), vocab_size)
     for idx, (c, seq_len) in enumerate(zip(chord_y, seq_lengths)):
         for j, notes in enumerate(c):
             chord_y_onehot[idx, j, notes] = 1
