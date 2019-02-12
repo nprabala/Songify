@@ -7,6 +7,8 @@ angular.module("mixTapeApp", [])
         //Sample JSON to send. Will format notes object later.
         $scope.noteTypes = ["sixteenth","eighth","quarter","half","whole"];
         $scope.currentType = "quarter";
+        $scope.chords = [];
+        
         $scope.sendMelody = function(){
         var notes =   utilsService.getMelody();
         var durations = graphicsEngineService.durations;
@@ -20,9 +22,38 @@ angular.module("mixTapeApp", [])
         req.send(JSON.stringify(melody));
         req.onreadystatechange = function() {
         // Typical action to be performed when the document is ready:
-            console.log(req.response);
+            $scope.chords = JSON.parse(req.response);
+            console.log($scope.chords);
         };
     };
+    
+    $scope.playChords = function(){
+        for (var i = 0; i < $scope.chords.length; i++){
+            var audio = new Audio();
+            var k = 0;
+            var chord = $scope.chords[i]["chord"];
+            console.log("PLAYING" + chord);
+            var notes = chord.split(".");
+            console.log(notes);
+            var audioArray =[];
+            for (var j = 0; j < notes.length; j++){
+                var note = notes[j];
+                audioArray.push("App/aud/" + note + "3.wav");
+                console.log(note + "3.wav");
+            }
+        }
+        audio.addEventListener('ended', function () {
+            k = ++k < audioArray.length ? k : 0;
+            console.log("playing: " + k);
+            audio.src = audioArray[k];
+            audio.play();
+        }, true);
+        audio.volume = 0.3;
+        audio.loop = false;
+        audio.src = audioArray[0];
+        audio.play();
+    };
+    
     $scope.updateGraphics = function(){
       graphicsEngineService.currentType = $scope.currentType;
     };
@@ -36,7 +67,8 @@ angular.module("mixTapeApp", [])
             '<button id="clear">Clear</button>' + 
             '<button id="melody">Get Melody</button>' + 
             '<button id="playback">Play Melody</button>' + 
-            '<button id="playback" ng-click="sendMelody()">Send Melody</button>' + 
+            '<button id="" ng-click="playChords()">playChords</button>' + 
+            '<button id="" ng-click="sendMelody()">Send Melody</button>' + 
             '<select ng-model="currentType" ng-options="x for x in noteTypes" ng-change="updateGraphics()"></select>'+
             '<div id="debug">Debug state: Ready</div>' + 
             '<canvas id="musicCanvas"></canvas>',
@@ -70,7 +102,7 @@ angular.module("mixTapeApp", [])
                 var audioBtn = document.getElementById("playback");
                 audioBtn.onclick = function() {
                     var audio = new Audio();
-                    var i = 0;
+                    var j = 0;
                     var melody = utilsService.getMelody();
                     var note;
                     var audio;
@@ -81,9 +113,9 @@ angular.module("mixTapeApp", [])
                         audioArray.push("App/aud/" + note + ".wav");
                     }
                     audio.addEventListener('ended', function () {
-                        i = ++i < audioArray.length ? i : 0;
-                        console.log("playing: " + i);
-                        audio.src = audioArray[i];
+                        j = ++j < audioArray.length ? j : 0;
+                        console.log("playing: " + j);
+                        audio.src = audioArray[j];
                         audio.play();
                     }, true);
                     audio.volume = 0.3;
