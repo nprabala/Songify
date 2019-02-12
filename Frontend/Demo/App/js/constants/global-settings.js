@@ -8,7 +8,7 @@ angular.module("mixTapeApp")
         numLines: 5, // Number of lines in a staff
         numSpaces: 4, // Number of spaces in a staff
         numMeasures: 4,
-        numMeasureLines: 4,
+        numMeasureLines: 1,
         noteRadius: 0.01,
         paddingX: 0.2,
         paddingY: 0.2,
