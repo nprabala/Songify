@@ -110,7 +110,6 @@ class MidiDataset(Dataset):
         #     melody_y.append(notes[i + self.SEQUENCE_LENGTH:]) # next note
         #     chord_y.append(chords[i + self.SEQUENCE_LENGTH - 1]) # chord belonging to last note played
 
-
         notes = [self.convert_note_to_int(n) for n in row['melody']]
         melody_x = notes[:-1] # all but last note
         melody_y = notes[1:] # all but first note
