@@ -121,6 +121,7 @@ class MidiDataset(Dataset):
             melody_y = []
             chord_y = []
             for i in range(len(notes) - self.SEQUENCE_LENGTH):
+                if sum(chords[i + self.SEQUENCE_LENGTH - 1]) == 0: continue
                 melody_x.append(notes[i:i + self.SEQUENCE_LENGTH])
                 melody_y.append(notes[i + self.SEQUENCE_LENGTH]) # next note
                 chord_y.append(chords[i + self.SEQUENCE_LENGTH - 1]) # chord belonging to last note played
