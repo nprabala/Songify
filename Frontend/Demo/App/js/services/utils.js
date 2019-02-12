@@ -32,38 +32,33 @@ angular.module("mixTapeApp")
                 var count = 0;
 
                 /*
-                 * Function to call when note ends (start next note)
-                 */
-                var onEnd = function () {
-                    if (count != len - 1) {
-                        count += 1;
-
-                        for (var i = 0; i < howlArray[count].length; i++) {
-                            howlArray[count][i].play();
-                        }
-                    }
-                };
-
-                /*
                  * Creates a howl object given input.
 
                  * isFirst determines if note is the first in its group
                  * (specifically for chords so that all the notes in the chord
                  * aren't triggering the next note to start, just the first one).
                  */
-                var createHowl = function(note, isFirst, ) {
-                    console.log()
+                var createHowl = function(note, isFirst) {
+                    // temp hack until we handle sharps and flats
                     if (note == 'F#4') return globalSettings.noteError;
+
                     var file = 'App/aud/' + note + '.wav';
 
                     if (isFirst) {
                         return new Howl({ src: [file], loop:false, volume: 0.5,
-                            onend: onEnd});
+                            onend:() => {
+                                if (++count != len) {
+                                    for (var i = 0; i < howlArray[count].length; i++) {
+                                        howlArray[count][i].play();
+                                    }
+                                }
+                            }
+                        });
                     } else {
                         return new Howl({ src: [file], loop:false, volume: 0.5});
                     }
                 };
-                
+
 
                 if (isChord) {
                     for (var i = 0; i < sequence.length; i++) {
