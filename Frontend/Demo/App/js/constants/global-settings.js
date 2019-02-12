@@ -15,4 +15,5 @@ angular.module("mixTapeApp")
         noteOffsetX: 0.4, // Fine-tune adjusting to allow center of note to show up where cursor tip is
         noteOffsetY: 3.6, // Fine-tune adjusting to allow center of note to show up where cursor tip is
         trebleStaff: ["B4", "A4", "G4", "F4", "E4", "D4", "C4", "B3", "A3", "G3", "F3", "E3", "D3", "C3"],
+        noteError: 'noteError',
     });
