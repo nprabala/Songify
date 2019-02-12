@@ -82,6 +82,7 @@ class MidiDataset(Dataset):
     def convert_int_to_note(cls, int):
         return cls.INT_TO_NOTES[int]
 
+    @classmethod
     def convert_onehot_to_chord(cls, onehot_list):
         notes = np.argmax(onehot_list)
         chord = '.'.join(convert_int_to_note(n) for n in notes)

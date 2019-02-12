@@ -33,7 +33,17 @@ class Predict:
         for i in range(self.MAX_LEN):
             if i < len(x):
                 input = x[i]
-            pred = self.model.forward()
+            else:
+                input = output['melody_out'].argmax()
+            output = self.model(input)
+
+            pred = self.dataset.convert_onehot_to_chord(output['chord_out'])
+            pred_output.append(pred)
+
+        return pred_output
+
+
+
         for i in range(0, len(x)):
             prediction = self.model.predict(numpy.array([x[i]]))
             index = numpy.argmax(prediction)

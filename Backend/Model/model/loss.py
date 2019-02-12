@@ -1,3 +1,4 @@
+import torch
 import torch.nn.functional as F
 
 def midi_loss(output, target, extra=None):
@@ -11,9 +12,21 @@ def midi_loss(output, target, extra=None):
 
     # flatten (batchsize, seq_len, vocab_size) -> (batchsize * seq_len, vocab_size)
     # contiguous returns tensor with same data
-    melody_out = melody_out[:, seq_len-1].contiguous().view(-1, vocab_size)
-    chord_out = chord_out[:, seq_len-1].contiguous().view(-1, vocab_size)
-    melody_y = melody_y[:, seq_len-1].flatten()
-    chord_y = chord_y[:, seq_len-1].view(-1, vocab_size)
+    flat_melody_out = torch.tensor([])
+    flat_chord_out = torch.tensor([])
+    flat_melody_y = torch.tensor([]).long()
+    flat_chord_y = torch.tensor([])
+    for i in range(batch_size):
+        flat_melody_out = torch.cat((flat_melody_out, melody_out[i, :seq_lengths[i]]))
+        flat_chord_out = torch.cat((flat_chord_out, chord_out[i, :seq_lengths[i]]))
+        flat_melody_y = torch.cat((flat_melody_y, melody_y[i, :seq_lengths[i]].long()))
+        flat_chord_y = torch.cat((flat_chord_y, chord_y[i, :seq_lengths[i]].float()))
 
-    return F.nll_loss(melody_out, melody_y) + F.multilabel_soft_margin_loss(chord_out, chord_y)
+    # melody_out = melody_out[:, seq_len-1].contiguous().view(-1, vocab_size)
+    # chord_out = chord_out[:, seq_len-1].contiguous().view(-1, vocab_size)
+    # melody_y = melody_y[:, seq_len-1].flatten()
+    # chord_y = chord_y[:, seq_len-1].view(-1, vocab_size)
+
+    print(flat_melody_out.shape, flat_chord_out.shape, flat_melody_y.shape, flat_chord_y.shape)
+
+    return F.nll_loss(flat_melody_out, flat_melody_y) + F.multilabel_soft_margin_loss(flat_chord_out, flat_chord_y)
