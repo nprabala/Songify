@@ -1,14 +1,14 @@
 {
-    "name": "BigMusic_LSTM",
+    "name": "BigMusic_LSTM_embed4_hidden64_numlayers2",
     "n_gpu": 1,
 
     "model": {
         "name": "BigMidiLSTM",
         "args": {
             "vocab_size": 14,
-            "embed_size": 8,
-            "hidden_size": 128,
-            "num_layers": 4,
+            "embed_size": 4,
+            "hidden_size": 64,
+            "num_layers": 2,
             "dropout": 0.1
         }
     },

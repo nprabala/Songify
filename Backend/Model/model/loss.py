@@ -28,6 +28,4 @@ def midi_loss(output, target, extra=None):
     # melody_y = melody_y[:, seq_len-1].flatten()
     # chord_y = chord_y[:, seq_len-1].view(-1, vocab_size)
 
-    print(flat_melody_out.shape, flat_chord_out.shape, flat_melody_y.shape, flat_chord_y.shape)
-
     return F.nll_loss(flat_melody_out, flat_melody_y) + F.multilabel_soft_margin_loss(flat_chord_out, flat_chord_y)
