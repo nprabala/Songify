@@ -1,6 +1,6 @@
 angular.module("mixTapeApp", [])
-    .controller("mixTapeController", ["$scope", "graphicsEngineService", "utilsService", "renderService",
-        function($scope,graphicsEngineService, utilsService, renderService) {
+    .controller("mixTapeController", ["$scope", "graphicsEngineService", "utilsService", "renderService", "globalSettings",
+        function($scope,graphicsEngineService, utilsService, renderService, globalSettings) {
         $scope.hello = "Welcome To Mixtape";
         var url = window.location;
         var hostName = url.hostname;
@@ -8,34 +8,124 @@ angular.module("mixTapeApp", [])
         $scope.noteTypes = ["sixteenth","eighth","quarter","half","whole"];
         $scope.currentType = "quarter";
         $scope.chords = [];
+        $scope.melody = [];
+        $scope.melodySounds = [];
+        $scope.chordSounds = [];
+        $scope.melodyDurations = [];
+        $scope.chordDurations = [];
 
-    $scope.sendMelody = function() {
-        var notes = utilsService.getMelody();
+    $scope.getMelody = function() {
+        var objs = graphicsEngineService.getObjects();
+        var locs = graphicsEngineService.getLocations();
+        var width = graphicsEngineService.getCanvasWidth();
+        var height = graphicsEngineService.getCanvasHeight();
+        var yOffset = (graphicsEngineService.getYOffset(0) / 2).toFixed(2);
+        var lineSpacing = graphicsEngineService.getLineSpacing();
+        var melody = [];
+        var result = "";
+        for (var i = 0; i < locs.length; i++) {
+            var diff = yOffset - (locs[i][1] * height).toFixed(2);
+            diff = Math.round(diff / lineSpacing);
+            if (diff >= -8 && diff <= 3) {
+                melody.push([globalSettings.trebleStaff[(diff * -1) + 3]]);
+            }
+        }
+
+        $scope.melodySounds = [];
+        for (var i = 0; i < melody.length; i++) {
+            var file = 'App/aud/' + melody[i] + '.wav';
+            var howl = new Howl({ src: [file], volume: 0.4});
+            $scope.melodySounds.push(howl);
+        }
+
+        $scope.melody = melody;
+        $scope.melodyDurations = graphicsEngineService.durations;
+    }
+
+    $scope.getChords = function(callback) {
+        $scope.getMelody();
+
+        var notes = $scope.melody;
         var durations = graphicsEngineService.durations;
         var melody = [];
-        document.getElementById("debug").innerHTML = "Chords retrieved!";
+
         for (var i = 0; i < notes.length; i++){
             melody.push({"note":notes[i][0].charAt(0), "duration":durations[i]})
         }
+
         var req = new XMLHttpRequest();
         req.open("POST","http://" + hostName + ":8081/chord_progressions");
         req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        req.send(JSON.stringify(melody));
         req.onreadystatechange = function() {
-        // Typical action to be performed when the document is ready:
-            $scope.chords = JSON.parse(req.response);
-            console.log($scope.chords);
+            var chords = JSON.parse(req.response);
+            console.log(chords);
+
+            $scope.chordSounds = [];
+            $scope.chordDurations = [];
+            for (var i = 0; i < chords.length; i++) {
+                var unsplitChord = chords[i]["chord"];
+                var duration = chords[i]["duration"];
+                var splitChord = unsplitChord.split(".");
+
+                var chordObj = [];
+                for (var j = 0; j < splitChord.length; j++) {
+                    if (splitChord[j].includes('#') || splitChord[j].includes('-')) continue; // TODO: Temp hack until sharps
+
+                    var file = 'App/aud/' + splitChord[j] + '4' + '.wav';
+                    var howl = new Howl({ src: [file], volume: 0.4});
+                    chordObj.push(howl);
+                }
+
+                $scope.chordSounds.push(chordObj);
+                $scope.chordDurations.push(duration);
+            }
+
+            $scope.chords = chords;
+            callback();
         };
+
+        req.send(JSON.stringify(melody));
+    };
+
+    $scope.playSequence = async function(sequence, durations, isChord) {
+        const sleep = (milliseconds) => {
+            return new Promise(resolve => setTimeout(resolve, milliseconds))
+        };
+
+        if (isChord) {
+            for (var i = 0; i < sequence.length; i++) {
+                for (var j = 0; j < sequence[i].length; j++) {
+                    sequence[i][j].play();
+                }
+
+                await sleep(durations[i] * 1000);
+            }
+        } else {
+            for (var i = 0; i < sequence.length; i++) {
+                sequence[i].play();
+                await sleep(durations[i]*1000);
+            }
+        }
+    }
+
+    $scope.playMelody = function() {
+        $scope.getMelody();
+        $scope.playSequence($scope.melodySounds, $scope.melodyDurations, false);
     };
 
     $scope.playChords = function(){
-        utilsService.playSequence($scope.chords, true);
+        var callback = function() { $scope.playSequence($scope.chordSounds, $scope.chordDurations, true); };
+        $scope.getChords(callback);
     };
 
     $scope.playComplete = function() {
-        utilsService.playSequence($scope.chords, true);
-        utilsService.playSequence(utilsService.getMelody(), false);
-    }
+        $scope.getMelody();
+        var callback = function() {
+            $scope.playSequence($scope.melodySounds, $scope.melodyDurations, false);
+            $scope.playSequence($scope.chordSounds, $scope.chordDurations, true);
+        }
+        $scope.getChords(callback);
+    };
 
     $scope.updateGraphics = function(){
       graphicsEngineService.currentType = $scope.currentType;
@@ -48,8 +138,7 @@ angular.module("mixTapeApp", [])
             restrict: 'A',
             template: '<div id="debug">Welcome to Mixtape!</div>' +
             '<button id="clear">Clear</button>' +
-            '<button id="playback">Play Melody</button>' +
-            '<button id="" ng-click="sendMelody()">Retrieve Chords</button>' +
+            '<button id="" ng-click="playMelody()">Play Melody</button>' +
             '<button id="" ng-click="playChords()">Play Chords</button>' +
             '<button id="" ng-click="playComplete()">Play with Chords</button>' +
             '<select ng-model="currentType" ng-options="x for x in noteTypes" ng-change="updateGraphics()"></select>'+
@@ -72,13 +161,6 @@ angular.module("mixTapeApp", [])
                     canvasContext.clearRect(0, 0, canvas.width, canvas.height);
                     renderService.clearObjects();
                     document.getElementById("debug").innerHTML = "Notes cleared!";
-                };
-
-                var audioBtn = document.getElementById("playback");
-                audioBtn.onclick = function() {
-                    var melody = utilsService.getMelody();
-                    document.getElementById("debug").innerHTML = "Playing: " + melody;
-                    utilsService.playSequence(melody, false);
                 };
 
                 graphicsEngineService.initialise(canvasContext, [], [],[], "quarter");
