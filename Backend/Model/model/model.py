@@ -88,7 +88,7 @@ class MidiLSTM(BaseModel):
 
         # pack up sequences by length
         packed_embed = pack_padded_sequence(embed, seq_lengths)
-        out, self.hidden = self.lstm(packed_embed, self.hidden, dropout=self.dropout)
+        out, self.hidden = self.lstm(packed_embed, self.hidden)
         out, out_lengths = pad_packed_sequence(out)
 
         out = self.hidden_network(out)
@@ -116,7 +116,7 @@ class MidiLSTM(BaseModel):
         melody_out = output['melody_out'].detach().numpy().argmax(dim=-1)
         chord_out = output['chord_out'].detach().numpy() > thresh
 
-class SmallMiddiLSTM(MidiLSTM):
+class SmallMidiLSTM(MidiLSTM):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.hidden_network = nn.Sequential()
