@@ -87,7 +87,27 @@ angular.module("mixTapeApp")
     // x-pos to render the chord underneath that note)    
     addChordNote: function(note, dur) {
         this.canvasChords.push(this.chord);
-        this.canvasChordLocations.push([this.canvasLocations[dur][0], this.canvasLocations[dur][1] * 1.1]);
+        var yPos = this.getYOffset(1) / 2;
+        var chordY = 0;
+        if (note == "F" || note == "F#") {
+            chordY = yPos / this.canvas_height;
+        }
+        else if (note == "B") {
+            chordY = (yPos / this.canvas_height) + (5 * globalSettings.noteRadius);
+        }
+        else if (note == "G") {
+            chordY = (yPos / this.canvas_height) - (globalSettings.noteRadius);
+        }
+        else if (note == "D") {
+            chordY = (yPos / this.canvas_height) + (2.5 * globalSettings.noteRadius);
+        }
+        else if (note == "A") {
+            chordY = (yPos / this.canvas_height) + (6 * globalSettings.noteRadius);
+        }
+        else {
+           chordY = (yPos / this.canvas_height); 
+        }
+        this.canvasChordLocations.push([this.canvasLocations[dur][0], chordY]);
         this.drawObjects();
     },
     
