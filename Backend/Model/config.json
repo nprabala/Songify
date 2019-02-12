@@ -16,7 +16,7 @@
         "name": "MidiDataLoader",
         "args":{
             "data_path": "data/out.pkl",
-            "batch_size": 2,
+            "batch_size": 128,
             "shuffle": true,
             "validation_split": 0.1,
             "num_workers":2
