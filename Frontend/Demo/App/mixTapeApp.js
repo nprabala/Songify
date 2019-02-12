@@ -28,9 +28,13 @@ angular.module("mixTapeApp", [])
     };
 
     $scope.playChords = function(){
-        var soundArray = utilsService.createSequence($scope.chords, true, $scope.chords.length);
-        utilsService.playSequence(soundArray);
+        utilsService.playSequence($scope.chords, true);
     };
+
+    $scope.playComplete = function() {
+        utilsService.playSequence($scope.chords, true);
+        utilsService.playSequence(utilsService.getMelody(), false);
+    }
 
     $scope.updateGraphics = function(){
       graphicsEngineService.currentType = $scope.currentType;
@@ -45,6 +49,7 @@ angular.module("mixTapeApp", [])
             '<button id="clear">Clear</button>' +
             '<button id="melody">Get Melody</button>' +
             '<button id="playback">Play Melody</button>' +
+            '<button id="" ng-click="playComplete()">Play Complete</button>' +
             '<button id="" ng-click="playChords()">playChords</button>' +
             '<button id="" ng-click="sendMelody()">Send Melody</button>' +
             '<select ng-model="currentType" ng-options="x for x in noteTypes" ng-change="updateGraphics()"></select>'+
@@ -80,8 +85,7 @@ angular.module("mixTapeApp", [])
                 audioBtn.onclick = function() {
                     var melody = utilsService.getMelody();
                     document.getElementById("debug").innerHTML = "Playing: " + melody;
-                    var soundArray = utilsService.createSequence(melody, false, melody.length);
-                    utilsService.playSequence(soundArray);
+                    utilsService.playSequence(melody, false);
                 };
 
                 graphicsEngineService.initialise(canvasContext, [], [],[], "quarter");

@@ -22,78 +22,35 @@ angular.module("mixTapeApp")
                 return melody;
             },
 
-            /*
-             * Creates the sequence for playing the notes in order given sequence.
-
-             * Len is the length of the input (in quarter notes for now)
-             */
-            createSequence: function(sequence, isChord, len) {
-                var howlArray = [];
-                var count = 0;
-
-                /*
-                 * Creates a howl object given input.
-
-                 * isFirst determines if note is the first in its group
-                 * (specifically for chords so that all the notes in the chord
-                 * aren't triggering the next note to start, just the first one).
-                 */
-                var createHowl = function(note, isFirst) {
-                    // temp hack until we handle sharps and flats
-                    if (note == 'F#4') return globalSettings.noteError;
-
-                    var file = 'App/aud/' + note + '.wav';
-
-                    if (isFirst) {
-                        return new Howl({ src: [file], loop:false, volume: 0.5,
-                            onend:() => {
-                                if (++count != len) {
-                                    for (var i = 0; i < howlArray[count].length; i++) {
-                                        howlArray[count][i].play();
-                                    }
-                                }
-                            }
-                        });
-                    } else {
-                        return new Howl({ src: [file], loop:false, volume: 0.5});
-                    }
+            playSequence: async function(sequence, isChords) {
+                const sleep = (milliseconds) => {
+                    return new Promise(resolve => setTimeout(resolve, milliseconds))
                 };
 
-
-                if (isChord) {
+                if (isChords) {
                     for (var i = 0; i < sequence.length; i++) {
                         var unsplitChord = sequence[i]["chord"];
                         var duration = sequence[i]["duration"];
                         var splitChord = unsplitChord.split(".");
 
-                        // create howl objects for each note in the chord and
-                        // combine into an array to push onto howlArray
                         var chords = [];
                         for (var j = 0; j < splitChord.length; j++) {
-                            var howlNote = createHowl(splitChord[j] + '4', j == 0);
-                            if (howlNote != globalSettings.noteError) {
-                                chords.push(howlNote);
-                            }
-                        }
+                            if (splitChord[j] == 'F#') continue; // TODO: Temp hack until sharps
 
-                        howlArray.push(chords);
+                            var file = 'App/aud/' + splitChord[j] + '4' + '.wav';
+                            var howl = new Howl({ src: [file], volume: 0.4});
+                            howl.play();
+                        }
+                        await sleep(duration * 1000);
                     }
 
-                // Melody
                 } else {
                     for (var i = 0; i < sequence.length; i++) {
-                        // wrap in an array to keep consistent with chords above
-                        howlArray.push([createHowl(sequence[i], true)]);
+                        var file = 'App/aud/' + sequence[i] + '.wav';
+                        var howl = new Howl({ src: [file], volume: 0.4});
+                        howl.play();
+                        await sleep(1000); // currently duration is 1
                     }
-                }
-
-                return howlArray;
-            },
-
-            // play the sequence given by soundArray
-            playSequence: function(soundArray) {
-                for (var i = 0; i < soundArray[0].length; i++) {
-                    soundArray[0][i].play();
                 }
             },
         }
