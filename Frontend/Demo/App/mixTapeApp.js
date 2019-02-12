@@ -1,5 +1,5 @@
 angular.module("mixTapeApp", [])
-    .controller("mixTapeController", ["$scope", "graphicsEngineService", "utilsService", "renderService", 
+    .controller("mixTapeController", ["$scope", "graphicsEngineService", "utilsService", "renderService",
         function($scope,graphicsEngineService, utilsService, renderService) {
         $scope.hello = "Welcome To Mixtape";
         var url = window.location;
@@ -7,11 +7,14 @@ angular.module("mixTapeApp", [])
         //Sample JSON to send. Will format notes object later.
         $scope.noteTypes = ["sixteenth","eighth","quarter","half","whole"];
         $scope.currentType = "quarter";
-        $scope.sendMelody = function(){
-        var notes =   utilsService.getMelody();
+        $scope.chords = [];
+
+    $scope.sendMelody = function() {
+        var notes = utilsService.getMelody();
         var durations = graphicsEngineService.durations;
         var melody = [];
-        for (var i =0; i < notes.length; i++){
+        document.getElementById("debug").innerHTML = "Chords retrieved!";
+        for (var i = 0; i < notes.length; i++){
             melody.push({"note":notes[i][0].charAt(0), "duration":durations[i]})
         }
         var req = new XMLHttpRequest();
@@ -20,9 +23,20 @@ angular.module("mixTapeApp", [])
         req.send(JSON.stringify(melody));
         req.onreadystatechange = function() {
         // Typical action to be performed when the document is ready:
-            console.log(req.response);
+            $scope.chords = JSON.parse(req.response);
+            console.log($scope.chords);
         };
     };
+
+    $scope.playChords = function(){
+        utilsService.playSequence($scope.chords, true);
+    };
+
+    $scope.playComplete = function() {
+        utilsService.playSequence($scope.chords, true);
+        utilsService.playSequence(utilsService.getMelody(), false);
+    }
+
     $scope.updateGraphics = function(){
       graphicsEngineService.currentType = $scope.currentType;
     };
@@ -32,13 +46,13 @@ angular.module("mixTapeApp", [])
         function($interval, renderService, graphicsEngineService, utilsService, globalSettings) {
         return {
             restrict: 'A',
-            template: '<audio id="B4"><source src="App/aud/B4.wav" type="audio/wav"></audio>' + 
-            '<button id="clear">Clear</button>' + 
-            '<button id="melody">Get Melody</button>' + 
-            '<button id="playback">Play Melody</button>' + 
-            '<button id="playback" ng-click="sendMelody()">Send Melody</button>' + 
+            template: '<div id="debug">Welcome to Mixtape!</div>' +
+            '<button id="clear">Clear</button>' +
+            '<button id="playback">Play Melody</button>' +
+            '<button id="" ng-click="sendMelody()">Retrieve Chords</button>' +
+            '<button id="" ng-click="playChords()">Play Chords</button>' +
+            '<button id="" ng-click="playComplete()">Play with Chords</button>' +
             '<select ng-model="currentType" ng-options="x for x in noteTypes" ng-change="updateGraphics()"></select>'+
-            '<div id="debug">Debug state: Ready</div>' + 
             '<canvas id="musicCanvas"></canvas>',
 
             link: function(scope, element) {
@@ -57,48 +71,23 @@ angular.module("mixTapeApp", [])
                 clearBtn.onclick = function() {
                     canvasContext.clearRect(0, 0, canvas.width, canvas.height);
                     renderService.clearObjects();
-                    document.getElementById("debug").innerHTML = "Debug state: Cleared";
+                    document.getElementById("debug").innerHTML = "Notes cleared!";
                 };
 
-                var melodyBtn = document.getElementById("melody");
-                melodyBtn.onclick = function() {
-                    var melody = utilsService.getMelody();
-                    document.getElementById("debug").innerHTML = "Melody: " + melody;
-                };
-
-                // TODO: need to fix
                 var audioBtn = document.getElementById("playback");
                 audioBtn.onclick = function() {
-                    var audio = new Audio();
-                    var i = 0;
                     var melody = utilsService.getMelody();
-                    var note;
-                    var audio;
                     document.getElementById("debug").innerHTML = "Playing: " + melody;
-                    var audioArray = [];
-                    for (var i = 0; i < melody.length; i++) {
-                        note = melody[i];
-                        audioArray.push("App/aud/" + note + ".wav");
-                    }
-                    audio.addEventListener('ended', function () {
-                        i = ++i < audioArray.length ? i : 0;
-                        console.log("playing: " + i);
-                        audio.src = audioArray[i];
-                        audio.play();
-                    }, true);
-                    audio.volume = 0.3;
-                    audio.loop = false;
-                    audio.src = audioArray[0];
-                    audio.play();
+                    utilsService.playSequence(melody, false);
                 };
 
                 graphicsEngineService.initialise(canvasContext, [], [],[], "quarter");
 
                 function canvasMouseClick(e) {
-                    
+
                     renderService.addNote(
-                        (e.x / 2) - (globalSettings.noteOffsetX * canvas.width * globalSettings.noteRadius), 
-                        (e.y / 2) - (globalSettings.noteOffsetY * canvas.height * globalSettings.noteRadius));    
+                        (e.x / 2) - (globalSettings.noteOffsetX * canvas.width * globalSettings.noteRadius),
+                        (e.y / 2) - (globalSettings.noteOffsetY * canvas.height * globalSettings.noteRadius));
                 }
 
                 function canvasResize(e) {
