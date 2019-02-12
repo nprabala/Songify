@@ -35,7 +35,12 @@ def midi_loss(output, target, extra=None):
     # melody_y = melody_y[:, seq_len-1].flatten()
     # chord_y = chord_y[:, seq_len-1].view(-1, vocab_size)
 
-    return F.nll_loss(flat_melody_out, flat_melody_y) + F.multilabel_soft_margin_loss(flat_chord_out, flat_chord_y)
+    if MidiDataset.USE_CHORD_ONEHOT:
+        chord_loss = F.nll_loss
+    else:
+        chord_loss = F.multilabel_soft_margin_loss
+
+    return F.nll_loss(flat_melody_out, flat_melody_y) + chord_loss(flat_chord_out, flat_chord_y)
 
 def midi_loss_chord_only(output, target, extra=None):
     melody_out = output['melody_out']
@@ -66,5 +71,10 @@ def midi_loss_chord_only(output, target, extra=None):
     # melody_y = melody_y[:, seq_len-1].flatten()
     # chord_y = chord_y[:, seq_len-1].view(-1, vocab_size)
 
+    if MidiDataset.USE_CHORD_ONEHOT:
+        chord_loss = F.nll_loss
+        flat_chord_y = flat_chord_y.long()
+    else:
+        chord_loss = F.multilabel_soft_margin_loss
 
-    return F.multilabel_soft_margin_loss(flat_chord_out, flat_chord_y)
+    return chord_loss(flat_chord_out, flat_chord_y)

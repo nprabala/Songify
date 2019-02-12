@@ -32,17 +32,17 @@ def midi_collate_fn(data):
         seq_lengths = []
         seq_melody_x = []
         seq_melody_y = []
-        chord_y_onehot = []
+        seq_chord_y = []
         for song_mel_x, song_mel_y, song_c_y in zip(melody_x, melody_y, chord_y):
             for seq_mel_x, seq_mel_y, seq_c_y in zip(song_mel_x, song_mel_y, song_c_y):
                 seq_lengths.append(len(seq_mel_x))
                 seq_melody_x.append(seq_mel_x)
                 seq_melody_y.append(seq_mel_y)
-                chord_y_onehot.append(seq_c_y)
+                seq_chord_y.append(seq_c_y)
         seq_lengths = torch.LongTensor(seq_lengths)
         seq_melody_x = torch.LongTensor(seq_melody_x)
         seq_melody_y = torch.LongTensor(seq_melody_y)
-        chord_y_onehot = torch.Tensor(chord_y_onehot)
+        seq_chord_y = torch.Tensor(seq_chord_y)
     else:
         # get length of each sequence in batch
         seq_lengths = torch.LongTensor([len(seq) for seq in melody_x])
@@ -55,20 +55,26 @@ def midi_collate_fn(data):
             seq_melody_y[idx, :seq_len] = torch.tensor(my)
 
         # make onehot chord tensor
-        chord_y_onehot = torch.zeros(batch_size, seq_lengths.max(), vocab_size)
-        for idx, (c, seq_len) in enumerate(zip(chord_y, seq_lengths)):
-            for j, notes in enumerate(c):
-                chord_y_onehot[idx, j, notes] = 1
+        if MidiDataset.USE_CHORD_ONEHOT:
+            seq_chord_y = torch.zeros(batch_size, seq_lengths.max())
+            for idx, (c, seq_len) in enumerate(zip(chord_y, seq_lengths)):
+                seq_chord_y[idx, :seq_len] = torch.tensor(c)
+        else:
+            seq_chord_y = torch.zeros(batch_size, seq_lengths.max(), vocab_size)
+            for idx, (c, seq_len) in enumerate(zip(chord_y, seq_lengths)):
+                seq_chord_y[idx, :seq_len] = torch.tensor(c)
+                # for j, notes in enumerate(c):
+                #     chord_y_onehot[idx, j, notes] = 1
 
         # sort tensors by length
         seq_lengths, perm_idx = seq_lengths.sort(0, descending=True)
         seq_melody_x = seq_melody_x[perm_idx]
         seq_melody_y = seq_melody_y[perm_idx]
-        chord_y_onehot = chord_y_onehot[perm_idx]
+        seq_chord_y = seq_chord_y[perm_idx]
 
     # package in dictionary
     data = {'melody_x': seq_melody_x}
-    target = {'melody_y': seq_melody_y, 'chord_y': chord_y_onehot}
+    target = {'melody_y': seq_melody_y, 'chord_y': seq_chord_y}
     extra = {'seq_lengths': seq_lengths}
 
     return data, target, extra

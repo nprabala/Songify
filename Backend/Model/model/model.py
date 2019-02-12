@@ -50,7 +50,10 @@ class MidiLSTM(BaseModel):
             nn.Dropout(self.dropout)
         )
         self.melody_classifier = nn.Linear(self.hidden_size//8, self.vocab_size)
-        self.chord_classifier = nn.Linear(self.hidden_size//8, self.vocab_size)
+        if MidiDataset.USE_CHORD_ONEHOT:
+            self.chord_classifier = nn.Linear(self.hidden_size//8, MidiDataset.NUM_CHORDS)
+        else:
+            self.chord_classifier = nn.Linear(self.hidden_size//8, self.vocab_size)
 
     def init_hidden(self, batch_size, device='cpu'):
         """
@@ -93,7 +96,10 @@ class MidiLSTM(BaseModel):
 
         out = self.hidden_network(out)
         melody_out = F.log_softmax(self.melody_classifier(out), dim=2)
-        chord_out = torch.sigmoid(self.chord_classifier(out))
+        if MidiDataset.USE_CHORD_ONEHOT:
+            chord_out = F.log_softmax(self.chord_classifier(out), dim=2)
+        else:
+            chord_out = torch.sigmoid(self.chord_classifier(out))
 
         # transpose from (seq_len, batch_size, ...) -> (batch_size, seq_len, ...)
         melody_out = melody_out.transpose(0, 1)
@@ -124,10 +130,16 @@ class SmallMidiLSTM(MidiLSTM):
             nn.Dropout(self.dropout),
             nn.Linear(self.hidden_size, self.vocab_size)
         )
-        self.chord_classifier = nn.Sequential(
-            nn.Dropout(self.dropout),
-            nn.Linear(self.hidden_size, self.vocab_size)
-        )
+        if MidiDataset.USE_CHORD_ONEHOT:
+            self.chord_classifier = nn.Sequential(
+                nn.Dropout(self.dropout),
+                nn.Linear(self.hidden_size, MidiDataset.NUM_CHORDS)
+            )
+        else:
+            self.chord_classifier = nn.Sequential(
+                nn.Dropout(self.dropout),
+                nn.Linear(self.hidden_size, self.vocab_size)
+            )
 
 
 class BigMidiLSTM(MidiLSTM):
@@ -147,19 +159,34 @@ class BigMidiLSTM(MidiLSTM):
             nn.Dropout(self.dropout),
             nn.Linear(self.hidden_size//8, self.vocab_size),
         )
-        self.chord_classifier = nn.Sequential(
-            nn.Dropout(self.dropout),
-            nn.Linear(self.hidden_size, self.hidden_size//2),
-            nn.ReLU(),
-            nn.Dropout(self.dropout),
-            nn.Linear(self.hidden_size//2, self.hidden_size//4),
-            nn.ReLU(),
-            nn.Dropout(self.dropout),
-            nn.Linear(self.hidden_size//4, self.hidden_size//8),
-            nn.ReLU(),
-            nn.Dropout(self.dropout),
-            nn.Linear(self.hidden_size//8, self.vocab_size),
-        )
+        if MidiDataset.USE_CHORD_ONEHOT:
+            self.chord_classifier = nn.Sequential(
+                nn.Dropout(self.dropout),
+                nn.Linear(self.hidden_size, self.hidden_size//2),
+                nn.ReLU(),
+                nn.Dropout(self.dropout),
+                nn.Linear(self.hidden_size//2, self.hidden_size//4),
+                nn.ReLU(),
+                nn.Dropout(self.dropout),
+                nn.Linear(self.hidden_size//4, self.hidden_size//8),
+                nn.ReLU(),
+                nn.Dropout(self.dropout),
+                nn.Linear(self.hidden_size//8, MidiDataset.NUM_CHORDS),
+            )
+        else:
+            self.chord_classifier = nn.Sequential(
+                nn.Dropout(self.dropout),
+                nn.Linear(self.hidden_size, self.hidden_size//2),
+                nn.ReLU(),
+                nn.Dropout(self.dropout),
+                nn.Linear(self.hidden_size//2, self.hidden_size//4),
+                nn.ReLU(),
+                nn.Dropout(self.dropout),
+                nn.Linear(self.hidden_size//4, self.hidden_size//8),
+                nn.ReLU(),
+                nn.Dropout(self.dropout),
+                nn.Linear(self.hidden_size//8, self.vocab_size),
+            )
 
 class MnistModel(BaseModel):
     def __init__(self, num_classes=10):

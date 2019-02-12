@@ -64,10 +64,22 @@ def chord_preprocess(output, target, extra=None):
             flat_chord_out = torch.cat((flat_chord_out, chord_out[i, :seq_lengths[i]]))
             flat_chord_y = torch.cat((flat_chord_y, chord_y[i, :seq_lengths[i]].float()))
 
-    flat_chord_out = flat_chord_out.flatten()
-    flat_chord_y = flat_chord_y.flatten()
+    if MidiDataset.USE_CHORD_ONEHOT:
+        flat_chord_out = torch.exp(flat_chord_out)
+        flat_chord_y = flat_chord_y.long()
+    else:
+        flat_chord_out = flat_chord_out.flatten()
+        flat_chord_y = flat_chord_y.flatten()
 
     return flat_chord_out, flat_chord_y
+
+def chord_accuracy(output, target, extra=None):
+    chord_out, chord_y = chord_preprocess(output, target, extra=extra)
+    return accuracy(chord_out, chord_y)
+
+def chord_accuracy_topk(output, target, extra=None):
+    chord_out, chord_y = chord_preprocess(output, target, extra=extra)
+    return accuracy_topk(chord_out, chord_y)
 
 
 def chord_multilabel_accuracy(output, target, extra=None, thresh=0.5):

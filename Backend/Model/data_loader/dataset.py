@@ -36,6 +36,10 @@ class MidiDataset(Dataset):
     USE_SEQUENCE = True
     SEQUENCE_LENGTH = 16
 
+    # Use onehot instead of binary
+    USE_CHORD_ONEHOT = True
+    NUM_CHORDS = 635
+
     def __init__(self, data_path, transform=None, target_transform=None):
         """
         Args:
@@ -51,6 +55,17 @@ class MidiDataset(Dataset):
         # load data
         with open(data_path, 'rb') as f:
             data_dict = pickle.load(f)
+
+        if self.USE_CHORD_ONEHOT:
+            chord_set = set([])
+            for song in data_dict['chords']:
+                for n in song:
+                    chord_set.add(n)
+            self.chord_to_idx = {c:i for i, c in enumerate(chord_set)}
+            self.idx_to_chord = {v:k for k,v in self.chord_to_idx.items()}
+            self.chord_converter = self.convert_chord_to_onehot
+        else:
+            self.chord_converter = self.convert_chord_to_binary
 
         self.df = pd.DataFrame.from_dict(data_dict)
         self.transform = transform
@@ -81,8 +96,11 @@ class MidiDataset(Dataset):
 
         return note_list
 
+    def convert_chord_to_onehot(self, chord):
+        return self.chord_to_idx[chord]
+
     @classmethod
-    def convert_chord_to_onehot(cls, chord):
+    def convert_chord_to_binary(cls, chord):
         note_list = [0] * cls.NUM_NOTES
         notes = chord.split('.')
 
@@ -96,8 +114,8 @@ class MidiDataset(Dataset):
         return cls.INT_TO_NOTES[int]
 
     @classmethod
-    def convert_onehot_to_chord(cls, onehot_list):
-        notes = np.argmax(onehot_list)
+    def convert_binary_to_chord(cls, binary_list):
+        notes = np.argmax(binary_list)
         chord = '.'.join(convert_int_to_note(n) for n in notes)
 
         return chord
@@ -116,12 +134,11 @@ class MidiDataset(Dataset):
 
         if self.USE_SEQUENCE:
             notes = [self.convert_note_to_int(n) for n in row['melody']]
-            chords = [self.convert_chord_to_onehot(c) for c in row['chords']]
+            chords = [self.chord_converter(c) for c in row['chords']]
             melody_x = []
             melody_y = []
             chord_y = []
             for i in range(len(notes) - self.SEQUENCE_LENGTH):
-                if sum(chords[i + self.SEQUENCE_LENGTH - 1]) == 0: continue
                 melody_x.append(notes[i:i + self.SEQUENCE_LENGTH])
                 melody_y.append(notes[i + self.SEQUENCE_LENGTH]) # next note
                 chord_y.append(chords[i + self.SEQUENCE_LENGTH - 1]) # chord belonging to last note played
@@ -129,7 +146,7 @@ class MidiDataset(Dataset):
             notes = [self.convert_note_to_int(n) for n in row['melody']]
             melody_x = notes[:-1] # all but last note
             melody_y = notes[1:] # all but first note
-            chord_y = [self.convert_chord_to_int(c) for c in row['chords']][:-1] # all but last
+            chord_y = [self.chord_converter(c) for c in row['chords']][:-1] # all but last
 
         if self.transform:
             melody_x = self.transform(melody_x)
