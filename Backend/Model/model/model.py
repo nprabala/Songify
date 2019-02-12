@@ -33,12 +33,13 @@ class MidiLSTM(BaseModel):
         self.num_layers = num_layers
         self.dropout = dropout
         self.bidirectional = bidirectional
+        self.scale = 2 if self.bidirectional else 1
 
         self.embed = nn.Embedding(self.vocab_size, self.embed_size)
         self.lstm = nn.LSTM(self.embed_size, self.hidden_size, num_layers=self.num_layers, dropout=self.dropout, bidirectional=self.bidirectional)
         self.hidden_network = nn.Sequential(
             nn.Dropout(self.dropout),
-            nn.Linear(self.hidden_size, self.hidden_size//2),
+            nn.Linear(self.hidden_size * self.scale, self.hidden_size//2),
             nn.ReLU(),
             nn.Dropout(self.dropout),
             nn.Linear(self.hidden_size//2, self.hidden_size//4),
@@ -56,9 +57,8 @@ class MidiLSTM(BaseModel):
         Initialize hidden input for LSTM
             (num_layers, batch_size, hidden_size)
         """
-        scale = 2 if self.bidirectional else 1
-        return (torch.zeros(self.num_layers * scale, batch_size, self.hidden_size).to(device),
-                torch.zeros(self.num_layers * scale, batch_size, self.hidden_size).to(device))
+        return (torch.zeros(self.num_layers * self.scale, batch_size, self.hidden_size).to(device),
+                torch.zeros(self.num_layers * self.scale, batch_size, self.hidden_size).to(device))
 
     def forward(self, data, extra=None):
         """
