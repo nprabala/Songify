@@ -62,6 +62,7 @@ angular.module("mixTapeApp", [])
 
             $scope.chordSounds = [];
             $scope.chordDurations = [];
+            renderService.clearChords();
             for (var i = 0; i < chords.length; i++) {
                 var unsplitChord = chords[i]["chord"];
                 var duration = chords[i]["duration"];
@@ -81,6 +82,7 @@ angular.module("mixTapeApp", [])
             }
 
             $scope.chords = chords;
+            renderService.addChords($scope.chords);
             callback();
         };
 
@@ -163,7 +165,7 @@ angular.module("mixTapeApp", [])
                     document.getElementById("debug").innerHTML = "Notes cleared!";
                 };
 
-                graphicsEngineService.initialise(canvasContext, [], [],[], "quarter");
+                graphicsEngineService.initialise(canvasContext, [], [], [], [],[], "quarter");
 
                 function canvasMouseClick(e) {
 
@@ -175,6 +177,8 @@ angular.module("mixTapeApp", [])
                 function canvasResize(e) {
                     var canvasObjs = graphicsEngineService.getObjects();
                     var canvasLocs = graphicsEngineService.getLocations();
+                    var canvasChords = graphicsEngineService.getChords();
+                    var canvasChordLocations = graphicsEngineService.getChordLocations();
                     var durs = graphicsEngineService.durations;
                     var curType = graphicsEngineService.currentType;
                     var width = window.innerWidth;
@@ -183,7 +187,7 @@ angular.module("mixTapeApp", [])
                     canvas.height = height;
                     canvas.style.width = width;
                     canvas.style.height = height;
-                    graphicsEngineService.initialise(canvasContext, canvasObjs, canvasLocs, durs, curType);
+                    graphicsEngineService.initialise(canvasContext, canvasObjs, canvasLocs, canvasChords, canvasChordLocations, durs, curType);
                     canvasContext.clearRect(0, 0, canvas.width, canvas.height);
                     renderService.draw();
                 }
