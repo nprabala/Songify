@@ -76,11 +76,7 @@ angular.module("mixTapeApp")
                             }
                         }
 
-                        // push back for duration number of times
-                        // TODO: if float value, this won't work
-                        for (var j = 0; j < duration; j++) {
-                            howlArray.push(chords);
-                        }
+                        howlArray.push(chords);
                     }
 
                 // Melody

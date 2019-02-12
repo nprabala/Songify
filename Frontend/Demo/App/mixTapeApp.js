@@ -28,8 +28,7 @@ angular.module("mixTapeApp", [])
     };
 
     $scope.playChords = function(){
-        var melody = utilsService.getMelody();
-        var soundArray = utilsService.createSequence($scope.chords, true, melody.length);
+        var soundArray = utilsService.createSequence($scope.chords, true, $scope.chords.length);
         utilsService.playSequence(soundArray);
     };
 
