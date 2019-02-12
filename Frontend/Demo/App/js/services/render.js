@@ -27,6 +27,14 @@ angular.module("mixTapeApp")
                 graphicsEngineService.clearObjects();
                 graphicsEngineService.drawObjects();
             } 
+            
+            function addChords(chords) {
+                graphicsEngineService.addChords(chords);
+            }
+            
+            function clearChords() {
+                graphicsEngineService.clearChords();
+            }
 
             return {
                 draw: function() {
@@ -42,6 +50,12 @@ angular.module("mixTapeApp")
                 clearObjects: function() {
                     clearObjects();
                     drawStaff();
+                },
+                addChords: function(chords) {
+                    addChords(chords);
+                },
+                clearChords: function() {
+                    clearChords();
                 }
             }
         }]);

@@ -1,9 +1,11 @@
 angular.module("mixTapeApp")
 .factory("graphicsEngineService", ["globalSettings", function(globalSettings) {
    return {
-    initialise: function(canvasContext, objs, locs,durs, curType) {
+    initialise: function(canvasContext, objs, locs, chords, clocs, durs, curType) {
         this.canvasObjects = objs; // This stores all of the canvas objects to be rendered (except the staff)
         this.canvasLocations = locs; // This stores all the locations of the canvas objects, corresponding to canvasObjects in 1:1
+        this.canvasChords = chords;
+        this.canvasChordLocations = clocs;
         
         // Collect basic data from canvas
         this.canvas = canvasContext;
@@ -30,9 +32,29 @@ angular.module("mixTapeApp")
         }
         this.draw = draw(ctx, x, y, rad);
     },
+    
+    chord: function(ctx, x, y, rad) {
+        function draw(ctx, x, y, rad) {
+            ctx.save();
+            ctx.beginPath();
+            ctx.translate(ctx.width / 2, ctx.height / 2);
+            ctx.scale(3, 2);
+            ctx.arc((x * 2) / 3, y, rad, 0, 2 * Math.PI, false);
+            ctx.fillStyle = "#0000ff";
+            ctx.fill();
+
+            ctx.restore();
+            ctx.stroke();  
+        }
+        this.draw = draw(ctx, x, y, rad);
+    },
 
     getObjects: function() {
         return this.canvasObjects;
+    },
+    
+    getChords: function() {
+      return this.canvasChords;  
     },
 
     getCanvasHeight: function() {
@@ -47,17 +69,42 @@ angular.module("mixTapeApp")
         return this.canvasLocations;
     },
 
-    // Returns the y-value of the top left corner of each staff. Param staffNum = 0 is the first row, staffNum = 1 is 2nd row, etc.
+    // Returns the y-value of the top left corner of each staff. 
+    // Param staffNum = 0 is the first row, staffNum = 1 is 2nd row, etc.
     getYOffset: function(staffNum) {
-        return (this.canvas_height * globalSettings.paddingY) + staffNum * (this.canvas_height * globalSettings.measureLineSpacing);
+        return (this.canvas_height * globalSettings.paddingY) + 
+        staffNum * (this.canvas_height * globalSettings.measureLineSpacing);
     },
 
     getLineSpacing: function() {
         return (this.canvas_height * globalSettings.lineHeight) / globalSettings.numSpaces;
     },
+    
+    // param note = letter note that should be rendered as a chord
+    // param sequence = the index of canvasObjects/canvasLocations that 
+    // the chord should be rendered underneath (for example, if sequence == 0, 
+    // should find the first location in canvasLocations and use that 
+    // x-pos to render the chord underneath that note)    
+    addChordNote: function(note, dur) {
+        this.canvasChords.push(this.chord);
+        this.canvasChordLocations.push([this.canvasLocations[dur][0], this.canvasLocations[dur][1] * 1.1]);
+        this.drawObjects();
+    },
+    
+    addChords: function(chords) {
+        var dur = 0; 
+        for (var i = 0; i < chords.length; i++) {
+            var chord = chords[i]["chord"].split(".");
+            for (var j = 0; j < chord.length; j++) {
+                this.addChordNote(chord[j], dur);
+            }
+            dur += chords[i]["duration"];
+        }
+    },
+    
+    
 
     addNote: function(x, y) {
-        this.canvasObjects.push(this.note);
         var time_duration = 1;
         if (this.currentType == "sixteenth"){
             time_duration = .25;
@@ -77,6 +124,7 @@ angular.module("mixTapeApp")
         var diff = yOffset - ((y / this.canvas_height)* height).toFixed(2);
         diff = Math.round(diff / lineSpacing);
             if (diff >= -8 && diff <= 3) {
+                this.canvasObjects.push(this.note);
                 this.durations.push(time_duration);
                 this.canvasLocations.push([(x / this.canvas_width), (y / this.canvas_height)]);
                 this.drawObjects();
@@ -89,14 +137,26 @@ angular.module("mixTapeApp")
             this.canvasObjects[i](this.canvas, locs[0] * this.canvas_width, locs[1] * this.canvas_height, noteRad);
             this.canvasObjects[i].draw;
         }
+        
+        for (var i = 0; i < this.canvasChords.length; i++) {
+            var locs = this.canvasChordLocations[i];
+            this.canvasChords[i](this.canvas, locs[0] * this.canvas_width, locs[1] * this.canvas_height, noteRad);
+            this.canvasChords[i].draw;
+        }
+    },
+
+    clearChords: function() {
+        this.canvasChords = [];
+        this.canvasChordLocations = [];
     },
 
     clearObjects: function() {
         this.canvasObjects = [];
         this.canvasLocations = [];
+        this.clearChords();
         this.durations = [];
         this.canvas.clearRect(0, 0, this.canvas.width, this.canvas.height); 
-        return;
+        
     },
     
     drawHorizontalLine: function(x, y, length) {
@@ -126,7 +186,7 @@ angular.module("mixTapeApp")
             this.drawVerticalLine(xOffset + paddingLeft + (j * (measureWidth / globalSettings.numMeasures)), yOffset + paddingTop, measureHeight);
         }
     },
-
+    
     drawStaff: function() {
         for (var i = 0; i < globalSettings.numMeasureLines; i++) {
             this.drawMeasures(0, i * (this.canvas_height * globalSettings.measureLineSpacing));    

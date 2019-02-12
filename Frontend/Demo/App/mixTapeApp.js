@@ -17,6 +17,8 @@ angular.module("mixTapeApp", [])
         for (var i = 0; i < notes.length; i++){
             melody.push({"note":notes[i][0].charAt(0), "duration":durations[i]})
         }
+        console.log("mel: " + melody);
+
         var req = new XMLHttpRequest();
         req.open("POST","http://" + hostName + ":8081/chord_progressions");
         req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
@@ -24,7 +26,9 @@ angular.module("mixTapeApp", [])
         req.onreadystatechange = function() {
         // Typical action to be performed when the document is ready:
             $scope.chords = JSON.parse(req.response);
-            console.log($scope.chords);
+            renderService.clearChords();
+            renderService.addChords($scope.chords);
+            // console.log($scope.chords);
         };
     };
 
@@ -81,7 +85,7 @@ angular.module("mixTapeApp", [])
                     utilsService.playSequence(melody, false);
                 };
 
-                graphicsEngineService.initialise(canvasContext, [], [],[], "quarter");
+                graphicsEngineService.initialise(canvasContext, [], [], [], [], [], "quarter");
 
                 function canvasMouseClick(e) {
 
@@ -93,6 +97,8 @@ angular.module("mixTapeApp", [])
                 function canvasResize(e) {
                     var canvasObjs = graphicsEngineService.getObjects();
                     var canvasLocs = graphicsEngineService.getLocations();
+                    var canvasChords = graphicsEngineService.getChords();
+                    var canvasChordLocations = graphicsEngineService.getChordLocations();
                     var durs = graphicsEngineService.durations;
                     var curType = graphicsEngineService.currentType;
                     var width = window.innerWidth;
@@ -101,7 +107,7 @@ angular.module("mixTapeApp", [])
                     canvas.height = height;
                     canvas.style.width = width;
                     canvas.style.height = height;
-                    graphicsEngineService.initialise(canvasContext, canvasObjs, canvasLocs, durs, curType);
+                    graphicsEngineService.initialise(canvasContext, canvasObjs, canvasLocs, canvasChords, canvasChordLocations, durs, curType);
                     canvasContext.clearRect(0, 0, canvas.width, canvas.height);
                     renderService.draw();
                 }
