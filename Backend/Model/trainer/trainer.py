@@ -49,7 +49,6 @@ class Trainer(BaseTrainer):
                 data[k] = data[k].to(self.device)
             for k in target.keys():
                 target[k] = target[k].to(self.device)
-            extra['device'] = self.device
 
             self.optimizer.zero_grad()
             output = self.model(data, extra=extra)

@@ -9,7 +9,7 @@ def midi_loss(output, target, extra=None):
 
     batch_size, seq_len, vocab_size = melody_out.shape
     seq_lengths = extra['seq_lengths']
-    device = extra['device']
+    device = melody_out.device
 
     # flatten (batchsize, seq_len, vocab_size) -> (batchsize * seq_len, vocab_size)
     # contiguous returns tensor with same data
