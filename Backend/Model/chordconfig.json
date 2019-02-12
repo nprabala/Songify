@@ -9,7 +9,8 @@
             "embed_size": 8,
             "hidden_size": 128,
             "num_layers": 4,
-            "dropout": 0.1
+            "dropout": 0.1,
+            "bidirectional": true
         }
     },
     "data_loader": {

@@ -56,8 +56,9 @@ class MidiLSTM(BaseModel):
         Initialize hidden input for LSTM
             (num_layers, batch_size, hidden_size)
         """
-        return (torch.zeros(self.num_layers, batch_size, self.hidden_size).to(device),
-                torch.zeros(self.num_layers, batch_size, self.hidden_size).to(device))
+        scale = 2 if self.bidirectional else 1
+        return (torch.zeros(self.num_layers * scale, batch_size, self.hidden_size).to(device),
+                torch.zeros(self.num_layers * scale, batch_size, self.hidden_size).to(device))
 
     def forward(self, data, extra=None):
         """
