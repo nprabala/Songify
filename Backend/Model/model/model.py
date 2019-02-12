@@ -123,10 +123,7 @@ class BigMidiLSTM(MidiLSTM):
             nn.Linear(self.hidden_size//4, self.hidden_size//8),
             nn.ReLU(),
             nn.Dropout(self.dropout),
-            nn.Linear(self.hidden_size//8, self.hidden_size//16),
-            nn.ReLU(),
-            nn.Dropout(self.dropout),
-            nn.Linear(self.hidden_size//16, self.vocab_size),
+            nn.Linear(self.hidden_size//8, self.vocab_size),
         )
         self.chord_classifier = nn.Sequential(
             nn.Dropout(self.dropout),
@@ -139,10 +136,7 @@ class BigMidiLSTM(MidiLSTM):
             nn.Linear(self.hidden_size//4, self.hidden_size//8),
             nn.ReLU(),
             nn.Dropout(self.dropout),
-            nn.Linear(self.hidden_size//8, self.hidden_size//16),
-            nn.ReLU(),
-            nn.Dropout(self.dropout),
-            nn.Linear(self.hidden_size//16, self.vocab_size),
+            nn.Linear(self.hidden_size//8, self.vocab_size),
         )
 
 class MnistModel(BaseModel):

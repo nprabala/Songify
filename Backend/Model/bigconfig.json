@@ -6,9 +6,9 @@
         "name": "BigMidiLSTM",
         "args": {
             "vocab_size": 14,
-            "embed_size": 16,
-            "hidden_size": 256,
-            "num_layers": 8,
+            "embed_size": 8,
+            "hidden_size": 128,
+            "num_layers": 4,
             "dropout": 0.1
         }
     },
