@@ -14,29 +14,11 @@ angular.module("mixTapeApp", [])
         $scope.melodyDurations = [];
         $scope.chordDurations = [];
 
-    $scope.getMelody = function() {
-        var objs = graphicsEngineService.getObjects();
-        var locs = graphicsEngineService.getLocations();
-        var width = graphicsEngineService.getCanvasWidth();
-        var height = graphicsEngineService.getCanvasHeight();
-        var yOffset = (graphicsEngineService.getYOffset(0) / 2).toFixed(2);
-        var lineSpacing = graphicsEngineService.getLineSpacing();
-        var melody = [];
-        var result = "";
-        for (var i = 0; i < locs.length; i++) {
-            var diff = yOffset - (locs[i][1] * height).toFixed(2);
-            diff = Math.round(diff / lineSpacing);
-            if (diff >= -8 && diff <= 3) {
-                melody.push([globalSettings.trebleStaff[(diff * -1) + 3]]);
-            }
-        }
-
+    getMelody = function() {
+        var melody = utilsService.getMelody();
         $scope.melodySounds = [];
         for (var i = 0; i < melody.length; i++) {
-            // TODO: can't have # in name, possible better solution
-            if (melody[i][1] == '#') {
-                melody[i] = melody[i][0] + 'S' + melody[2];
-            }
+            var note = utilsService.cleanNote(melody[i]);
             var file = 'App/aud/' + melody[i] + '.wav';
             var howl = new Howl({ src: [file], volume: 0.4});
             $scope.melodySounds.push(howl);
@@ -46,98 +28,51 @@ angular.module("mixTapeApp", [])
         $scope.melodyDurations = graphicsEngineService.durations;
     }
 
-    $scope.getChords = function(callback) {
-        $scope.getMelody();
+    getChords = function(chords) {
+        $scope.chordSounds = [];
+        $scope.chordDurations = [];
+        renderService.clearChords();
+        for (var i = 0; i < chords.length; i++) {
+            var unsplitChord = chords[i]["chord"];
+            var duration = chords[i]["duration"];
+            var splitChord = unsplitChord.split(".");
 
-        var notes = $scope.melody;
-        var durations = graphicsEngineService.durations;
-        var melody = [];
+            var chordObj = [];
+            for (var j = 0; j < splitChord.length; j++) {
+                var note = utilsService.cleanNote(splitChord[j] + '4');
+                var file = 'App/aud/' + note + '.wav';
+                var howl = new Howl({ src: [file], volume: 0.4});
+                chordObj.push(howl);
+            }
 
-        for (var i = 0; i < notes.length; i++){
-            melody.push({"note":notes[i][0].charAt(0), "duration":durations[i]})
+            $scope.chordSounds.push(chordObj);
+            $scope.chordDurations.push(duration);
         }
 
-        var req = new XMLHttpRequest();
-        req.open("POST","http://" + hostName + ":8081/chord_progressions");
-        req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        req.onreadystatechange = function() {
-            var chords = JSON.parse(req.response);
-            console.log(chords);
-
-            $scope.chordSounds = [];
-            $scope.chordDurations = [];
-            renderService.clearChords();
-            for (var i = 0; i < chords.length; i++) {
-                var unsplitChord = chords[i]["chord"];
-                var duration = chords[i]["duration"];
-                var splitChord = unsplitChord.split(".");
-
-                var chordObj = [];
-                for (var j = 0; j < splitChord.length; j++) {
-                    // TODO: can't have # in name, possible better solution
-                    if (splitChord[j][1] == '#') {
-                        splitChord[j] = splitChord[j][0] + 'S'
-                    }
-                    var file = 'App/aud/' + splitChord[j] + '4' + '.wav';
-                    var howl = new Howl({ src: [file], volume: 0.4});
-                    chordObj.push(howl);
-                }
-
-                $scope.chordSounds.push(chordObj);
-                $scope.chordDurations.push(duration);
-            }
-
-            $scope.chords = chords;
-            renderService.addChords($scope.chords);
-            callback();
-        };
-
-        req.send(JSON.stringify(melody));
+        $scope.chords = chords;
+        renderService.addChords($scope.chords);
     };
-    
-    $scope.sleep = function(milliseconds) {
-        return new Promise(resolve => setTimeout(resolve, milliseconds))
-    };
-
-    $scope.playSequence = async function(sequence, durations, isChord) {
-
-        if (isChord) {
-            for (var i = 0; i < sequence.length; i++) {
-                for (var j = 0; j < sequence[i].length; j++) {
-                    sequence[i][j].play();
-                }
-
-                await $scope.sleep(durations[i] * 1000);
-            }
-        } else {
-            for (var i = 0; i < sequence.length; i++) {
-                sequence[i].play();
-                await $scope.sleep(durations[i]*1000);
-            }
-        }
-    }
 
     $scope.playMelody = function() {
-        $scope.getMelody();
-        $scope.playSequence($scope.melodySounds, $scope.melodyDurations, false);
+        getMelody();
+        utilsService.playSequence($scope.melodySounds, $scope.melodyDurations, false);
     };
 
-    $scope.playChords = function(){
-        var callback = async function() { 
-            await $scope.sleep(500); // TODO: keep until find better solution
-            $scope.playSequence($scope.chordSounds, $scope.chordDurations, true); 
-        };
-        $scope.getChords(callback);
+    $scope.playChords = async function(){
+        getMelody();
+        utilsService.requestChords($scope.melody, hostName, getChords);
+        await utilsService.sleep(300);
+
+        utilsService.playSequence($scope.chordSounds, $scope.chordDurations, true);
     };
 
-    $scope.playComplete = function() {
-        $scope.getMelody();
-        var callback = async function() {
-            await $scope.sleep(500); // TODO: keep until find better solution
-            $scope.playSequence($scope.melodySounds, $scope.melodyDurations, false);
-            $scope.playSequence($scope.chordSounds, $scope.chordDurations, true);
-        }
-        $scope.getChords(callback);
+    $scope.playComplete = async function() {
+        getMelody();
+        utilsService.requestChords($scope.melody, hostName, getChords);
+        await utilsService.sleep(300);
+
+        utilsService.playSequence($scope.melodySounds, $scope.melodyDurations, false);
+        utilsService.playSequence($scope.chordSounds, $scope.chordDurations, true);
     };
 
     $scope.updateGraphics = function(){
