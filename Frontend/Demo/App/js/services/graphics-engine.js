@@ -1,7 +1,7 @@
 angular.module("mixTapeApp")
 .factory("graphicsEngineService", ["globalSettings", function(globalSettings) {
    return {
-    initialise: function(canvasContext, objs, locs, chords, clocs, durs, curType) {
+    initialise: function(canvasContext, objs, locs, chords, clocs, durs) {
         this.canvasObjects = objs; // This stores all of the canvas objects to be rendered (except the staff)
         this.canvasLocations = locs; // This stores all the locations of the canvas objects, corresponding to canvasObjects in 1:1
         this.canvasChords = chords;
@@ -13,11 +13,10 @@ angular.module("mixTapeApp")
         this.canvas_height = this.canvas_attributes['height'] / 2;
         this.canvas_width = this.canvas_attributes['width'] / 2;
         this.durations = durs;
-        this.currentType = curType;
         this.canvas.strokeStyle = "black";
     },
 
-    note: function(ctx, x, y, rad) {
+    note: function(ctx, x, y, rad, pitchType) {
         function draw(ctx, x, y, rad) {
             ctx.save();
             ctx.beginPath();
@@ -126,16 +125,16 @@ angular.module("mixTapeApp")
 
     addNote: function(x, y) {
         var time_duration = 1;
-        if (this.currentType == "sixteenth"){
+        if (globalSettings.currentType == "sixteenth"){
             time_duration = .25;
         } 
-        if(this.currentType == "eighth"){
+        if(globalSettings.currentType == "eighth"){
             time_duration = .5;
         }
-        if(this.currentType == "half"){
+        if(globalSettings.currentType == "half"){
             time_duration = 2;
         }
-        if(this.currentType == "whole"){
+        if(globalSettings.currentType == "whole"){
             time_duration = 4;
         }
         var height = this.getCanvasHeight();
@@ -144,6 +143,7 @@ angular.module("mixTapeApp")
         var diff = yOffset - ((y / this.canvas_height)* height).toFixed(2);
         diff = Math.round(diff / lineSpacing);
             if (diff >= -8 && diff <= 3) {
+                globalSettings.pitchAlterations.push(globalSettings.pitchType);
                 this.canvasObjects.push(this.note);
                 this.durations.push(time_duration);
                 this.canvasLocations.push([(x / this.canvas_width), (y / this.canvas_height)]);
@@ -175,6 +175,7 @@ angular.module("mixTapeApp")
         this.canvasLocations = [];
         this.clearChords();
         this.durations = [];
+        globalSettings.pitchAlterations = [];
         this.canvas.clearRect(0, 0, this.canvas.width, this.canvas.height); 
         
     },

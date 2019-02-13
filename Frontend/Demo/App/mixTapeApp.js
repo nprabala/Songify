@@ -6,6 +6,8 @@ angular.module("mixTapeApp", [])
         var hostName = url.hostname;
         //Sample JSON to send. Will format notes object later.
         $scope.noteTypes = ["sixteenth","eighth","quarter","half","whole"];
+        $scope.pitchAlteration = ["Sharp","Flat","Natural"]
+        $scope.pitchType = "Natural";
         $scope.currentType = "quarter";
         $scope.chords = [];
         $scope.melody = [];
@@ -13,13 +15,14 @@ angular.module("mixTapeApp", [])
         $scope.chordSounds = [];
         $scope.melodyDurations = [];
         $scope.chordDurations = [];
+        $scope.topMessage = "Welcome to Mixtape!";
 
     getMelody = function() {
         var melody = utilsService.getMelody();
         $scope.melodySounds = [];
         for (var i = 0; i < melody.length; i++) {
             var note = utilsService.cleanNote(melody[i]);
-            var file = 'App/aud/' + melody[i] + '.wav';
+            var file = 'App/aud/' + note + '.wav';
             var howl = new Howl({ src: [file], volume: 0.4});
             $scope.melodySounds.push(howl);
         }
@@ -55,6 +58,7 @@ angular.module("mixTapeApp", [])
 
     $scope.playMelody = function() {
         getMelody();
+        $scope.topMessage = $scope.melody.toString();
         utilsService.playSequence($scope.melodySounds, $scope.melodyDurations, false);
     };
 
@@ -62,9 +66,11 @@ angular.module("mixTapeApp", [])
         getMelody();
         utilsService.requestChords($scope.melody, hostName, getChords);
         await utilsService.sleep(500);
+        $scope.topMessage = $scope.chordSounds.toString();
 
         utilsService.playSequence($scope.chordSounds, $scope.chordDurations, true);
     };
+    
 
     $scope.playComplete = async function() {
         getMelody();
@@ -75,21 +81,28 @@ angular.module("mixTapeApp", [])
         utilsService.playSequence($scope.chordSounds, $scope.chordDurations, true);
     };
 
-    $scope.updateGraphics = function(){
-      graphicsEngineService.currentType = $scope.currentType;
+    $scope.updateNoteType = function(){
+      globalSettings.currentType = $scope.currentType;
     };
+    
+    $scope.updatePitchType = function(){
+      globalSettings.pitchType = $scope.pitchType;  
+    };
+    
 }])
 
     .directive("mixtapeApp", ["$interval", "renderService", "graphicsEngineService", "utilsService", "globalSettings",
         function($interval, renderService, graphicsEngineService, utilsService, globalSettings) {
         return {
             restrict: 'A',
-            template: '<div id="debug">Welcome to Mixtape!</div>' +
+            template: '<div id="debug">{{topMessage}}</div>' +
             '<button id="clear">Clear</button>' +
             '<button id="" ng-click="playMelody()">Play Melody</button>' +
             '<button id="" ng-click="playChords()">Play Chords</button>' +
             '<button id="" ng-click="playComplete()">Play with Chords</button>' +
-            '<select ng-model="currentType" ng-options="x for x in noteTypes" ng-change="updateGraphics()"></select>'+
+            '<select ng-model="currentType" ng-options="x for x in noteTypes" ng-change="updateNoteType()"></select>'+
+            '<select ng-model="pitchType" ng-options="x for x in pitchAlteration" ng-change="updatePitchType()"></select>'+
+
             '<canvas id="musicCanvas"></canvas>',
 
             link: function(scope, element) {
@@ -108,10 +121,9 @@ angular.module("mixTapeApp", [])
                 clearBtn.onclick = function() {
                     canvasContext.clearRect(0, 0, canvas.width, canvas.height);
                     renderService.clearObjects();
-                    document.getElementById("debug").innerHTML = "Notes cleared!";
                 };
 
-                graphicsEngineService.initialise(canvasContext, [], [], [], [],[], "quarter");
+                graphicsEngineService.initialise(canvasContext, [], [], [], [],[]);
 
                 function canvasMouseClick(e) {
 
@@ -126,14 +138,13 @@ angular.module("mixTapeApp", [])
                     var canvasChords = graphicsEngineService.getChords();
                     var canvasChordLocations = graphicsEngineService.getChordLocations();
                     var durs = graphicsEngineService.durations;
-                    var curType = graphicsEngineService.currentType;
                     var width = window.innerWidth;
                     var height = window.innerHeight;
                     canvas.width = width;
                     canvas.height = height;
                     canvas.style.width = width;
                     canvas.style.height = height;
-                    graphicsEngineService.initialise(canvasContext, canvasObjs, canvasLocs, canvasChords, canvasChordLocations, durs, curType);
+                    graphicsEngineService.initialise(canvasContext, canvasObjs, canvasLocs, canvasChords, canvasChordLocations, durs);
                     canvasContext.clearRect(0, 0, canvas.width, canvas.height);
                     renderService.draw();
                 }

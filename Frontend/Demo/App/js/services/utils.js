@@ -16,10 +16,19 @@ angular.module("mixTapeApp")
                     var diff = yOffset - (locs[i][1] * height).toFixed(2);
                     diff = Math.round(diff / lineSpacing);
                     if (diff >= -8 && diff <= 3) {
-                        melody.push([globalSettings.trebleStaff[(diff * -1) + 3]]);
+                        var pitchType = globalSettings.pitchAlterations[i];
+                        var pitchFileMod = "";
+                        if (pitchType == "Sharp"){
+                            pitchFileMod = "#";
+                        }
+                        if(pitchType == "Flat"){
+                            pitchFileMod = "-";
+                        }
+                        var pitch = globalSettings.trebleStaff[(diff * -1) + 3];
+                        var fileString = this.flatSharpExceptions(pitch,pitchFileMod);
+                        melody.push(fileString);
                     }
                 }
-
                 return melody;
             },
 
@@ -28,7 +37,7 @@ angular.module("mixTapeApp")
                 var melody = [];
 
                 for (var i = 0; i < notes.length; i++){
-                    melody.push({"note":notes[i][0].charAt(0), "duration":durations[i]})
+                    melody.push({"note":notes[i].charAt(0), "duration":durations[i]})
                 }
 
                 var req = new XMLHttpRequest();
@@ -47,8 +56,8 @@ angular.module("mixTapeApp")
             },
 
             cleanNote: function(note) {
-                if (note[1] == '#') {
-                    return note[0] + 'S' + note[2];
+                if (note.substr(1,1) == '#') {
+                    return note.substr(0,1) + 'S' + note.substr(2,2);
                 } else {
                     return note;
                 }
@@ -73,6 +82,37 @@ angular.module("mixTapeApp")
                         sequence[i].stop();
                     }
                 }
+            },
+            // Checks for all the flat sharp combos that really mean something else.
+            flatSharpExceptions: function (pitch, pitchFileMod){
+                if (pitch.substr(0,1) == "A" && pitchFileMod == "-"){
+                    return "G" + "#" + pitch.substr(1,1);
+                }
+                if (pitch.substr(0,1) == "A" && pitchFileMod == "#"){
+                    return "B" + "-" + pitch.substr(1,1);
+                }
+                if (pitch.substr(0,1) == "B" && pitchFileMod == "#"){
+                    return "C" + pitch.substr(1,1);
+                }
+                if (pitch.substr(0,1) == "D" && pitchFileMod == "-"){
+                    return "C" + "#" + pitch.substr(1,1);
+                }
+                if (pitch.substr(0,1) == "D" && pitchFileMod == "#"){
+                    return "E" + "-" + pitch.substr(1,1);
+                }
+                if (pitch.substr(0,1) == "C" && pitchFileMod == "-"){
+                    return "B" + (parseInt(pitch.substr(1,1)) - 1).toString();
+                }
+                if (pitch.substr(0,1) == "E" && pitchFileMod == "#"){
+                    return "F" + pitch.substr(1,1);
+                }
+                if (pitch.substr(0,1) == "F" && pitchFileMod == "-"){
+                    return "E" + pitch.substr(1,1);
+                }
+                if (pitch.substr(0,1) == "G" && pitchFileMod == "-"){
+                    return "F" + pitch.substr(1,1);
+                }
+                return pitch.substr(0,1) + pitchFileMod + pitch.substr(1,1); 
             },
         }
     }]);
