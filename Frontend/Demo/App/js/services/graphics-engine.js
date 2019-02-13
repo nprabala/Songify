@@ -83,7 +83,8 @@ angular.module("mixTapeApp")
     // param sequence = the index of canvasObjects/canvasLocations that 
     // the chord should be rendered underneath (for example, if sequence == 0, 
     // should find the first location in canvasLocations and use that 
-    // x-pos to render the chord underneath that note)    
+    // x-pos to render the chord underneath that note)  
+    // TODO: should not render when chordObj = ""
     addChordNote: function(note, dur) {
         this.canvasChords.push(this.chord);
         var yPos = this.getYOffset(1) / 2;
@@ -109,7 +110,6 @@ angular.module("mixTapeApp")
         else if (note == "E" || note == "E#" || note == "E-") {
             chordY = (yPos / this.canvas_height) + (globalSettings.noteRadius);
         }
-        
         else {
            chordY = (yPos / this.canvas_height); 
         }
@@ -121,7 +121,6 @@ angular.module("mixTapeApp")
                 break;
             }
         }
-        console.log("accessing index for newdur: " + newDur);
         this.canvasChordLocations.push([this.canvasLocations[newDur][0], chordY]);
         this.drawObjects();
     },
