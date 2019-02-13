@@ -9,10 +9,10 @@ from data_loader.dataset import MidiDataset
 
 class Predict:
     MAX_LEN = 1000
-    def __init__(self):
-        self.data_path = './data/out.pkl'
+    def __init__(self, data_path='./data/out.pkl', resume='./weights/seq_Chord_Music_LSTM_small/0212_112518/model_best.pth'):
+        self.data_path = data_path
         self.dataset = MidiDataset(self.data_path)
-        self.resume = './weights/seq_Chord_Music_LSTM_small/0212_112518/model_best.pth'
+        self.resume = resume
 
         # Load checkpoint
         if torch.cuda.is_available():
@@ -25,7 +25,7 @@ class Predict:
         # Load model
         self.model = get_instance(module_model, 'model', self.config)
         self.model.load_state_dict(state_dict)
-        print(self.model)
+        self.model.eval()
 
 
     def generateOutput(self, input, extra=None):
@@ -44,13 +44,6 @@ class Predict:
                 pred_output.append(chordstr)
 
         return pred_output
-
-        for i in range(0, len(x)):
-            prediction = self.model.predict(numpy.array([x[i]]))
-            index = numpy.argmax(prediction)
-            result = self.dataset.int_to_chord[index]
-            prediction_output.append(result)
-        return prediction_output
 
     def process(self, input_):
         notes = [self.dataset.convert_note_to_int(n) for n in input_]
