@@ -41,6 +41,11 @@ angular.module("mixTapeApp", [])
             var splitChord = unsplitChord.split(".");
 
             var chordObj = [];
+            if (splitChord[0] == "") {
+                $scope.chordSounds.push("");
+                $scope.chordDurations.push(duration);
+                continue;
+            }
             for (var j = 0; j < splitChord.length; j++) {
                 var note = utilsService.cleanNote(splitChord[j] + '4');
                 var file = 'App/aud/' + note + '.wav';
