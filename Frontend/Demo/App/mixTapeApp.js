@@ -65,8 +65,7 @@ angular.module("mixTapeApp", [])
     $scope.playChords = async function(){
         getMelody();
         utilsService.requestChords($scope.melody, hostName, getChords);
-        await utilsService.sleep(500);
-        $scope.topMessage = $scope.chordSounds.toString();
+        await utilsService.sleep(1000);
 
         utilsService.playSequence($scope.chordSounds, $scope.chordDurations, true);
     };
@@ -75,7 +74,7 @@ angular.module("mixTapeApp", [])
     $scope.playComplete = async function() {
         getMelody();
         utilsService.requestChords($scope.melody, hostName, getChords);
-        await utilsService.sleep(500);
+        await utilsService.sleep(1000);
 
         utilsService.playSequence($scope.melodySounds, $scope.melodyDurations, false);
         utilsService.playSequence($scope.chordSounds, $scope.chordDurations, true);
@@ -121,6 +120,7 @@ angular.module("mixTapeApp", [])
                 clearBtn.onclick = function() {
                     canvasContext.clearRect(0, 0, canvas.width, canvas.height);
                     renderService.clearObjects();
+                    document.getElementById("debug").innerHTML = "Cleared!";
                 };
 
                 graphicsEngineService.initialise(canvasContext, [], [], [], [],[]);
