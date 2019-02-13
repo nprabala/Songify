@@ -97,7 +97,7 @@ class MidiDataset(Dataset):
         return note_list
 
     def convert_chord_to_onehot(self, chord):
-        return self.chord_to_idx[chord]
+        return self.idx_to_chord[chord]
 
     @classmethod
     def convert_chord_to_binary(cls, chord):

@@ -1,5 +1,5 @@
-import osco
 import sys
+import json
 import numpy
 import torch
 
@@ -10,39 +10,40 @@ from data_loader.dataset import MidiDataset
 class Predict:
     MAX_LEN = 1000
     def __init__(self):
-        # Load config
-        self.json_path = './config.json'
-        self.config = config = json.load(open(self.json_path))
-        self.dataset = MidiDataset
+        self.data_path = './data/out.pkl'
+        self.dataset = MidiDataset(self.data_path)
+        self.resume = './weights/seq_Chord_Music_LSTM_small/0212_112518/model_best.pth'
 
-        # load model
-        self.model = get_instance(module_model, 'model', self.config)
-        self.resume = './saved/Music_LSTM/0208_141502/model_best.pth'
+        # Load checkpoint
         if torch.cuda.is_available():
             checkpoint = torch.load(self.resume)
         else:
             checkpoint = torch.load(self.resume, map_location=lambda storage, loc: storage)
         state_dict = checkpoint['state_dict']
+        self.config = checkpoint['config']
+
+        # Load model
+        self.model = get_instance(module_model, 'model', self.config)
         self.model.load_state_dict(state_dict)
+        print(self.model)
 
 
-
-    def generateOutput(self, x):
+    def generateOutput(self, input, extra=None):
         pred_output = []
 
-        for i in range(self.MAX_LEN):
-            if i < len(x):
-                input = x[i]
-            else:
-                input = output['melody_out'].argmax()
-            output = self.model(input)
+        output = self.model(input, extra=extra)
 
-            pred = self.dataset.convert_onehot_to_chord(output['chord_out'])
-            pred_output.append(pred)
+        for i, chord in enumerate(output['chord_out']):
+            c_idx = int(torch.argmax(chord))
+            chordstr = self.dataset.convert_chord_to_onehot(c_idx)
+            if i == 0:
+                # make up for input by attaching the same chord
+                for j in range(self.dataset.SEQUENCE_LENGTH):
+                    pred_output.append(chordstr)
+            else:
+                pred_output.append(chordstr)
 
         return pred_output
-
-
 
         for i in range(0, len(x)):
             prediction = self.model.predict(numpy.array([x[i]]))
@@ -52,9 +53,39 @@ class Predict:
         return prediction_output
 
     def process(self, input_):
-        x = torch.tensor([self.dataset.convert_note_to_int(n) for n in input_]).long().view(1,-1)
-        return x
+        notes = [self.dataset.convert_note_to_int(n) for n in input_]
+        x = []
+        lengths = []
+
+        for i in range(len(input_) - self.dataset.SEQUENCE_LENGTH + 1):
+            curr_x = notes[i:i + self.dataset.SEQUENCE_LENGTH]
+            x.append(curr_x)
+            lengths.append(len(curr_x))
+
+        # convert to torch tensor
+        x = torch.LongTensor(x)
+        seq_lengths = torch.LongTensor(lengths)
+
+        # store in output
+        input = {'melody_x':x,}
+        extra = {'seq_lengths': seq_lengths}
+        return input, extra
 
     def get_prediction(self, input_):
-        x = self.process(input_)
-        return self.generateOutput(x)
+        if isinstance(input_[0], list):
+            outputs = []
+            for i in range(len(input_)):
+                x, extra = self.process(input_[i])
+                outputs.append(self.generateOutput(x, extra=extra))
+            return outputs
+        else:
+            x, extra = self.process(input_)
+            return self.generateOutput(x, extra=extra)
+
+if __name__ == "__main__":
+    predict = Predict()
+    input = ['A','A','A','A','A','A','C','C','C','C','C','C','C','C','C','C','A','A','B','B','B','B','B','A']
+    # inputs = [input, input]
+    output = predict.get_prediction(input)
+    print(input)
+    print(output)
