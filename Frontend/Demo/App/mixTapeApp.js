@@ -33,6 +33,10 @@ angular.module("mixTapeApp", [])
 
         $scope.melodySounds = [];
         for (var i = 0; i < melody.length; i++) {
+            // TODO: can't have # in name, possible better solution
+            if (melody[i][1] == '#') {
+                melody[i] = melody[i][0] + 'S' + melody[2];
+            }
             var file = 'App/aud/' + melody[i] + '.wav';
             var howl = new Howl({ src: [file], volume: 0.4});
             $scope.melodySounds.push(howl);
@@ -70,8 +74,10 @@ angular.module("mixTapeApp", [])
 
                 var chordObj = [];
                 for (var j = 0; j < splitChord.length; j++) {
-                    if (splitChord[j].includes('#') || splitChord[j].includes('-')) continue; // TODO: Temp hack until sharps
-
+                    // TODO: can't have # in name, possible better solution
+                    if (splitChord[j][1] == '#') {
+                        splitChord[j] = splitChord[j][0] + 'S'
+                    }
                     var file = 'App/aud/' + splitChord[j] + '4' + '.wav';
                     var howl = new Howl({ src: [file], volume: 0.4});
                     chordObj.push(howl);
@@ -88,11 +94,12 @@ angular.module("mixTapeApp", [])
 
         req.send(JSON.stringify(melody));
     };
+    
+    $scope.sleep = function(milliseconds) {
+        return new Promise(resolve => setTimeout(resolve, milliseconds))
+    };
 
     $scope.playSequence = async function(sequence, durations, isChord) {
-        const sleep = (milliseconds) => {
-            return new Promise(resolve => setTimeout(resolve, milliseconds))
-        };
 
         if (isChord) {
             for (var i = 0; i < sequence.length; i++) {
@@ -100,12 +107,12 @@ angular.module("mixTapeApp", [])
                     sequence[i][j].play();
                 }
 
-                await sleep(durations[i] * 1000);
+                await $scope.sleep(durations[i] * 1000);
             }
         } else {
             for (var i = 0; i < sequence.length; i++) {
                 sequence[i].play();
-                await sleep(durations[i]*1000);
+                await $scope.sleep(durations[i]*1000);
             }
         }
     }
@@ -116,13 +123,17 @@ angular.module("mixTapeApp", [])
     };
 
     $scope.playChords = function(){
-        var callback = function() { $scope.playSequence($scope.chordSounds, $scope.chordDurations, true); };
+        var callback = async function() { 
+            await $scope.sleep(500); // TODO: keep until find better solution
+            $scope.playSequence($scope.chordSounds, $scope.chordDurations, true); 
+        };
         $scope.getChords(callback);
     };
 
     $scope.playComplete = function() {
         $scope.getMelody();
-        var callback = function() {
+        var callback = async function() {
+            await $scope.sleep(500); // TODO: keep until find better solution
             $scope.playSequence($scope.melodySounds, $scope.melodyDurations, false);
             $scope.playSequence($scope.chordSounds, $scope.chordDurations, true);
         }
