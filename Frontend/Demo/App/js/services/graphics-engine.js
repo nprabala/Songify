@@ -88,25 +88,41 @@ angular.module("mixTapeApp")
         this.canvasChords.push(this.chord);
         var yPos = this.getYOffset(1) / 2;
         var chordY = 0;
-        if (note == "F" || note == "F#") {
+        if (note == "F" || note == "F#" || note == "F-") {
             chordY = yPos / this.canvas_height;
         }
-        else if (note == "B") {
-            chordY = (yPos / this.canvas_height) + (5 * globalSettings.noteRadius);
-        }
-        else if (note == "G") {
+        else if (note == "G" || note == "G#" || note == "G-") {
             chordY = (yPos / this.canvas_height) - (globalSettings.noteRadius);
         }
-        else if (note == "D") {
-            chordY = (yPos / this.canvas_height) + (2.5 * globalSettings.noteRadius);
-        }
-        else if (note == "A") {
+        else if (note == "A" || note == "A#" || note == "A-") {
             chordY = (yPos / this.canvas_height) + (6 * globalSettings.noteRadius);
         }
+        else if (note == "B" || note == "B#" || note == "B-") {
+            chordY = (yPos / this.canvas_height) + (5 * globalSettings.noteRadius);
+        }
+        else if (note == "C" || note == "C#" || note == "C-") {
+            chordY =  (yPos / this.canvas_height) + (4 * globalSettings.noteRadius);           
+        }
+        else if (note == "D" || note == "D#" || note == "D-") {
+            chordY = (yPos / this.canvas_height) + (2.5 * globalSettings.noteRadius);
+        }
+        else if (note == "E" || note == "E#" || note == "E-") {
+            chordY = (yPos / this.canvas_height) + (globalSettings.noteRadius);
+        }
+        
         else {
            chordY = (yPos / this.canvas_height); 
         }
-        this.canvasChordLocations.push([this.canvasLocations[dur][0], chordY]);
+        var newDur = 0;
+        for (var i = 0; i < this.durations.length; i++) {
+            newDur += this.durations[i];
+            if (newDur > dur) {
+                newDur = i;
+                break;
+            }
+        }
+        console.log("accessing index for newdur: " + newDur);
+        this.canvasChordLocations.push([this.canvasLocations[newDur][0], chordY]);
         this.drawObjects();
     },
     
