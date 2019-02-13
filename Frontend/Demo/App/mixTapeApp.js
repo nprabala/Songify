@@ -61,7 +61,7 @@ angular.module("mixTapeApp", [])
     $scope.playChords = async function(){
         getMelody();
         utilsService.requestChords($scope.melody, hostName, getChords);
-        await utilsService.sleep(300);
+        await utilsService.sleep(500);
 
         utilsService.playSequence($scope.chordSounds, $scope.chordDurations, true);
     };
@@ -69,7 +69,7 @@ angular.module("mixTapeApp", [])
     $scope.playComplete = async function() {
         getMelody();
         utilsService.requestChords($scope.melody, hostName, getChords);
-        await utilsService.sleep(300);
+        await utilsService.sleep(500);
 
         utilsService.playSequence($scope.melodySounds, $scope.melodyDurations, false);
         utilsService.playSequence($scope.chordSounds, $scope.chordDurations, true);
