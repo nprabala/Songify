@@ -1,3 +1,17 @@
+02/12//19 (lfu2)
+
+* Created chord object in graphics engine service
+
+* Added rendering functionality for displaying chords (in blue), currently the chords are displayed at the x-coordinate of the note that it corresponds to. And they are displayed as quarter notes. This will change
+
+* Incremental updates/patches to UI (for scaling and rendering) to make sure it doesn't break :(
+
+Known issues:
+
+* Should probably store all misc data about a note (location, length, pitch) in its modular component instead of storing as separate array
+
+* Should have a separate visual cue for the notes with different lengths
+
 02/05/19 (lfu2)
 
 * Added draw note functionality in graphics-engine.js, click on screen draws a correpsonding note
