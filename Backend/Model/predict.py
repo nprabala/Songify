@@ -59,7 +59,7 @@ class Predict:
         x = torch.LongTensor(x)
         seq_lengths = torch.LongTensor(lengths)
 
-        # store in output
+        # store in output 
         input = {'melody_x':x,}
         extra = {'seq_lengths': seq_lengths}
         return input, extra

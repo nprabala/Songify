@@ -1,6 +1,6 @@
 from sanic import Sanic
 from sanic.response import text, json
-from model_lite.predict import Predict
+from predict import Predict
 from sanic_cors import CORS, cross_origin
 
 
