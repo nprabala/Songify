@@ -15,7 +15,7 @@ https://github.com/warmspringwinds/pytorch-rnn-sequence-generation-classificatio
 '''
 
 class MidiLSTM(BaseModel):
-    def __init__(self, vocab_size, embed_size, hidden_size, num_layers=1, dropout=0.1):
+    def __init__(self, vocab_size, embed_size, hidden_size, num_layers=1, dropout=0.1, bidirectional=False):
         """
         Parameters
         ----------
@@ -26,18 +26,20 @@ class MidiLSTM(BaseModel):
         num_layers : int
             Number of LSTMs stacked on each other
         """
-        super(MidiLSTM, self).__init__()
+        super().__init__()
         self.vocab_size = vocab_size
         self.embed_size = embed_size
         self.hidden_size = hidden_size
         self.num_layers = num_layers
         self.dropout = dropout
+        self.bidirectional = bidirectional
+        self.scale = 2 if self.bidirectional else 1
 
         self.embed = nn.Embedding(self.vocab_size, self.embed_size)
-        self.lstm = nn.LSTM(self.embed_size, self.hidden_size, num_layers=self.num_layers, dropout=self.dropout)
+        self.lstm = nn.LSTM(self.embed_size, self.hidden_size, num_layers=self.num_layers, dropout=self.dropout, bidirectional=self.bidirectional)
         self.hidden_network = nn.Sequential(
             nn.Dropout(self.dropout),
-            nn.Linear(self.hidden_size, self.hidden_size//2),
+            nn.Linear(self.hidden_size * self.scale, self.hidden_size//2),
             nn.ReLU(),
             nn.Dropout(self.dropout),
             nn.Linear(self.hidden_size//2, self.hidden_size//4),
@@ -48,15 +50,18 @@ class MidiLSTM(BaseModel):
             nn.Dropout(self.dropout)
         )
         self.melody_classifier = nn.Linear(self.hidden_size//8, self.vocab_size)
-        self.chord_classifier = nn.Linear(self.hidden_size//8, self.vocab_size)
+        if MidiDataset.USE_CHORD_ONEHOT:
+            self.chord_classifier = nn.Linear(self.hidden_size//8, MidiDataset.NUM_CHORDS)
+        else:
+            self.chord_classifier = nn.Linear(self.hidden_size//8, self.vocab_size)
 
     def init_hidden(self, batch_size, device='cpu'):
         """
         Initialize hidden input for LSTM
             (num_layers, batch_size, hidden_size)
         """
-        return (torch.zeros(self.num_layers, batch_size, self.hidden_size).to(device),
-                torch.zeros(self.num_layers, batch_size, self.hidden_size).to(device))
+        return (torch.zeros(self.num_layers * self.scale, batch_size, self.hidden_size).to(device),
+                torch.zeros(self.num_layers * self.scale, batch_size, self.hidden_size).to(device))
 
     def forward(self, data, extra=None):
         """
@@ -91,16 +96,25 @@ class MidiLSTM(BaseModel):
 
         out = self.hidden_network(out)
         melody_out = F.log_softmax(self.melody_classifier(out), dim=2)
-        chord_out = torch.sigmoid(self.chord_classifier(out))
+        if MidiDataset.USE_CHORD_ONEHOT:
+            chord_out = F.log_softmax(self.chord_classifier(out), dim=2)
+        else:
+            chord_out = torch.sigmoid(self.chord_classifier(out))
 
         # transpose from (seq_len, batch_size, ...) -> (batch_size, seq_len, ...)
         melody_out = melody_out.transpose(0, 1)
         chord_out = chord_out.transpose(0, 1)
 
-        output = {
-            'melody_out': melody_out,
-            'chord_out': chord_out
-        }
+        if MidiDataset.USE_SEQUENCE:
+            output = {
+                'melody_out': melody_out[:, -1],
+                'chord_out': chord_out[:, -1]
+            }
+        else:
+            output = {
+                'melody_out': melody_out,
+                'chord_out': chord_out
+            }
 
         return output
 
@@ -108,9 +122,29 @@ class MidiLSTM(BaseModel):
         melody_out = output['melody_out'].detach().numpy().argmax(dim=-1)
         chord_out = output['chord_out'].detach().numpy() > thresh
 
+class SmallMidiLSTM(MidiLSTM):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.hidden_network = nn.Sequential()
+        self.melody_classifier = nn.Sequential(
+            nn.Dropout(self.dropout),
+            nn.Linear(self.hidden_size, self.vocab_size)
+        )
+        if MidiDataset.USE_CHORD_ONEHOT:
+            self.chord_classifier = nn.Sequential(
+                nn.Dropout(self.dropout),
+                nn.Linear(self.hidden_size, MidiDataset.NUM_CHORDS)
+            )
+        else:
+            self.chord_classifier = nn.Sequential(
+                nn.Dropout(self.dropout),
+                nn.Linear(self.hidden_size, self.vocab_size)
+            )
+
+
 class BigMidiLSTM(MidiLSTM):
     def __init__(self, *args, **kwargs):
-        super(BigMidiLSTM, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.hidden_network =  nn.Sequential()
         self.melody_classifier = nn.Sequential(
             nn.Dropout(self.dropout),
@@ -123,33 +157,36 @@ class BigMidiLSTM(MidiLSTM):
             nn.Linear(self.hidden_size//4, self.hidden_size//8),
             nn.ReLU(),
             nn.Dropout(self.dropout),
-            nn.Linear(self.hidden_size//8, self.hidden_size//16),
-            nn.ReLU(),
-            nn.Dropout(self.dropout),
-            nn.Linear(self.hidden_size//16, self.hidden_size//32),
-            nn.ReLU(),
-            nn.Dropout(self.dropout),
-            nn.Linear(self.hidden_size//32, self.vocab_size)
+            nn.Linear(self.hidden_size//8, self.vocab_size),
         )
-        self.chord_classifier = nn.Sequential(
-            nn.Dropout(self.dropout),
-            nn.Linear(self.hidden_size, self.hidden_size//2),
-            nn.ReLU(),
-            nn.Dropout(self.dropout),
-            nn.Linear(self.hidden_size//2, self.hidden_size//4),
-            nn.ReLU(),
-            nn.Dropout(self.dropout),
-            nn.Linear(self.hidden_size//4, self.hidden_size//8),
-            nn.ReLU(),
-            nn.Dropout(self.dropout),
-            nn.Linear(self.hidden_size//8, self.hidden_size//16),
-            nn.ReLU(),
-            nn.Dropout(self.dropout),
-            nn.Linear(self.hidden_size//16, self.hidden_size//32),
-            nn.ReLU(),
-            nn.Dropout(self.dropout),
-            nn.Linear(self.hidden_size//32, self.vocab_size)
-        )
+        if MidiDataset.USE_CHORD_ONEHOT:
+            self.chord_classifier = nn.Sequential(
+                nn.Dropout(self.dropout),
+                nn.Linear(self.hidden_size, self.hidden_size//2),
+                nn.ReLU(),
+                nn.Dropout(self.dropout),
+                nn.Linear(self.hidden_size//2, self.hidden_size//4),
+                nn.ReLU(),
+                nn.Dropout(self.dropout),
+                nn.Linear(self.hidden_size//4, self.hidden_size//8),
+                nn.ReLU(),
+                nn.Dropout(self.dropout),
+                nn.Linear(self.hidden_size//8, MidiDataset.NUM_CHORDS),
+            )
+        else:
+            self.chord_classifier = nn.Sequential(
+                nn.Dropout(self.dropout),
+                nn.Linear(self.hidden_size, self.hidden_size//2),
+                nn.ReLU(),
+                nn.Dropout(self.dropout),
+                nn.Linear(self.hidden_size//2, self.hidden_size//4),
+                nn.ReLU(),
+                nn.Dropout(self.dropout),
+                nn.Linear(self.hidden_size//4, self.hidden_size//8),
+                nn.ReLU(),
+                nn.Dropout(self.dropout),
+                nn.Linear(self.hidden_size//8, self.vocab_size),
+            )
 
 class MnistModel(BaseModel):
     def __init__(self, num_classes=10):

@@ -46,8 +46,8 @@ def main(config, resume):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='PyTorch Template')
-    parser.add_argument('-c', '--config', default='./config.json', type=str,
-                           help='config file path (default: ./config.json)')
+    parser.add_argument('-c', '--config', default='config/config.json', type=str,
+                           help='config file path (default: config/config.json)')
     parser.add_argument('-r', '--resume', default=None, type=str,
                            help='path to latest checkpoint (default: None)')
     args = parser.parse_args()
