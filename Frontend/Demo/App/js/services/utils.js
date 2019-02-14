@@ -37,13 +37,19 @@ angular.module("mixTapeApp")
                 var melody = [];
 
                 for (var i = 0; i < notes.length; i++){
-                    melody.push({"note":notes[i].charAt(0), "duration":durations[i]})
+                    if (notes[i].length == 3) {
+                        melody.push({"note":notes[i].substr(0, 2), "duration":durations[i]});    
+                    }
+                    else {
+                        melody.push({"note":notes[i].charAt(0), "duration":durations[i]});    
+                    }
                 }
-
+                console.log("chords for melody: " + JSON.stringify(melody));
                 var req = new XMLHttpRequest();
                 req.open("POST","http://" + hostName + ":8081/chord_progressions");
                 req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
                 req.onreadystatechange = function() {
+                    
                     var chords = JSON.parse(req.response);
                     console.log(chords);
                     callback(chords);
