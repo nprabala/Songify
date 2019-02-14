@@ -1,6 +1,6 @@
 angular.module("mixTapeApp", [])
-    .controller("mixTapeController", ["$scope", "graphicsEngineService", "utilsService", "renderService", "globalSettings", "soundService", "readNotesService",
-        function($scope,graphicsEngineService, utilsService, renderService, globalSettings, soundService, readNotesService) {
+    .controller("mixTapeController", ["$scope", "graphicsEngineService", "utilsService", "renderService", "globalSettings", "soundService", "songService",
+        function($scope,graphicsEngineService, utilsService, renderService, globalSettings, soundService, songService) {
         $scope.hello = "Welcome To Mixtape";
         var url = window.location;
         var hostName = url.hostname;
@@ -13,18 +13,17 @@ angular.module("mixTapeApp", [])
         $scope.topMessage = "Welcome to Mixtape!";
 
     $scope.playMelody = function() {
-        soundService.playNotes();
-        $scope.topMessage = readNotesService.getMelody().toString(); // debug
+        songService.playMelody();
+        $scope.topMessage = songService.getMelody().toString(); // debug
     };
 
     $scope.playChords = async function(){
-        soundService.playChords();
+        songService.playChords();
     };
 
 
     $scope.playComplete = async function() {
-        soundService.playNotes();
-        soundService.playChords();
+        songService.playSong();
     };
 
     $scope.updateNoteType = function(){
@@ -37,8 +36,8 @@ angular.module("mixTapeApp", [])
 
 }])
 
-    .directive("mixtapeApp", ["$interval", "renderService", "graphicsEngineService", "utilsService", "globalSettings", "soundService", "readNotesService",
-        function($interval, renderService, graphicsEngineService, utilsService, globalSettings, soundService, readNotesService) {
+    .directive("mixtapeApp", ["$interval", "renderService", "graphicsEngineService", "utilsService", "globalSettings", "soundService", "songService",
+        function($interval, renderService, graphicsEngineService, utilsService, globalSettings, soundService, songService) {
         return {
             restrict: 'A',
             template: '<div id="debug">{{topMessage}}</div>' +
@@ -68,24 +67,19 @@ angular.module("mixTapeApp", [])
                     canvasContext.clearRect(0, 0, canvas.width, canvas.height);
                     renderService.clearObjects();
                     document.getElementById("debug").innerHTML = "Cleared!";
+                    songService.clearSong();
                 };
 
                 graphicsEngineService.initialise(canvasContext, [], [], [], [],[]);
-                soundService.initialise();
-                readNotesService.initialise(utilsService.getHostname());
+                songService.initialise(utilsService.getHostname());
 
                 function canvasMouseClick(e) {
                     renderService.addNote(
                         (e.x / 2) - (globalSettings.noteOffsetX * canvas.width * globalSettings.noteRadius),
                         (e.y / 2) - (globalSettings.noteOffsetY * canvas.height * globalSettings.noteRadius));
 
-                    // update melody
-                    readNotesService.updateMelody();
-                    soundService.updateMelody(readNotesService.getMelody(), readNotesService.getMelodyDurations());
-
-                    // update chords
-                    renderService.clearChords();
-                    readNotesService.updateChords();
+                    // TODO: not the right place for this... called on each click
+                    songService.updateSong();
                 }
 
                 function canvasResize(e) {

@@ -60,12 +60,19 @@ angular.module("mixTapeApp")
                     }
                 },
 
-                playNotes: async function() {
+                playMelody: async function() {
                     for (var i = 0; i < this.melody.length; i++) {
                         this.melody[i].play();
                         await sleep(this.melodyDuration[i]*1000);
                         this.melody[i].stop();
                     }
+                },
+
+                clearSounds: function() {
+                    this.melody = [];
+                    this.chords = [];
+                    this.melodyDuration = [];
+                    this.chordsDuration = [];
                 },
 
                 initialise: function() {

@@ -1,6 +1,6 @@
 angular.module("mixTapeApp")
-    .factory("utilsService", ["globalSettings", "graphicsEngineService",
-        function(globalSettings, graphicsEngineService) {
+    .factory("utilsService", ["globalSettings",
+        function(globalSettings) {
     	"use strict"
         return {
 
@@ -10,7 +10,7 @@ angular.module("mixTapeApp")
 
             getHostname: function() {
                 return this.hostname;
-            }, 
+            },
 
             // Checks for all the flat sharp combos that really mean something else.
             flatSharpExceptions: function (pitch, pitchFileMod){

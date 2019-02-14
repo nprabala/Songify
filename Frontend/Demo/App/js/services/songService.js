@@ -1,5 +1,5 @@
 angular.module("mixTapeApp")
-    .factory("readNotesService", ["globalSettings", "utilsService", "graphicsEngineService", "soundService", "renderService",
+    .factory("songService", ["globalSettings", "utilsService", "graphicsEngineService", "soundService", "renderService",
         function(globalSettings, utilsService, graphicsEngineService, soundService, renderService) {
             function readMelody() {
                 var objs = graphicsEngineService.getObjects();
@@ -68,23 +68,32 @@ angular.module("mixTapeApp")
                         this.chordDurations.push(duration);
                     }
 
-                    // TODO: Ideally we can pass the two below functions as args
-
                     // update sounds
                     soundService.updateChords(this.chords, this.chordDurations);
 
                     // update chords on display
+                    // TODO: Ideally we can pass the two below functions as args
+                    renderService.clearChords();
                     renderService.addChords(this.chords);
                 },
 
+
                 updateChords: function() {
-                    requestChords(this.melody, this.melodyDurations, this.hostname,
-                        this.getChordsCallback);
+                    if (this.melody != []) {
+                        requestChords(this.melody, this.melodyDurations, this.hostname,
+                            this.getChordsCallback);
+                    }
                 },
 
                 updateMelody: function() {
                     this.melody = readMelody();
                     this.melodyDurations = graphicsEngineService.durations;
+                    soundService.updateMelody(this.melody, this.melodyDurations);
+                },
+
+                updateSong: function() {
+                    this.updateMelody();
+                    this.updateChords();
                 },
 
                 getMelody: function() {
@@ -103,7 +112,34 @@ angular.module("mixTapeApp")
                     return this.chordDurations;
                 },
 
+                playMelody: function() {
+                    if (this.melody != []) {
+                        soundService.playMelody();
+                    }
+                },
+
+                playChords: function() {
+                    if (this.chords != []) {
+                        soundService.playChords();
+                    }
+                },
+
+                playSong: function() {
+                    this.playMelody();
+                    this.playChords();
+                },
+
+
+                clearSong: function() {
+                    this.chords = [];
+                    this.melody = [];
+                    this.melodyDurations = [];
+                    this.chordDurations = [];
+                    soundService.clearSounds();
+                },
+
                 initialise: function(hostname) {
+                    soundService.initialise();
                     this.hostname = hostname;
                     this.chords = [];
                     this.melody = [];
