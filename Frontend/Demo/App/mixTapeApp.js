@@ -1,6 +1,6 @@
 angular.module("mixTapeApp", [])
-    .controller("mixTapeController", ["$scope", "graphicsEngineService", "utilsService", "renderService", "globalSettings",
-        function($scope,graphicsEngineService, utilsService, renderService, globalSettings) {
+    .controller("mixTapeController", ["$scope", "graphicsEngineService", "utilsService", "renderService", "globalSettings", "soundService",
+        function($scope,graphicsEngineService, utilsService, renderService, globalSettings, soundService) {
         $scope.hello = "Welcome To Mixtape";
         var url = window.location;
         var hostName = url.hostname;
@@ -17,39 +17,12 @@ angular.module("mixTapeApp", [])
         $scope.chordDurations = [];
         $scope.topMessage = "Welcome to Mixtape!";
 
-    sounds = {
-        'A3' : new Howl({ src: ['App/aud/A3.wav'], volume: 0.4}),
-        'A4' : new Howl({ src: ['App/aud/A4.wav'], volume: 0.4}),
-        'B-3' : new Howl({ src: ['App/aud/B-3.wav'], volume: 0.4}),
-        'B-4' : new Howl({ src: ['App/aud/B-4.wav'], volume: 0.4}),
-        'B3' : new Howl({ src: ['App/aud/B3.wav'], volume: 0.4}),
-        'B4' : new Howl({ src: ['App/aud/B4.wav'], volume: 0.4}),
-        'C3' : new Howl({ src: ['App/aud/C3.wav'], volume: 0.4}),
-        'C4' : new Howl({ src: ['App/aud/C4.wav'], volume: 0.4}),
-        'CS3' : new Howl({ src: ['App/aud/CS3.wav'], volume: 0.4}),
-        'CS4' : new Howl({ src: ['App/aud/CS4.wav'], volume: 0.4}),
-        'D3' : new Howl({ src: ['App/aud/D3.wav'], volume: 0.4}),
-        'D4' : new Howl({ src: ['App/aud/D4.wav'], volume: 0.4}),
-        'E-3' : new Howl({ src: ['App/aud/E-3.wav'], volume: 0.4}),
-        'E-4' : new Howl({ src: ['App/aud/E-4.wav'], volume: 0.4}),
-        'E3' : new Howl({ src: ['App/aud/E3.wav'], volume: 0.4}),
-        'E4' : new Howl({ src: ['App/aud/E4.wav'], volume: 0.4}),
-        'F3' : new Howl({ src: ['App/aud/F3.wav'], volume: 0.4}),
-        'F4' : new Howl({ src: ['App/aud/F4.wav'], volume: 0.4}),
-        'FS3' : new Howl({ src: ['App/aud/FS3.wav'], volume: 0.4}),
-        'FS4' : new Howl({ src: ['App/aud/FS4.wav'], volume: 0.4}),
-        'G3' : new Howl({ src: ['App/aud/G3.wav'], volume: 0.4}),
-        'G4' : new Howl({ src: ['App/aud/G4.wav'], volume: 0.4}),
-        'GS3' : new Howl({ src: ['App/aud/GS3.wav'], volume: 0.4}),
-        'GS4' : new Howl({ src: ['App/aud/GS4.wav'], volume: 0.4}),
-    };
-
     getMelody = function() {
         var melody = utilsService.getMelody();
         $scope.melodySounds = [];
         for (var i = 0; i < melody.length; i++) {
             var note = utilsService.cleanNote(melody[i]);
-            $scope.melodySounds.push(sounds[note]);
+            $scope.melodySounds.push(soundService.getSounds(note));
         }
 
         $scope.melody = melody;
@@ -73,7 +46,7 @@ angular.module("mixTapeApp", [])
             }
             for (var j = 0; j < splitChord.length; j++) {
                 var note = utilsService.cleanNote(splitChord[j] + '4');
-                chordObj.push(sounds[note]);
+                chordObj.push(soundService.getSounds(note));
             }
 
             $scope.chordSounds.push(chordObj);
@@ -87,25 +60,21 @@ angular.module("mixTapeApp", [])
     $scope.playMelody = function() {
         getMelody();
         $scope.topMessage = $scope.melody.toString();
-        utilsService.playSequence($scope.melodySounds, $scope.melodyDurations, false);
+        soundService.playSequence($scope.melodySounds, $scope.melodyDurations, false);
     };
 
     $scope.playChords = async function(){
         getMelody();
         utilsService.requestChords($scope.melody, hostName, getChords);
-        await utilsService.sleep(1000);
-
-        utilsService.playSequence($scope.chordSounds, $scope.chordDurations, true);
+        soundService.playSequence($scope.chordSounds, $scope.chordDurations, true);
     };
 
 
     $scope.playComplete = async function() {
         getMelody();
         utilsService.requestChords($scope.melody, hostName, getChords);
-        await utilsService.sleep(1000);
-
-        utilsService.playSequence($scope.melodySounds, $scope.melodyDurations, false);
-        utilsService.playSequence($scope.chordSounds, $scope.chordDurations, true);
+        soundService.playSequence($scope.melodySounds, $scope.melodyDurations, false);
+        soundService.playSequence($scope.chordSounds, $scope.chordDurations, true);
     };
 
     $scope.updateNoteType = function(){
@@ -118,8 +87,8 @@ angular.module("mixTapeApp", [])
 
 }])
 
-    .directive("mixtapeApp", ["$interval", "renderService", "graphicsEngineService", "utilsService", "globalSettings",
-        function($interval, renderService, graphicsEngineService, utilsService, globalSettings) {
+    .directive("mixtapeApp", ["$interval", "renderService", "graphicsEngineService", "utilsService", "globalSettings", "soundService",
+        function($interval, renderService, graphicsEngineService, utilsService, globalSettings, soundService) {
         return {
             restrict: 'A',
             template: '<div id="debug">{{topMessage}}</div>' +
@@ -152,9 +121,9 @@ angular.module("mixTapeApp", [])
                 };
 
                 graphicsEngineService.initialise(canvasContext, [], [], [], [],[]);
+                soundService.initialise();
 
                 function canvasMouseClick(e) {
-
                     renderService.addNote(
                         (e.x / 2) - (globalSettings.noteOffsetX * canvas.width * globalSettings.noteRadius),
                         (e.y / 2) - (globalSettings.noteOffsetY * canvas.height * globalSettings.noteRadius));

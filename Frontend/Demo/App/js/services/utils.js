@@ -38,10 +38,10 @@ angular.module("mixTapeApp")
 
                 for (var i = 0; i < notes.length; i++){
                     if (notes[i].length == 3) {
-                        melody.push({"note":notes[i].substr(0, 2), "duration":durations[i]});    
+                        melody.push({"note":notes[i].substr(0, 2), "duration":durations[i]});
                     }
                     else {
-                        melody.push({"note":notes[i].charAt(0), "duration":durations[i]});    
+                        melody.push({"note":notes[i].charAt(0), "duration":durations[i]});
                     }
                 }
                 console.log("chords for melody: " + JSON.stringify(melody));
@@ -49,16 +49,12 @@ angular.module("mixTapeApp")
                 req.open("POST","http://" + hostName + ":8081/chord_progressions");
                 req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
                 req.onreadystatechange = function() {
-                    
+
                     var chords = JSON.parse(req.response);
                     console.log(chords);
                     callback(chords);
                 }
                 req.send(JSON.stringify(melody));
-            },
-
-            sleep: function(milliseconds) {
-                return new Promise(resolve => setTimeout(resolve, milliseconds))
             },
 
             cleanNote: function(note) {
@@ -69,26 +65,6 @@ angular.module("mixTapeApp")
                 }
             },
 
-            playSequence: async function(sequence, durations, isChord) {
-                if (isChord) {
-                    for (var i = 0; i < sequence.length; i++) {
-                        for (var j = 0; j < sequence[i].length; j++) {
-                            sequence[i][j].play();
-                        }
-
-                        await this.sleep(durations[i] * 1000);
-                        for (var j = 0; j < sequence[i].length; j++) {
-                            sequence[i][j].stop();
-                        }
-                    }
-                } else {
-                    for (var i = 0; i < sequence.length; i++) {
-                        sequence[i].play();
-                        await this.sleep(durations[i]*1000);
-                        sequence[i].stop();
-                    }
-                }
-            },
             // Checks for all the flat sharp combos that really mean something else.
             flatSharpExceptions: function (pitch, pitchFileMod){
                 if (pitch.substr(0,1) == "A" && pitchFileMod == "-"){
@@ -118,7 +94,7 @@ angular.module("mixTapeApp")
                 if (pitch.substr(0,1) == "G" && pitchFileMod == "-"){
                     return "F" + pitch.substr(1,1);
                 }
-                return pitch.substr(0,1) + pitchFileMod + pitch.substr(1,1); 
+                return pitch.substr(0,1) + pitchFileMod + pitch.substr(1,1);
             },
         }
     }]);
