@@ -81,7 +81,7 @@ class MidiLSTM(BaseModel):
         """
         x = data['melody_x']
         seq_lengths = extra['seq_lengths']
-        batch_size, max_seq_len  = x.shape
+        batch_size = x.size(0)
 
         # transpose from (batch_size, seq_len, ...) -> (seq_len, batch_size, ...)
         x = x.transpose(0, 1)
