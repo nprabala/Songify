@@ -1,37 +1,78 @@
 angular.module("mixTapeApp")
     .factory("soundService", [
         function() {
+
+            const sleep = (milliseconds) => {
+                return new Promise(resolve => setTimeout(resolve, milliseconds))
+            };
+
+            function cleanNote(note) {
+                if (note.substr(1,1) == '#') {
+                    return note.substr(0,1) + 'S' + note.substr(2,2);
+                } else {
+                    return note;
+                }
+            }
+
             return {
-                getSounds: function(note) {
-                    return this.sounds[note];
+                updateMelody: function(notes, duration) {
+                    this.melody = [];
+                    for (var i = 0; i < notes.length; i++) {
+                        var note = cleanNote(notes[i]);
+                        this.melody.push(this.sounds[note]);
+                    }
+
+                    this.melodyDuration = duration;
                 },
 
-                playSequence: async function(sequence, durations, isChord) {
-                    if (isChord) {
-                        for (var i = 0; i < sequence.length; i++) {
-                            for (var j = 0; j < sequence[i].length; j++) {
-                                sequence[i][j].play();
-                            }
+                updateChords: function(chords, duration) {
+                    this.chords = [];
+                    for (var i = 0; i < chords.length; i++) {
+                        var unsplitChord = chords[i]["chord"];
+                        var splitChord = unsplitChord.split(".");
 
-                            await this.sleep(durations[i] * 1000);
-                            for (var j = 0; j < sequence[i].length; j++) {
-                                sequence[i][j].stop();
+                        var chordObj = [];
+                        if (splitChord[0] == "") {
+                            chordObj.push(this.sounds[''])
+                        } else {
+                            for (var j = 0; j < splitChord.length; j++) {
+                                var note = cleanNote(splitChord[j] + '4'); // assume 4th octave
+                                chordObj.push(this.sounds[note]);
                             }
                         }
-                    } else {
-                        for (var i = 0; i < sequence.length; i++) {
-                            sequence[i].play();
-                            await this.sleep(durations[i]*1000);
-                            sequence[i].stop();
+
+                        this.chords.push(chordObj);
+                    }
+
+                    this.chordsDuration = duration;
+                },
+
+                playChords: async function() {
+                    for (var i = 0; i < this.chords.length; i++) {
+                        for (var j = 0; j < this.chords[i].length; j++) {
+                            this.chords[i][j].play();
+                        }
+
+                        await sleep(this.chordsDuration[i] * 1000);
+                        for (var j = 0; j < this.chords[i].length; j++) {
+                            this.chords[i][j].stop();
                         }
                     }
                 },
 
-                initialise: function() {
-                    this.sleep = function(milliseconds) {
-                        return new Promise(resolve => setTimeout(resolve, milliseconds))
-                    };
+                playNotes: async function() {
+                    for (var i = 0; i < this.melody.length; i++) {
+                        this.melody[i].play();
+                        await sleep(this.melodyDuration[i]*1000);
+                        this.melody[i].stop();
+                    }
+                },
 
+                initialise: function() {
+                    this.melody = [];
+                    this.chords = [];
+                    this.melodyDuration = [];
+                    this.chordsDuration = [];
                     this.sounds = {
                         'A3' : new Howl({ src: ['App/aud/A3.wav'], volume: 0.4}),
                         'A4' : new Howl({ src: ['App/aud/A4.wav'], volume: 0.4}),
@@ -57,6 +98,7 @@ angular.module("mixTapeApp")
                         'G4' : new Howl({ src: ['App/aud/G4.wav'], volume: 0.4}),
                         'GS3' : new Howl({ src: ['App/aud/GS3.wav'], volume: 0.4}),
                         'GS4' : new Howl({ src: ['App/aud/GS4.wav'], volume: 0.4}),
+                        '' : new Howl({ src: ['App/aud/GS4.wav'], volume: 0.4, mute:true}),
                     };
                 },
             }
