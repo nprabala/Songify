@@ -1,109 +1,59 @@
 angular.module("mixTapeApp", [])
-    .controller("mixTapeController", ["$scope", "graphicsEngineService", "utilsService", "renderService", "globalSettings",
-        function($scope,graphicsEngineService, utilsService, renderService, globalSettings) {
+    .controller("mixTapeController", ["$scope", "graphicsEngineService", "utilsService", "renderService", "globalSettings", "soundService", "songService",
+        function($scope,graphicsEngineService, utilsService, renderService, globalSettings, soundService, songService) {
         $scope.hello = "Welcome To Mixtape";
         var url = window.location;
         var hostName = url.hostname;
+        utilsService.setHostname(hostName);
         //Sample JSON to send. Will format notes object later.
         $scope.noteTypes = ["sixteenth","eighth","quarter","half","whole"];
         $scope.pitchAlteration = ["Sharp","Flat","Natural"]
         $scope.pitchType = "Natural";
         $scope.currentType = "quarter";
-        $scope.chords = [];
-        $scope.melody = [];
-        $scope.melodySounds = [];
-        $scope.chordSounds = [];
-        $scope.melodyDurations = [];
-        $scope.chordDurations = [];
         $scope.topMessage = "Welcome to Mixtape!";
 
-    getMelody = function() {
-        var melody = utilsService.getMelody();
-        $scope.melodySounds = [];
-        for (var i = 0; i < melody.length; i++) {
-            var note = utilsService.cleanNote(melody[i]);
-            var file = 'App/aud/' + note + '.wav';
-            var howl = new Howl({ src: [file], volume: 0.4});
-            $scope.melodySounds.push(howl);
-        }
-
-        $scope.melody = melody;
-        $scope.melodyDurations = graphicsEngineService.durations;
-    }
-
-    getChords = function(chords) {
-        $scope.chordSounds = [];
-        $scope.chordDurations = [];
-        renderService.clearChords();
-        for (var i = 0; i < chords.length; i++) {
-            var unsplitChord = chords[i]["chord"];
-            var duration = chords[i]["duration"];
-            var splitChord = unsplitChord.split(".");
-
-            var chordObj = [];
-            if (splitChord[0] == "") {
-                $scope.chordSounds.push("");
-                $scope.chordDurations.push(duration);
-                continue;
-            }
-            for (var j = 0; j < splitChord.length; j++) {
-                var note = utilsService.cleanNote(splitChord[j] + '4');
-                var file = 'App/aud/' + note + '.wav';
-                var howl = new Howl({ src: [file], volume: 0.4});
-                chordObj.push(howl);
-            }
-
-            $scope.chordSounds.push(chordObj);
-            $scope.chordDurations.push(duration);
-        }
-
-        $scope.chords = chords;
-        renderService.addChords($scope.chords);
-    };
-
     $scope.playMelody = function() {
-        getMelody();
-        $scope.topMessage = $scope.melody.toString();
-        utilsService.playSequence($scope.melodySounds, $scope.melodyDurations, false);
+        songService.updateMelody();
+        songService.playMelody();
+        $scope.topMessage = songService.getMelody().toString(); // debug
     };
 
     $scope.playChords = async function(){
-        getMelody();
-        utilsService.requestChords($scope.melody, hostName, getChords);
-        await utilsService.sleep(1000);
-
-        utilsService.playSequence($scope.chordSounds, $scope.chordDurations, true);
+        songService.playChords();
     };
-    
+
 
     $scope.playComplete = async function() {
-        getMelody();
-        utilsService.requestChords($scope.melody, hostName, getChords);
-        await utilsService.sleep(1000);
-
-        utilsService.playSequence($scope.melodySounds, $scope.melodyDurations, false);
-        utilsService.playSequence($scope.chordSounds, $scope.chordDurations, true);
+        songService.updateMelody();
+        songService.playMelody();
+        songService.playChords();
     };
+
+    $scope.loadChords = function() {
+        songService.updateMelody();
+        songService.updateChords();
+    }
 
     $scope.updateNoteType = function(){
       globalSettings.currentType = $scope.currentType;
     };
-    
+
     $scope.updatePitchType = function(){
-      globalSettings.pitchType = $scope.pitchType;  
+      globalSettings.pitchType = $scope.pitchType;
     };
-    
+
 }])
 
-    .directive("mixtapeApp", ["$interval", "renderService", "graphicsEngineService", "utilsService", "globalSettings",
-        function($interval, renderService, graphicsEngineService, utilsService, globalSettings) {
+    .directive("mixtapeApp", ["$interval", "renderService", "graphicsEngineService", "utilsService", "globalSettings", "soundService", "songService",
+        function($interval, renderService, graphicsEngineService, utilsService, globalSettings, soundService, songService) {
         return {
             restrict: 'A',
             template: '<div id="debug">{{topMessage}}</div>' +
             '<button id="clear">Clear</button>' +
             '<button id="" ng-click="playMelody()">Play Melody</button>' +
-            '<button id="" ng-click="playChords()">Play Chords</button>' +
-            '<button id="" ng-click="playComplete()">Play with Chords</button>' +
+            '<button id="" ng-click="loadChords()">Load Chords</button>' +
+            '<button id="playChords" ng-click="playChords()">Play Chords</button>' +
+            '<button id="playComplete" ng-click="playComplete()">Play with Chords</button>' +
             '<select ng-model="currentType" ng-options="x for x in noteTypes" ng-change="updateNoteType()"></select>'+
             '<select ng-model="pitchType" ng-options="x for x in pitchAlteration" ng-change="updatePitchType()"></select>'+
 
@@ -126,12 +76,13 @@ angular.module("mixTapeApp", [])
                     canvasContext.clearRect(0, 0, canvas.width, canvas.height);
                     renderService.clearObjects();
                     document.getElementById("debug").innerHTML = "Cleared!";
+                    songService.clearSong();
                 };
 
                 graphicsEngineService.initialise(canvasContext, [], [], [], [],[]);
+                songService.initialise(utilsService.getHostname());
 
                 function canvasMouseClick(e) {
-
                     renderService.addNote(
                         (e.x / 2) - (globalSettings.noteOffsetX * canvas.width * globalSettings.noteRadius),
                         (e.y / 2) - (globalSettings.noteOffsetY * canvas.height * globalSettings.noteRadius));
