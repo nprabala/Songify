@@ -13,6 +13,7 @@ angular.module("mixTapeApp", [])
         $scope.topMessage = "Welcome to Mixtape!";
 
     $scope.playMelody = function() {
+        songService.updateMelody();
         songService.playMelody();
         $scope.topMessage = songService.getMelody().toString(); // debug
     };
@@ -23,8 +24,15 @@ angular.module("mixTapeApp", [])
 
 
     $scope.playComplete = async function() {
-        songService.playSong();
+        songService.updateMelody();
+        songService.playMelody();
+        songService.playChords();
     };
+
+    $scope.loadChords = function() {
+        songService.updateMelody();
+        songService.updateChords();
+    }
 
     $scope.updateNoteType = function(){
       globalSettings.currentType = $scope.currentType;
@@ -43,8 +51,9 @@ angular.module("mixTapeApp", [])
             template: '<div id="debug">{{topMessage}}</div>' +
             '<button id="clear">Clear</button>' +
             '<button id="" ng-click="playMelody()">Play Melody</button>' +
-            '<button id="" ng-click="playChords()">Play Chords</button>' +
-            '<button id="" ng-click="playComplete()">Play with Chords</button>' +
+            '<button id="" ng-click="loadChords()">Load Chords</button>' +
+            '<button id="playChords" ng-click="playChords()">Play Chords</button>' +
+            '<button id="playComplete" ng-click="playComplete()">Play with Chords</button>' +
             '<select ng-model="currentType" ng-options="x for x in noteTypes" ng-change="updateNoteType()"></select>'+
             '<select ng-model="pitchType" ng-options="x for x in pitchAlteration" ng-change="updatePitchType()"></select>'+
 
@@ -77,9 +86,6 @@ angular.module("mixTapeApp", [])
                     renderService.addNote(
                         (e.x / 2) - (globalSettings.noteOffsetX * canvas.width * globalSettings.noteRadius),
                         (e.y / 2) - (globalSettings.noteOffsetY * canvas.height * globalSettings.noteRadius));
-
-                    // TODO: not the right place for this... called on each click
-                    songService.updateSong();
                 }
 
                 function canvasResize(e) {

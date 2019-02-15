@@ -91,11 +91,6 @@ angular.module("mixTapeApp")
                     soundService.updateMelody(this.melody, this.melodyDurations);
                 },
 
-                updateSong: function() {
-                    this.updateMelody();
-                    this.updateChords();
-                },
-
                 getMelody: function() {
                     return this.melody;
                 },
@@ -122,11 +117,6 @@ angular.module("mixTapeApp")
                     if (this.chords != []) {
                         soundService.playChords();
                     }
-                },
-
-                playSong: function() {
-                    this.playMelody();
-                    this.playChords();
                 },
 
 
