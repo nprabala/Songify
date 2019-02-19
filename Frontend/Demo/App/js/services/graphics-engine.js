@@ -17,7 +17,6 @@ angular.module("mixTapeApp")
     },
 
     note: function(ctx, x, y, rad, duration, pitchType) {
-        console.log("DURATION!!!!" + duration);
         function draw(ctx, x, y, rad, duration) {
             ctx.save();
             ctx.beginPath();
@@ -135,6 +134,7 @@ angular.module("mixTapeApp")
                 break;
             }
         }
+        console.log("adding canvas chords!!");
         this.canvasChordLocations.push([this.canvasLocations[newDur][0], chordY]);
         this.drawObjects();
     },
@@ -181,6 +181,21 @@ angular.module("mixTapeApp")
     },
     drawObjects: function() {
         var noteRad = globalSettings.noteRadius * this.canvas_height;
+        var i = this.canvasObjects.length - 1;
+        console.log("i: " + i);
+        if (i < 0) return;
+        var locs = this.canvasLocations[i];
+        this.canvasObjects[i](this.canvas, locs[0] * this.canvas_width, locs[1] * this.canvas_height, noteRad, this.durations[i]);
+        this.canvasObjects[i].draw;
+    
+        var locs = this.canvasChordLocations[i];
+        console.log("LOCS HERE: " + locs);
+        this.canvasChords[i](this.canvas, locs[0] * this.canvas_width, locs[1] * this.canvas_height, noteRad);
+        this.canvasChords[i].draw;
+    },
+    
+    redraw: function() {
+        var noteRad = globalSettings.noteRadius * this.canvas_height;
         for (var i = 0; i < this.canvasObjects.length; i++) {
             var locs = this.canvasLocations[i];
             this.canvasObjects[i](this.canvas, locs[0] * this.canvas_width, locs[1] * this.canvas_height, noteRad, this.durations[i]);
@@ -191,7 +206,7 @@ angular.module("mixTapeApp")
             var locs = this.canvasChordLocations[i];
             this.canvasChords[i](this.canvas, locs[0] * this.canvas_width, locs[1] * this.canvas_height, noteRad);
             this.canvasChords[i].draw;
-        }
+        }        
     },
 
     clearChords: function() {

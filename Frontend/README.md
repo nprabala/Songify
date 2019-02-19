@@ -6,11 +6,12 @@
 
 * Fixed scaling issues (again)
 
+* Fixed bug: when a note is drawn, I think every other note is rendered AGAIN. now this doesn't happen
+ 
 * Toggle switch button CSS code: https://codemyui.com/toggle-switch-with-lables/
 
 * Need to fix: currently the toggle is 2 state. Should be updated to 3 state to include playing chords only
 
-* Need to fix: when a note is drawn, I think every other note is rendered AGAIN. not sure why (to recreate the bug, click on the staff many times and see the border for each note slowly get darker)
 
 
 02/12/19 (lfu2)

@@ -10,7 +10,7 @@ angular.module("mixTapeApp", [])
         $scope.pitchAlteration = ["Sharp","Flat","Natural"]
         $scope.pitchType = "Natural";
         $scope.currentType = "quarter";
-        $scope.topMessage = "Welcome to Mixtape! Click on the staff to add a note.";
+        $scope.topMessage = "Welcome to Mixtape! Click anywhere on the top staff to create your melody, then select 'Get Chords' to generate the accompaniment.";
 
     $scope.playMelody = function() {
         songService.updateMelody();
