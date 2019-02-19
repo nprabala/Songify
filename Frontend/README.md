@@ -1,4 +1,15 @@
-02/12//19 (lfu2)
+02/18/19 (lfu2)
+
+* UI updates: making all the buttons look prettier, added in logo 
+
+* Added in rendering for treble clef
+
+* Toggle switch button CSS code: https://codemyui.com/toggle-switch-with-lables/
+
+* Need to fix: currently the toggle is 2 state. Should be updated to 3 state to include playing chords only
+
+
+02/12/19 (lfu2)
 
 * Created chord object in graphics engine service
 

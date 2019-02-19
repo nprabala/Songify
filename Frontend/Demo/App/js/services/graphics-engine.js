@@ -210,6 +210,14 @@ angular.module("mixTapeApp")
     },
 
     drawMeasures: function(xOffset, yOffset) {
+        var self = this;
+        var img = new Image();
+        img.onload = function() {
+             self.canvas.drawImage(img, 100, -4, 140, 140); 
+             self.canvas.drawImage(img, 100, 130, 140, 140);
+        };
+        img.src = "App/img/treble.png";
+
         var measureWidth = globalSettings.numMeasures * this.canvas_width * globalSettings.measureWidth;
         var paddingLeft = globalSettings.paddingX * this.canvas_width;
         var paddingTop = globalSettings.paddingY * this.canvas_height;
@@ -218,9 +226,9 @@ angular.module("mixTapeApp")
         for (var i = 0; i < globalSettings.numLines; i++) {
             this.drawHorizontalLine(xOffset + paddingLeft, yOffset + paddingTop + (i * lineSpacing), measureWidth);    
         }
-        for (var j = 0; j < globalSettings.numMeasures + 1; j++) {
-            this.drawVerticalLine(xOffset + paddingLeft + (j * (measureWidth / globalSettings.numMeasures)), yOffset + paddingTop, measureHeight);
-        }
+        // for (var j = 0; j < globalSettings.numMeasures + 1; j++) {
+        //     this.drawVerticalLine(xOffset + paddingLeft + (j * (measureWidth / globalSettings.numMeasures)), yOffset + paddingTop, measureHeight);
+        // }
     },
     
     drawStaff: function() {
