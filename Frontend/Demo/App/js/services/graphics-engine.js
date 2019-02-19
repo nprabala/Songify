@@ -16,20 +16,34 @@ angular.module("mixTapeApp")
         this.canvas.strokeStyle = "black";
     },
 
-    note: function(ctx, x, y, rad, pitchType) {
-        function draw(ctx, x, y, rad) {
+    note: function(ctx, x, y, rad, duration, pitchType) {
+        console.log("DURATION!!!!" + duration);
+        function draw(ctx, x, y, rad, duration) {
             ctx.save();
             ctx.beginPath();
             ctx.translate(ctx.width / 2, ctx.height / 2);
             ctx.scale(3, 2);
             ctx.arc((x * 2) / 3, y, rad, 0, 2 * Math.PI, false);
-            ctx.fillStyle = "#373737";
+            if (duration == 4) {
+                ctx.fillStyle = globalSettings.palettePink[0]; 
+            }
+            else if (duration == 2) {
+                ctx.fillStyle = globalSettings.palettePink[1]; 
+            }
+            else if (duration == 1) {
+                ctx.fillStyle = globalSettings.palettePink[2];    
+            }
+            else if (duration == 0.5) {
+                ctx.fillStyle = globalSettings.palettePink[3];
+            }
+            else if (duration == 0.25) {
+                ctx.fillStyle = globalSettings.palettePink[4];
+            }
             ctx.fill();
-
             ctx.restore();
             ctx.stroke();  
         }
-        this.draw = draw(ctx, x, y, rad);
+        this.draw = draw(ctx, x, y, rad, duration);
     },
     
     chord: function(ctx, x, y, rad) {
@@ -169,7 +183,7 @@ angular.module("mixTapeApp")
         var noteRad = globalSettings.noteRadius * this.canvas_height;
         for (var i = 0; i < this.canvasObjects.length; i++) {
             var locs = this.canvasLocations[i];
-            this.canvasObjects[i](this.canvas, locs[0] * this.canvas_width, locs[1] * this.canvas_height, noteRad);
+            this.canvasObjects[i](this.canvas, locs[0] * this.canvas_width, locs[1] * this.canvas_height, noteRad, this.durations[i]);
             this.canvasObjects[i].draw;
         }
         

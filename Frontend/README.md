@@ -1,6 +1,6 @@
 02/18/19 (lfu2)
 
-* UI updates: making all the buttons look prettier, added in logo 
+* UI updates: making all the buttons look prettier, added in logo, added in palette (pink for now)
 
 * Added in rendering for treble clef
 
@@ -9,6 +9,8 @@
 * Toggle switch button CSS code: https://codemyui.com/toggle-switch-with-lables/
 
 * Need to fix: currently the toggle is 2 state. Should be updated to 3 state to include playing chords only
+
+* Need to fix: when a note is drawn, I think every other note is rendered AGAIN. not sure why (to recreate the bug, click on the staff many times and see the border for each note slowly get darker)
 
 
 02/12/19 (lfu2)
