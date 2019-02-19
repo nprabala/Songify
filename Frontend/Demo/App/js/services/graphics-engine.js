@@ -16,20 +16,33 @@ angular.module("mixTapeApp")
         this.canvas.strokeStyle = "black";
     },
 
-    note: function(ctx, x, y, rad, pitchType) {
-        function draw(ctx, x, y, rad) {
+    note: function(ctx, x, y, rad, duration, pitchType) {
+        function draw(ctx, x, y, rad, duration) {
             ctx.save();
             ctx.beginPath();
             ctx.translate(ctx.width / 2, ctx.height / 2);
             ctx.scale(3, 2);
             ctx.arc((x * 2) / 3, y, rad, 0, 2 * Math.PI, false);
-            ctx.fillStyle = "#373737";
+            if (duration == 4) {
+                ctx.fillStyle = globalSettings.palettePink[0]; 
+            }
+            else if (duration == 2) {
+                ctx.fillStyle = globalSettings.palettePink[1]; 
+            }
+            else if (duration == 1) {
+                ctx.fillStyle = globalSettings.palettePink[2];    
+            }
+            else if (duration == 0.5) {
+                ctx.fillStyle = globalSettings.palettePink[3];
+            }
+            else if (duration == 0.25) {
+                ctx.fillStyle = globalSettings.palettePink[4];
+            }
             ctx.fill();
-
             ctx.restore();
             ctx.stroke();  
         }
-        this.draw = draw(ctx, x, y, rad);
+        this.draw = draw(ctx, x, y, rad, duration);
     },
     
     chord: function(ctx, x, y, rad) {
@@ -121,6 +134,7 @@ angular.module("mixTapeApp")
                 break;
             }
         }
+        console.log("adding canvas chords!!");
         this.canvasChordLocations.push([this.canvasLocations[newDur][0], chordY]);
         this.drawObjects();
     },
@@ -167,9 +181,24 @@ angular.module("mixTapeApp")
     },
     drawObjects: function() {
         var noteRad = globalSettings.noteRadius * this.canvas_height;
+        var i = this.canvasObjects.length - 1;
+        console.log("i: " + i);
+        if (i < 0) return;
+        var locs = this.canvasLocations[i];
+        this.canvasObjects[i](this.canvas, locs[0] * this.canvas_width, locs[1] * this.canvas_height, noteRad, this.durations[i]);
+        this.canvasObjects[i].draw;
+    
+        var locs = this.canvasChordLocations[i];
+        console.log("LOCS HERE: " + locs);
+        this.canvasChords[i](this.canvas, locs[0] * this.canvas_width, locs[1] * this.canvas_height, noteRad);
+        this.canvasChords[i].draw;
+    },
+    
+    redraw: function() {
+        var noteRad = globalSettings.noteRadius * this.canvas_height;
         for (var i = 0; i < this.canvasObjects.length; i++) {
             var locs = this.canvasLocations[i];
-            this.canvasObjects[i](this.canvas, locs[0] * this.canvas_width, locs[1] * this.canvas_height, noteRad);
+            this.canvasObjects[i](this.canvas, locs[0] * this.canvas_width, locs[1] * this.canvas_height, noteRad, this.durations[i]);
             this.canvasObjects[i].draw;
         }
         
@@ -177,7 +206,7 @@ angular.module("mixTapeApp")
             var locs = this.canvasChordLocations[i];
             this.canvasChords[i](this.canvas, locs[0] * this.canvas_width, locs[1] * this.canvas_height, noteRad);
             this.canvasChords[i].draw;
-        }
+        }        
     },
 
     clearChords: function() {
@@ -210,6 +239,14 @@ angular.module("mixTapeApp")
     },
 
     drawMeasures: function(xOffset, yOffset) {
+        var self = this;
+        var img = new Image();
+        img.onload = function() {
+             self.canvas.drawImage(img, 100, -4, 140, 140); 
+             self.canvas.drawImage(img, 100, 130, 140, 140);
+        };
+        img.src = "App/img/treble.png";
+
         var measureWidth = globalSettings.numMeasures * this.canvas_width * globalSettings.measureWidth;
         var paddingLeft = globalSettings.paddingX * this.canvas_width;
         var paddingTop = globalSettings.paddingY * this.canvas_height;
@@ -218,9 +255,9 @@ angular.module("mixTapeApp")
         for (var i = 0; i < globalSettings.numLines; i++) {
             this.drawHorizontalLine(xOffset + paddingLeft, yOffset + paddingTop + (i * lineSpacing), measureWidth);    
         }
-        for (var j = 0; j < globalSettings.numMeasures + 1; j++) {
-            this.drawVerticalLine(xOffset + paddingLeft + (j * (measureWidth / globalSettings.numMeasures)), yOffset + paddingTop, measureHeight);
-        }
+        // for (var j = 0; j < globalSettings.numMeasures + 1; j++) {
+        //     this.drawVerticalLine(xOffset + paddingLeft + (j * (measureWidth / globalSettings.numMeasures)), yOffset + paddingTop, measureHeight);
+        // }
     },
     
     drawStaff: function() {

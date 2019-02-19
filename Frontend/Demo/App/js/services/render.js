@@ -25,7 +25,7 @@ angular.module("mixTapeApp")
 
             function clearObjects() {
                 graphicsEngineService.clearObjects();
-                graphicsEngineService.drawObjects();
+                graphicsEngineService.redraw();
             } 
             
             function addChords(chords) {
