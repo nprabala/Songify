@@ -4,7 +4,7 @@
 
 * Added in rendering for treble clef
 
-* Fixed scaling issues (again...)
+* Fixed scaling issues (again)
 
 * Toggle switch button CSS code: https://codemyui.com/toggle-switch-with-lables/
 
