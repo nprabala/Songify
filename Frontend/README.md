@@ -4,6 +4,8 @@
 
 * Added in rendering for treble clef
 
+* Fixed scaling issues (again...)
+
 * Toggle switch button CSS code: https://codemyui.com/toggle-switch-with-lables/
 
 * Need to fix: currently the toggle is 2 state. Should be updated to 3 state to include playing chords only
