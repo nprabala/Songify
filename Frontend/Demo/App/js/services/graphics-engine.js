@@ -136,7 +136,6 @@ angular.module("mixTapeApp")
         }
         console.log("adding canvas chords!!");
         this.canvasChordLocations.push([this.canvasLocations[newDur][0], chordY]);
-        this.drawObjects();
     },
     
     addChords: function(chords) {
@@ -148,6 +147,7 @@ angular.module("mixTapeApp")
             }
             dur += chords[i]["duration"];
         }
+        this.drawChords();
     },
     
     
@@ -182,16 +182,19 @@ angular.module("mixTapeApp")
     drawObjects: function() {
         var noteRad = globalSettings.noteRadius * this.canvas_height;
         var i = this.canvasObjects.length - 1;
-        console.log("i: " + i);
         if (i < 0) return;
         var locs = this.canvasLocations[i];
         this.canvasObjects[i](this.canvas, locs[0] * this.canvas_width, locs[1] * this.canvas_height, noteRad, this.durations[i]);
         this.canvasObjects[i].draw;
+    },
     
-        var locs = this.canvasChordLocations[i];
-        console.log("LOCS HERE: " + locs);
-        this.canvasChords[i](this.canvas, locs[0] * this.canvas_width, locs[1] * this.canvas_height, noteRad);
-        this.canvasChords[i].draw;
+    drawChords: function() {
+        var noteRad = globalSettings.noteRadius * this.canvas_height;
+        for (var j = 0; j < this.canvasChords.length; j++) {
+            var locs = this.canvasChordLocations[j];
+            this.canvasChords[j](this.canvas, locs[0] * this.canvas_width, locs[1] * this.canvas_height, noteRad);
+            this.canvasChords[j].draw;
+        }     
     },
     
     redraw: function() {
@@ -202,11 +205,11 @@ angular.module("mixTapeApp")
             this.canvasObjects[i].draw;
         }
         
-        for (var i = 0; i < this.canvasChords.length; i++) {
-            var locs = this.canvasChordLocations[i];
-            this.canvasChords[i](this.canvas, locs[0] * this.canvas_width, locs[1] * this.canvas_height, noteRad);
-            this.canvasChords[i].draw;
-        }        
+        for (var j = 0; j < this.canvasChords.length; j++) {
+            var locs = this.canvasChordLocations[j];
+            this.canvasChords[j](this.canvas, locs[0] * this.canvas_width, locs[1] * this.canvas_height, noteRad);
+            this.canvasChords[j].draw;
+        }         
     },
 
     clearChords: function() {

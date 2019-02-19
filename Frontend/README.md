@@ -6,7 +6,7 @@
 
 * Fixed scaling issues (again)
 
-* Fixed bug: when a note is drawn, I think every other note is rendered AGAIN. now this doesn't happen
+* Fixed bug: when a note is drawn, I think every other note is rendered AGAIN. now this doesn't happen. 
  
 * Toggle switch button CSS code: https://codemyui.com/toggle-switch-with-lables/
 
