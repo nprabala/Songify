@@ -57,7 +57,7 @@ angular.module("mixTapeApp", [])
 }])
 
     .directive("mixtapeApp", ["$interval", "renderService", "utilsService", "globalSettings", "songService",
-        function($interval, renderService, utilsService, globalSettingss, songService) {
+        function($interval, renderService, utilsService, globalSettings, songService) {
         return {
             restrict: 'A',
             template: '<img id="logo" src="App/img/logo.png"></img><div></div>' +

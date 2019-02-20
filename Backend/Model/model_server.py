@@ -54,7 +54,7 @@ def get_chord_progressions(notes_timestamps):
             # check if last_chord is the same as chord, if so, update
             # last_chord's duration
             last_chord = concated_chords[-1]
-            if last_chord['chord'] == chord:
+            if last_chord['chord'] == chord and last_chord['duration'] < 4:
                 last_chord['duration'] += sixteenth
                 continue
 
