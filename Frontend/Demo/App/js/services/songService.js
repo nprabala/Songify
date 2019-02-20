@@ -1,35 +1,6 @@
 angular.module("mixTapeApp")
-    .factory("songService", ["globalSettings", "utilsService", "graphicsEngineService", "soundService", "renderService",
-        function(globalSettings, utilsService, graphicsEngineService, soundService, renderService) {
-            function readMelody() {
-                var objs = graphicsEngineService.getObjects();
-                var locs = graphicsEngineService.getLocations();
-                var width = graphicsEngineService.getCanvasWidth();
-                var height = graphicsEngineService.getCanvasHeight();
-                var yOffset = (graphicsEngineService.getYOffset(0) / 2).toFixed(2);
-                var lineSpacing = graphicsEngineService.getLineSpacing();
-                var melody = [];
-                var result = "";
-
-                for (var i = 0; i < locs.length; i++) {
-                    var diff = yOffset - (locs[i][1] * height).toFixed(2);
-                    diff = Math.round(diff / lineSpacing);
-                    if (diff >= -8 && diff <= 3) {
-                        var pitchType = globalSettings.pitchAlterations[i];
-                        var pitchFileMod = "";
-                        if (pitchType == "Sharp"){
-                            pitchFileMod = "#";
-                        }
-                        if(pitchType == "Flat"){
-                            pitchFileMod = "-";
-                        }
-                        var pitch = globalSettings.trebleStaff[(diff * -1) + 3];
-                        var fileString = utilsService.flatSharpExceptions(pitch,pitchFileMod);
-                        melody.push(fileString);
-                    }
-                }
-                return melody;
-            };
+    .factory("songService", ["globalSettings", "utilsService", "soundService", "renderService",
+        function(globalSettings, utilsService, soundService, renderService) {
 
             function requestChords(notes, durations, hostname, callback) {
                 var melody = [];
@@ -44,7 +15,7 @@ angular.module("mixTapeApp")
 
                 console.log("chords for melody: " + JSON.stringify(melody));
                 var req = new XMLHttpRequest();
-                req.open("POST","http://" + hostname + ":8081/chord_progressions");
+                req.open("POST","http://" + utilsService.getHostname() + ":8081/chord_progressions");
                 req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
                 req.onreadystatechange = function() {
                     var chords = JSON.parse(req.response);
@@ -85,9 +56,9 @@ angular.module("mixTapeApp")
                     }
                 },
 
-                updateMelody: function() {
-                    this.melody = readMelody();
-                    this.melodyDurations = graphicsEngineService.durations;
+                updateMelody: function(melody, durations) {
+                    this.melody = melody;
+                    this.melodyDurations = durations;
                     soundService.updateMelody(this.melody, this.melodyDurations);
                 },
 
@@ -128,9 +99,8 @@ angular.module("mixTapeApp")
                     soundService.clearSounds();
                 },
 
-                initialise: function(hostname) {
+                initialise: function() {
                     soundService.initialise();
-                    this.hostname = hostname;
                     this.chords = [];
                     this.melody = [];
                     this.melodyDurations = [];

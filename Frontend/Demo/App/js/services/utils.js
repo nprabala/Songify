@@ -3,7 +3,6 @@ angular.module("mixTapeApp")
         function(globalSettings) {
     	"use strict"
         return {
-
             setHostname: function(hostname) {
                 this.hostname = hostname;
             },
