@@ -24,6 +24,24 @@ html, body {
      text-align: center;
  }
 
+.row{
+    border-bottom-width: 5px;
+    border-bottom-style: solid;
+}
+
+.cell{
+	height: -webkit-fill-available;
+    display: inline-block;
+    border: 0px;
+    border-style: groove;
+
+}
+
+.staff{
+	height: inherit;
+}
+
+
 canvas {
     height: 100vh;
     width: 100vw;

@@ -60,7 +60,8 @@ angular.module("mixTapeApp", [])
         function($interval, renderService, utilsService, globalSettings, songService) {
         return {
             restrict: 'A',
-            template: '<img id="logo" src="App/img/logo.png"></img><div></div>' +
+            template: function(){
+                var menu = '<img id="logo" src="App/img/logo.png"></img><div></div>' +
             '<div id="topMessage">{{topMessage}}</div>' +
             '<div id="noteSelection">Current note (click to add to staff): ' +
             '<select ng-model="currentType" ng-options="x for x in noteTypes" ng-change="updateNoteType()"></select>'+
@@ -73,17 +74,32 @@ angular.module("mixTapeApp", [])
                     '<div class="toggle"><p>Melody + Chords</p></div><div class="toggle"><p>Melody Only</p></div>' +
                 '</div>' + //inner-container
 
-    	        '<div class="inner-container" id="toggle-container">' +
-        	        '<div class="toggle"><p>Melody + Chords</p></div><div class="toggle"><p>Melody Only</p></div>' +
-    		    '</div>' + //inner-container
-		    '</div>' + //container
+                '<div class="inner-container" id="toggle-container">' +
+                    '<div class="toggle"><p>Melody + Chords</p></div><div class="toggle"><p>Melody Only</p></div>' +
+                '</div>' + //inner-container
+            '</div>' + //container
+            '<div id="playbackController"><button id="playChoice" ng-click="choosePlayback()">Play</button></div>';
+            var staff = '<div class="staff">';
+            var noteWidthPercentage = (globalSettings.noteRadius*2)*100;
+            var notePercentage = globalSettings.lineHeight *100;
+            console.log(1/(globalSettings.noteRadius*2));
 
-		    '<div id="playbackController"><button id="playChoice" ng-click="choosePlayback()">Play</button></div>' +
+            for (var i = 0; i < globalSettings.numLines; i++){
+                staff += '<div class="row" style="height:' + String(notePercentage)+'%;">';
+                for (var j = 0; j < 1/(globalSettings.noteRadius*2); j++){
+                    var id = String(j);
+                    staff += '<div id="'+id+'" class="cell" style="width:' + String(noteWidthPercentage)+'%;"></div>';
+                }
+                staff += '</div>';
+            }
+            staff += '</div>';
+            return menu + staff;
 
             // '<div id="playbackController"><button id="" ng-click="playMelody()">Play Melody</button>' +
             // '<button id="playChords" ng-click="playChords()">Play Chords</button>' +
             // '<button id="playComplete" ng-click="playComplete()">Play Melody with Chords</button></div>' +
-            '<canvas id="musicCanvas"></canvas>',
+
+            },
 
             link: function(scope, element) {
                 var toggle = document.getElementById('container');
@@ -100,15 +116,20 @@ angular.module("mixTapeApp", [])
                 	}
                 });
 
-                renderService.initialise(element.find('canvas')[0]);
-                songService.initialise();
+                // renderService.initialise(element.find('canvas')[0]);
+                // songService.initialise();
 
-                function canvasMouseClick(e) { renderService.addNote(e.x, e.y); }
-                function canvasResize(e) { renderService.canvasResize(); }
-                window.addEventListener('mousedown', canvasMouseClick);
-                window.addEventListener('resize', canvasResize, true);
+                // function canvasMouseClick(e) { renderService.addNote(e.x, e.y); }
+                // function canvasResize(e) { renderService.canvasResize(); }
+                // window.addEventListener('mousedown', canvasMouseClick);
+                // window.addEventListener('resize', canvasResize, true);
 
-                renderService.draw();
+                // renderService.draw();
             }
         }
     }]);
+
+
+
+
+
