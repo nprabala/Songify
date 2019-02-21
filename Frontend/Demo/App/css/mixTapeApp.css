@@ -25,16 +25,19 @@ html, body {
  }
 
 .row{
-    border-bottom-width: 5px;
-    border-bottom-style: solid;
+border-color: black;
+border-bottom-width: 5px;
+border:5px;
 }
+
+
+
 
 .cell{
 	height: -webkit-fill-available;
+
     display: inline-block;
     border: 0px;
-    border-style: groove;
-
 }
 
 .staff{

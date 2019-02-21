@@ -11,7 +11,7 @@ angular.module("mixTapeApp", [])
         $scope.pitchType = "Natural";
         $scope.currentType = "quarter";
         $scope.topMessage = "Welcome to Mixtape! Click anywhere on the top staff to create your melody, then select 'Get Chords' to generate the accompaniment.";
-
+        $scope.noteGrid = {};
     $scope.playMelody = function() {
         songService.updateMelody(renderService.readMelody(), renderService.readMelodyDurations());
         songService.playMelody();
@@ -54,6 +54,38 @@ angular.module("mixTapeApp", [])
       globalSettings.pitchType = $scope.pitchType;
     };
 
+
+    $scope.drawNote = function(i,j){
+        var col = $("." + "cell");
+        col = col[(1/(globalSettings.noteRadius*2))*i + j];
+        if(col.firstChild){
+            col.removeChild(col.children[0]);
+        }
+        var note = this.generateNoteHTML(this.currentType);
+        col.appendChild(note);
+
+    };
+
+
+    // TODO: Alter to draw a particular kind of note.
+    $scope.generateNoteHTML = function(noteType){
+        var namespace = "http://www.w3.org/2000/svg";
+        var cx = "50%";
+        var cy = "50%";
+        r= "30%";
+        var note = document.createElementNS(namespace, "circle");
+        note.setAttributeNS(null, "cx", cx);
+        note.setAttributeNS(null, "cy",cy);
+        note.setAttributeNS(null, "r",r);
+        if(noteType == "half"){
+            note.setAttributeNS(null, "fill","none");
+            note.setAttributeNS(null,"stroke","black");
+        }
+
+
+        return note;
+    };
+
 }])
 
     .directive("mixtapeApp", ["$interval", "renderService", "utilsService", "globalSettings", "songService",
@@ -81,14 +113,18 @@ angular.module("mixTapeApp", [])
             '<div id="playbackController"><button id="playChoice" ng-click="choosePlayback()">Play</button></div>';
             var staff = '<div class="staff">';
             var noteWidthPercentage = (globalSettings.noteRadius*2)*100;
-            var notePercentage = globalSettings.lineHeight *100;
-            console.log(1/(globalSettings.noteRadius*2));
-
-            for (var i = 0; i < globalSettings.numLines; i++){
+            var notePercentage = (globalSettings.lineHeight/2) *100;
+            for (var i = 0; i < globalSettings.trebleStaff.length; i++){
+                var line = "";
+                if (i % 2 == 0 && i >= 2 && i < globalSettings.trebleStaff.length -1){
+                    line = '<line x1="0%" y1="50%" x2="100%" y2="50%" style="stroke:rgb(0,0,0);stroke-width:2"/>';
+                }
                 staff += '<div class="row" style="height:' + String(notePercentage)+'%;">';
                 for (var j = 0; j < 1/(globalSettings.noteRadius*2); j++){
                     var id = String(j);
-                    staff += '<div id="'+id+'" class="cell" style="width:' + String(noteWidthPercentage)+'%;"></div>';
+                    staff += '<svg id="'+id+'" style="width:' + noteWidthPercentage + '%;"ng-click="drawNote('+i+','+j+')" class="cell"'+
+                    '>' + line + '</svg>';
+
                 }
                 staff += '</div>';
             }
