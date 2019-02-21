@@ -5,40 +5,35 @@ import pickle
 import torch
 from torch.utils.data import Dataset
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
+from .constants import NOTES_TO_INT, INT_TO_NOTES, CHORD_TO_INT, INT_TO_CHORD, CHORD_TO_NOTES, NOTES_TO_CHORD
 
 
+'''
+TODO LOOK AT THIS
+https://www.reddit.com/r/musictheory/comments/1jd894/looking_for_an_algorithm_that_generates_chord/
+'''
 class MidiDataset(Dataset):
     """MIDI Music Dataset"""
     # NOTES = ['C', 'C#', 'D-', 'D', 'D#', 'E-', 'E', 'E#', 'F-', 'F', 'F#',
     #             'G-', 'G', 'G#', 'A-', 'A', 'A#', 'B-', 'B', 'B#', 'C-']
     # NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
     # NOTE_TO_INT = {k:v for v, k in enumerate(NOTES)}
-    NOTES_TO_INT = {
-        'PAD':0, # padding
-        '':1, # empty note
-        'B#':2, 'C':2,
-        'C#':3, 'D-':3,
-        'D':4,
-        'D#':5, 'E-':5,
-        'E':6,  'F-':6,
-        'E#':7, 'F':7,
-        'F#':8, 'G-':8,
-        'G':9,
-        'G#':10,'A-':10,
-        'A':11,
-        'A#':12,'B-':12,
-        'B':13, 'C-':13,
-    }
+
     NUM_NOTES = max(NOTES_TO_INT.values()) + 1
-    INT_TO_NOTES = {v:k for k,v in NOTES_TO_INT.items()}
+    NOTES_TO_INT = NOTES_TO_INT
+    INT_TO_NOTES = INT_TO_NOTES
+    CHORD_TO_INT = CHORD_TO_INT
+    CHORD_TO_NOTES = CHORD_TO_NOTES
+    NOTES_TO_CHORD = NOTES_TO_CHORD
 
     # Use sequence of notes insteads of entire song (false runs sequence over entire song)
-    USE_SEQUENCE = True
+    USE_SEQUENCE = False
     SEQUENCE_LENGTH = 16
 
     # Use onehot instead of binary
     USE_CHORD_ONEHOT = True
-    NUM_CHORDS = 635
+    NUM_CHORDS = max(CHORD_TO_INT.values()) + 1
+    INTERSECT_THRESH = 2 # Number of notes to intersect to count as a chord
 
     def __init__(self, data_path, transform=None, target_transform=None):
         """
@@ -57,19 +52,70 @@ class MidiDataset(Dataset):
             data_dict = pickle.load(f)
 
         if self.USE_CHORD_ONEHOT:
-            chord_set = set([])
-            for song in data_dict['chords']:
-                for n in song:
-                    chord_set.add(n)
-            self.chord_to_idx = {c:i for i, c in enumerate(chord_set)}
-            self.idx_to_chord = {v:k for k,v in self.chord_to_idx.items()}
             self.chord_converter = self.convert_chord_to_onehot
         else:
             self.chord_converter = self.convert_chord_to_binary
 
+        # if self.USE_CHORD_ONEHOT:
+        #     chord_set = set([])
+        #     for song in data_dict['chords']:
+        #         for n in song:
+        #             chord = '.'.join(sorted(n.split('.')))
+        #             chord_set.add(self.simplify_chord(n))
+        #
+        #     self.CHORD_DICT = CHORD_TO_NOTES
+        #     for k,v in self.CHORD_DICT.items():
+        #         self.CHORD_DICT[k] = self.simplify_chord(v)
+        #
+        #     self.IDX_CHORD_DICT = {v:k for k,v in self.CHORD_DICT.items()}
+        #
+        #     missed = []
+        #     correct = []
+        #     two = []
+        #     for chord in chord_set:
+        #         found = False
+        #         for k,v in self.IDX_CHORD_DICT.items():
+        #             if len(set(chord.split('.')).intersection(set(k.split('.')))) > 1:
+        #             # if all(x in chord.split('.') for x in k.split('.')) or all(x in k.split('.') for x in chord.split('.')):
+        #                 found = True
+        #                 correct.append(chord)
+        #                 break
+        #         if not found:
+        #             missed.append(chord)
+        #
+        #     print(two)
+        #     print("TWO", len(two))
+        #     print("MISSED", len(missed))
+        #     print(missed)
+        #     print("CORRECT", len(correct))
+        #     raise
+        #
+        #     self.chord_to_idx = {c:i for i, c in enumerate(chord_set)}
+        #     self.idx_to_chord = {v:k for k,v in self.chord_to_idx.items()}
+        #
+        #
+        #     self.chord_converter = self.convert_chord_to_onehot
+        # else:
+        #     self.chord_converter = self.convert_chord_to_binary
+
         self.df = pd.DataFrame.from_dict(data_dict)
         self.transform = transform
         self.target_transform = target_transform
+
+    @classmethod
+    def simplify_chord(cls, chord):
+        '''
+        Given chord, gives idx of all the notes, simplifying it
+        return as string joined by '.'
+        '''
+        note_list = []
+        notes = chord.split('.')
+
+        for n in notes:
+            n_idx = str(cls.convert_note_to_int(n))
+            if n_idx not in note_list: note_list.append(n_idx)
+
+        return '.'.join(note_list)
 
     @classmethod
     def convert_note_to_int(cls, note):
@@ -92,12 +138,19 @@ class MidiDataset(Dataset):
         notes = chord.split('.')
 
         for n in notes:
-            note_list.append(cls.NOTES_TO_INT[n])
+            note_list.append(cls.convert_note_to_int(n))
 
         return note_list
 
     def convert_chord_to_onehot(self, chord):
-        return self.idx_to_chord[chord]
+        chord_name = 'EMPTY'
+        for k,v in NOTES_TO_CHORD.items():
+            if len(set(chord.split('.')).intersection(set(k.split('.')))) >= self.INTERSECT_THRESH:
+                chord_name = v
+                break
+
+        # offset by 1 to remove pad
+        return self.CHORD_TO_INT[chord_name]
 
     @classmethod
     def convert_chord_to_binary(cls, chord):
@@ -155,3 +208,7 @@ class MidiDataset(Dataset):
             chord_y = self.target_transform(chord_y)
 
         return melody_x, melody_y, chord_y
+
+if __name__ == '__main__':
+    data_path = 'data/out.pkl'
+    dataset = MidiDataset(data_path)

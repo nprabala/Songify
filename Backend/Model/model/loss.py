@@ -37,6 +37,7 @@ def midi_loss(output, target, extra=None):
 
     if MidiDataset.USE_CHORD_ONEHOT:
         chord_loss = F.nll_loss
+        flat_chord_y = flat_chord_y.long()
     else:
         chord_loss = F.multilabel_soft_margin_loss
 
