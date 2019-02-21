@@ -1,7 +1,6 @@
 angular.module("mixTapeApp")
     .factory("songService", ["globalSettings", "utilsService", "soundService", "renderService",
         function(globalSettings, utilsService, soundService, renderService) {
-
             function requestChords(notes, durations, hostname, callback) {
                 var melody = [];
                 for (var i = 0; i < notes.length; i++){
@@ -12,7 +11,6 @@ angular.module("mixTapeApp")
                         melody.push({"note":notes[i].charAt(0), "duration":durations[i]});
                     }
                 }
-
                 console.log("chords for melody: " + JSON.stringify(melody));
                 var req = new XMLHttpRequest();
                 req.open("POST","http://" + utilsService.getHostname() + ":8081/chord_progressions");
@@ -43,9 +41,9 @@ angular.module("mixTapeApp")
                     soundService.updateChords(this.chords, this.chordDurations);
 
                     // update chords on display
-                    // TODO: Ideally we can pass the two below functions as args
-                    renderService.clearChords();
-                    renderService.addChords(this.chords);
+                    // TODO: Reconfigure to work with div format
+                    // renderService.clearChords();
+                    // renderService.addChords(this.chords);
                 },
 
 

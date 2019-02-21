@@ -1,70 +1,129 @@
 angular.module("mixTapeApp", [])
-    .controller("mixTapeController", ["$scope", "utilsService", "renderService", "globalSettings", "songService",
-        function($scope, utilsService, renderService, globalSettings, songService) {
+.controller("mixTapeController", ["$scope", "utilsService", "renderService", "globalSettings", "songService",
+    function($scope, utilsService, renderService, globalSettings, songService) {
         $scope.hello = "Welcome To Mixtape";
         var url = window.location;
         var hostName = url.hostname;
         utilsService.setHostname(hostName);
-        //Sample JSON to send. Will format notes object later.
-        $scope.noteTypes = ["sixteenth","eighth","quarter","half","whole"];
+        songService.initialise();
+
+        $scope.noteTypes = ["sixteenth","eighth","quarter","half","whole", "clear"];
         $scope.pitchAlteration = ["Sharp","Flat","Natural"]
         $scope.pitchType = "Natural";
         $scope.currentType = "quarter";
         $scope.topMessage = "Welcome to Mixtape! Click anywhere on the top staff to create your melody, then select 'Get Chords' to generate the accompaniment.";
-        $scope.noteGrid = {};
-    $scope.playMelody = function() {
-        songService.updateMelody(renderService.readMelody(), renderService.readMelodyDurations());
-        songService.playMelody();
-    };
+        $scope.noteGrid = [];
 
-    $scope.choosePlayback = function() {
-        if (globalSettings.toggleNumber) {
-            $scope.playComplete();
+        for(var i = 0; i < 1/(globalSettings.noteRadius*2); i++){
+            $scope.noteGrid.push("Empty");
         }
-        else {
-            $scope.playMelody();
-        }
-    };
+        $scope.playMelody = function() {
+            var compiledMelody = [];
+            var compiledDurations = []
+            for (var j = 0; j < this.noteGrid.length; j++){
+                if (this.noteGrid[j] != "Empty"){
+                    compiledMelody.push(this.noteGrid[j]["note"]);
+                    compiledDurations.push(this.noteGrid[j]["duration"])
+                }
+            }
+            songService.updateMelody(compiledMelody, compiledDurations);
+            songService.playMelody();
+        };
 
-    $scope.playChords = async function(){
-        songService.playChords();
-    };
+        $scope.choosePlayback = function() {
+            if (globalSettings.toggleNumber) {
+                $scope.playComplete();
+            }
+            else {
+                $scope.playMelody();
+            }
+        };
 
-    $scope.playComplete = async function() {
-        songService.updateMelody(renderService.readMelody(), renderService.readMelodyDurations());
-        songService.playMelody();
-        songService.playChords();
-    };
+        $scope.playChords = async function(){
+            songService.playChords();
+        };
 
-    $scope.loadChords = function() {
-        songService.updateMelody(renderService.readMelody(), renderService.readMelodyDurations());
-        songService.updateChords();
-    };
+        $scope.playComplete = async function() {
+            songService.updateMelody(renderService.readMelody(), renderService.readMelodyDurations());
+            songService.playMelody();
+            songService.playChords();
+        };
 
-    $scope.clear = function() {
-        renderService.clearObjects();
-        songService.clearSong();
-    };
+        $scope.loadChords = function() {
+            songService.updateMelody(renderService.readMelody(), renderService.readMelodyDurations());
+            songService.updateChords();
+        };
 
-    $scope.updateNoteType = function(){
-      globalSettings.currentType = $scope.currentType;
-    };
+        $scope.clear = function() {
+            for(var i = 0; i < 1/(globalSettings.noteRadius*2); i++){
+                $scope.noteGrid[i] = "Empty";
+            }
+            var cols = $("." + "cell");
+            for (var j = 0; j < cols.length; j++){
 
-    $scope.updatePitchType = function(){
-      globalSettings.pitchType = $scope.pitchType;
-    };
+            }
+            songService.clearSong();
+        };
+
+        $scope.updateNoteType = function(){
+          globalSettings.currentType = $scope.currentType;
+      };
+
+      $scope.updatePitchType = function(){
+          globalSettings.pitchType = $scope.pitchType;
+      };
 
 
-    $scope.drawNote = function(i,j){
+      $scope.drawNote = function(i,j){
         var col = $("." + "cell");
         col = col[(1/(globalSettings.noteRadius*2))*i + j];
-        if(col.firstChild){
-            col.removeChild(col.children[0]);
-        }
-        var note = this.generateNoteHTML(this.currentType);
-        col.appendChild(note);
 
+        if (i % 2 == 0 && i >= 2 && i < globalSettings.trebleStaff.length -1){
+            if(col.children.length == 2){
+                col.removeChild(col.children[1]);
+            }
+        }
+        else{
+            if(col.children.length == 1){
+                col.removeChild(col.children[0]);
+            }
+        }
+        if(this.currentType == "clear"){
+            this.noteGrid[j] = "Empty";
+            return;
+        }
+        var noteHTML = this.generateNoteHTML(this.currentType);
+        col.appendChild(noteHTML);
+        var note = this.convertToNote(i);
+        this.noteGrid[j] = note;
     };
+
+    $scope.convertToNote = function(i){
+        var pitch = globalSettings.trebleStaff[i];
+        var time_duration = 1;
+        var pitchFileMod = "";
+        if (globalSettings.currentType == "sixteenth"){
+            time_duration = .25;
+        }
+        if(globalSettings.currentType == "eighth"){
+            time_duration = .5;
+        }
+        if(globalSettings.currentType == "half"){
+            time_duration = 2;
+        }
+        if(globalSettings.currentType == "whole"){
+            time_duration = 4;
+        }
+        if (this.pitchType == "Sharp"){
+         pitchFileMod = "#";
+     }
+     if(this.pitchType == "Flat"){
+         pitchFileMod = "-";
+     }
+     var fileString = utilsService.flatSharpExceptions(pitch,pitchFileMod);
+     var note = {"note":fileString, "duration":time_duration};
+     return note;
+ }
 
 
     // TODO: Alter to draw a particular kind of note.
@@ -88,26 +147,26 @@ angular.module("mixTapeApp", [])
 
 }])
 
-    .directive("mixtapeApp", ["$interval", "renderService", "utilsService", "globalSettings", "songService",
-        function($interval, renderService, utilsService, globalSettings, songService) {
+.directive("mixtapeApp", ["$interval", "renderService", "utilsService", "globalSettings", "songService",
+    function($interval, renderService, utilsService, globalSettings, songService) {
         return {
             restrict: 'A',
             template: function(){
                 var menu = '<img id="logo" src="App/img/logo.png"></img><div></div>' +
-            '<div id="topMessage">{{topMessage}}</div>' +
-            '<div id="noteSelection">Current note (click to add to staff): ' +
-            '<select ng-model="currentType" ng-options="x for x in noteTypes" ng-change="updateNoteType()"></select>'+
-            '<select ng-model="pitchType" ng-options="x for x in pitchAlteration" ng-change="updatePitchType()"></select></div>'+
-            '<div id="staffController"><button id="clear" ng-click="clear()">Clear Staff</button>' +
-            '<button id="" ng-click="loadChords()">Get Chords</button></div>' +
+                '<div id="topMessage">{{topMessage}}</div>' +
+                '<div id="noteSelection">Current note (click to add to staff): ' +
+                '<select ng-model="currentType" ng-options="x for x in noteTypes" ng-change="updateNoteType()"></select>'+
+                '<select ng-model="pitchType" ng-options="x for x in pitchAlteration" ng-change="updatePitchType()"></select></div>'+
+                '<div id="staffController"><button id="clear" ng-click="clear()">Clear Staff</button>' +
+                '<button id="" ng-click="loadChords()">Get Chords</button></div>' +
 
-            '<div id="container">' +
+                '<div id="container">' +
                 '<div class="inner-container">' +
-                    '<div class="toggle"><p>Melody + Chords</p></div><div class="toggle"><p>Melody Only</p></div>' +
+                '<div class="toggle"><p>Melody + Chords</p></div><div class="toggle"><p>Melody Only</p></div>' +
                 '</div>' + //inner-container
 
                 '<div class="inner-container" id="toggle-container">' +
-                    '<div class="toggle"><p>Melody + Chords</p></div><div class="toggle"><p>Melody Only</p></div>' +
+                '<div class="toggle"><p>Melody + Chords</p></div><div class="toggle"><p>Melody Only</p></div>' +
                 '</div>' + //inner-container
             '</div>' + //container
             '<div id="playbackController"><button id="playChoice" ng-click="choosePlayback()">Play</button></div>';
@@ -135,35 +194,25 @@ angular.module("mixTapeApp", [])
             // '<button id="playChords" ng-click="playChords()">Play Chords</button>' +
             // '<button id="playComplete" ng-click="playComplete()">Play Melody with Chords</button></div>' +
 
-            },
+        },
 
-            link: function(scope, element) {
-                var toggle = document.getElementById('container');
-                var toggleContainer = document.getElementById('toggle-container');
+        link: function(scope, element) {
+            var toggle = document.getElementById('container');
+            var toggleContainer = document.getElementById('toggle-container');
 
-                toggle.addEventListener('click', function() {
-                	globalSettings.toggleNumber = !globalSettings.toggleNumber;
-                	if (globalSettings.toggleNumber) {
-                		toggleContainer.style.clipPath = 'inset(0 0 0 50%)';
-                		toggleContainer.style.backgroundColor = '#D74046';
-                	} else {
-                		toggleContainer.style.clipPath = 'inset(0 50% 0 0)';
-                		toggleContainer.style.backgroundColor = 'dodgerblue';
-                	}
-                });
-
-                // renderService.initialise(element.find('canvas')[0]);
-                // songService.initialise();
-
-                // function canvasMouseClick(e) { renderService.addNote(e.x, e.y); }
-                // function canvasResize(e) { renderService.canvasResize(); }
-                // window.addEventListener('mousedown', canvasMouseClick);
-                // window.addEventListener('resize', canvasResize, true);
-
-                // renderService.draw();
-            }
+            toggle.addEventListener('click', function() {
+             globalSettings.toggleNumber = !globalSettings.toggleNumber;
+             if (globalSettings.toggleNumber) {
+              toggleContainer.style.clipPath = 'inset(0 0 0 50%)';
+              toggleContainer.style.backgroundColor = '#D74046';
+          } else {
+              toggleContainer.style.clipPath = 'inset(0 50% 0 0)';
+              toggleContainer.style.backgroundColor = 'dodgerblue';
+          }
+      });
         }
-    }]);
+    }
+}]);
 
 
 
