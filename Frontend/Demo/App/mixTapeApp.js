@@ -75,18 +75,12 @@ angular.module("mixTapeApp", [])
 
 
       $scope.drawNote = function(i,j){
-        var col = $("." + "cell");
-        col = col[(1/(globalSettings.noteRadius*2))*i + j];
-
-        if (i % 2 == 0 && i >= 2 && i < globalSettings.trebleStaff.length -1){
-            if(col.children.length == 2){
-                col.removeChild(col.children[1]);
-            }
-        }
-        else{
-            if(col.children.length == 1){
-                col.removeChild(col.children[0]);
-            }
+        var cols = $("." + "cell");
+        var col = cols[(1/(globalSettings.noteRadius*2))*i + j];
+        var sameColumn = [];
+        for (var k = 0; k < globalSettings.trebleStaff.length; k++){
+            sameColumn = cols[(1/(globalSettings.noteRadius*2))*k + j];
+            utilsService.clearNote(sameColumn,k);
         }
         if(this.currentType == "clear"){
             this.noteGrid[j] = "Empty";
@@ -131,17 +125,25 @@ angular.module("mixTapeApp", [])
         var namespace = "http://www.w3.org/2000/svg";
         var cx = "50%";
         var cy = "50%";
-        r= "30%";
-        var note = document.createElementNS(namespace, "circle");
+        var r= "30%";
+        var ry = "25%";
+        if(noteType == "whole"){
+            var note = document.createElementNS(namespace, "ellipse");
+            note.setAttributeNS(null, "rx",r);
+            note.setAttributeNS(null, "ry",ry);
+        }
+        else{
+            var note = document.createElementNS(namespace, "circle");
+            note.setAttributeNS(null, "r",r);
+
+
+        }
         note.setAttributeNS(null, "cx", cx);
         note.setAttributeNS(null, "cy",cy);
-        note.setAttributeNS(null, "r",r);
-        if(noteType == "half"){
+        if(noteType == "half" || noteType == "whole"){
             note.setAttributeNS(null, "fill","none");
             note.setAttributeNS(null,"stroke","black");
         }
-
-
         return note;
     };
 

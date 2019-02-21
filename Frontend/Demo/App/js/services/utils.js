@@ -1,6 +1,6 @@
 angular.module("mixTapeApp")
-    .factory("utilsService", ["globalSettings",
-        function(globalSettings) {
+.factory("utilsService", ["globalSettings",
+    function(globalSettings) {
     	"use strict"
         return {
             setHostname: function(hostname) {
@@ -41,6 +41,22 @@ angular.module("mixTapeApp")
                     return "F" + pitch.substr(1,1);
                 }
                 return pitch.substr(0,1) + pitchFileMod + pitch.substr(1,1);
+            },
+            clearNote: function(col, i){
+                if (i % 2 == 0 && i >= 2 && i < globalSettings.trebleStaff.length -1){
+                    if(col.children.length >= 2){
+                        for (var k = 1; k < col.children.length; k++){
+                            col.removeChild(col.children[k]);
+                        }
+                    }
+                }
+                else{
+                    if(col.children.length >= 1){
+                        for (var k = 0; k < col.children.length; k++){
+                            col.removeChild(col.children[k]);
+                        }            
+                    }
+                }
             },
         }
     }]);
