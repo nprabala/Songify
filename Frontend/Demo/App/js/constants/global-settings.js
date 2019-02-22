@@ -2,7 +2,7 @@ angular.module("mixTapeApp")
     .constant("globalSettings", {
         debug: 1,
         toggleNumber: false,
-        lineHeight: 0.05,
+        lineHeight: 0.12,
         measureHeight: 0.3,
         measureLineSpacing: 0.4,
         measureWidth: 0.4,
@@ -21,4 +21,5 @@ angular.module("mixTapeApp")
         pitchType: "natural",
         pitchAlterations: [],
         palettePink: ["#D6D2D2", "#F1E4F3", "#F4BBD3", "#F686BD", "#FE5D9F"],
+        
     });

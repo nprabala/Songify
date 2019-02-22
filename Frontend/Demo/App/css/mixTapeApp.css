@@ -31,17 +31,21 @@ border:5px;
 }
 
 
+.padding{
+	height:5%;
+}
+
 
 
 .cell{
 	height: -webkit-fill-available;
-
     display: inline-block;
     border: 0px;
 }
 
 .staff{
-	height: inherit;
+	height: 30%;
+
 }
 
 

@@ -13,13 +13,17 @@ angular.module("mixTapeApp", [])
         $scope.currentType = "quarter";
         $scope.topMessage = "Welcome to Mixtape! Click anywhere on the top staff to create your melody, then select 'Get Chords' to generate the accompaniment.";
         $scope.noteGrid = [];
+        $scope.chordGrid = [];
+        $scope.melodyStaff = "melody";
+        $scope.chordStaff = "chords";
 
         for(var i = 0; i < 1/(globalSettings.noteRadius*2); i++){
             $scope.noteGrid.push("Empty");
         }
-        $scope.playMelody = function() {
+
+        $scope.updateMelody = function(){
             var compiledMelody = [];
-            var compiledDurations = []
+            var compiledDurations = [];
             for (var j = 0; j < this.noteGrid.length; j++){
                 if (this.noteGrid[j] != "Empty"){
                     compiledMelody.push(this.noteGrid[j]["note"]);
@@ -27,6 +31,10 @@ angular.module("mixTapeApp", [])
                 }
             }
             songService.updateMelody(compiledMelody, compiledDurations);
+        }
+
+        $scope.playMelody = function() {
+            this.updateMelody();
             songService.playMelody();
         };
 
@@ -44,24 +52,26 @@ angular.module("mixTapeApp", [])
         };
 
         $scope.playComplete = async function() {
-            songService.updateMelody(renderService.readMelody(), renderService.readMelodyDurations());
+            this.updateMelody();
             songService.playMelody();
             songService.playChords();
         };
 
         $scope.loadChords = function() {
-            songService.updateMelody(renderService.readMelody(), renderService.readMelodyDurations());
+            this.updateMelody();
             songService.updateChords();
+            // TODO: Flesh out drawing chords on the staff element.
+            // $scope.chords = songService.chords;
+            // $scope.drawChords();
         };
 
         $scope.clear = function() {
+            console.log("CLEARING");
             for(var i = 0; i < 1/(globalSettings.noteRadius*2); i++){
                 $scope.noteGrid[i] = "Empty";
             }
-            var cols = $("." + "cell");
-            for (var j = 0; j < cols.length; j++){
-
-            }
+            utilsService.clearStaff("melody");
+            utilsService.clearStaff("chord");
             songService.clearSong();
         };
 
@@ -74,78 +84,37 @@ angular.module("mixTapeApp", [])
       };
 
 
-      $scope.drawNote = function(i,j){
-        var cols = $("." + "cell");
-        var col = cols[(1/(globalSettings.noteRadius*2))*i + j];
-        var sameColumn = [];
-        for (var k = 0; k < globalSettings.trebleStaff.length; k++){
-            sameColumn = cols[(1/(globalSettings.noteRadius*2))*k + j];
-            utilsService.clearNote(sameColumn,k);
-        }
-        if(this.currentType == "clear"){
-            this.noteGrid[j] = "Empty";
-            return;
-        }
-        var noteHTML = this.generateNoteHTML(this.currentType);
-        col.appendChild(noteHTML);
-        var note = this.convertToNote(i);
-        this.noteGrid[j] = note;
-    };
-
-    $scope.convertToNote = function(i){
-        var pitch = globalSettings.trebleStaff[i];
-        var time_duration = 1;
-        var pitchFileMod = "";
-        if (globalSettings.currentType == "sixteenth"){
-            time_duration = .25;
-        }
-        if(globalSettings.currentType == "eighth"){
-            time_duration = .5;
-        }
-        if(globalSettings.currentType == "half"){
-            time_duration = 2;
-        }
-        if(globalSettings.currentType == "whole"){
-            time_duration = 4;
-        }
-        if (this.pitchType == "Sharp"){
-         pitchFileMod = "#";
-     }
-     if(this.pitchType == "Flat"){
-         pitchFileMod = "-";
-     }
-     var fileString = utilsService.flatSharpExceptions(pitch,pitchFileMod);
-     var note = {"note":fileString, "duration":time_duration};
-     return note;
- }
-
-
-    // TODO: Alter to draw a particular kind of note.
-    $scope.generateNoteHTML = function(noteType){
-        var namespace = "http://www.w3.org/2000/svg";
-        var cx = "50%";
-        var cy = "50%";
-        var r= "30%";
-        var ry = "25%";
-        if(noteType == "whole"){
-            var note = document.createElementNS(namespace, "ellipse");
-            note.setAttributeNS(null, "rx",r);
-            note.setAttributeNS(null, "ry",ry);
+      $scope.drawNote = function(i,j, staff){
+        var staffElem = $("#" + staff)[0];
+        var rows = staffElem.children
+        var row = rows[i];
+        var col = row.children[j];
+        var noteHTML = utilsService.generateNoteHTML(this.currentType);
+        var note = utilsService.convertToNote(i);
+        if (staff == "melody"){
+            for (var k = 0; k < rows.length; k++){
+                utilsService.clearNote(rows[k].children[j],k);
+            }
+            if(this.currentType == "clear"){
+                this.noteGrid[j] = "Empty";
+                return;
+            }
+            this.noteGrid[j] = note;
         }
         else{
-            var note = document.createElementNS(namespace, "circle");
-            note.setAttributeNS(null, "r",r);
-
+            // TODO: Enable editing of chords.
+            // utilsService.clearNote(col,i);
+            // if(this.currentType == "clear"){
+            //     // TODO: Handle weird case when chord contains two of same note.
+            //     this.chordGrid[j].remove(note["note"]);
+            //     return;
+            // }
 
         }
-        note.setAttributeNS(null, "cx", cx);
-        note.setAttributeNS(null, "cy",cy);
-        if(noteType == "half" || noteType == "whole"){
-            note.setAttributeNS(null, "fill","none");
-            note.setAttributeNS(null,"stroke","black");
-        }
-        return note;
+        col.appendChild(noteHTML);
+
     };
+
 
 }])
 
@@ -172,25 +141,10 @@ angular.module("mixTapeApp", [])
                 '</div>' + //inner-container
             '</div>' + //container
             '<div id="playbackController"><button id="playChoice" ng-click="choosePlayback()">Play</button></div>';
-            var staff = '<div class="staff">';
-            var noteWidthPercentage = (globalSettings.noteRadius*2)*100;
-            var notePercentage = (globalSettings.lineHeight/2) *100;
-            for (var i = 0; i < globalSettings.trebleStaff.length; i++){
-                var line = "";
-                if (i % 2 == 0 && i >= 2 && i < globalSettings.trebleStaff.length -1){
-                    line = '<line x1="0%" y1="50%" x2="100%" y2="50%" style="stroke:rgb(0,0,0);stroke-width:2"/>';
-                }
-                staff += '<div class="row" style="height:' + String(notePercentage)+'%;">';
-                for (var j = 0; j < 1/(globalSettings.noteRadius*2); j++){
-                    var id = String(j);
-                    staff += '<svg id="'+id+'" style="width:' + noteWidthPercentage + '%;"ng-click="drawNote('+i+','+j+')" class="cell"'+
-                    '>' + line + '</svg>';
-
-                }
-                staff += '</div>';
-            }
-            staff += '</div>';
-            return menu + staff;
+            var melodyStaff = utilsService.generateStaff("melody");
+            var chordStaff = utilsService.generateStaff("chord");
+            var padding = '<div class="padding"></div>';
+            return menu + melodyStaff + padding + chordStaff;
 
             // '<div id="playbackController"><button id="" ng-click="playMelody()">Play Melody</button>' +
             // '<button id="playChords" ng-click="playChords()">Play Chords</button>' +
