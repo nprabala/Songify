@@ -67,30 +67,6 @@ angular.module("mixTapeApp")
                     soundService.updateMelody(compiledMelody, compiledDurations);
                 },
 
-                requestTranscriptionMelody: function(blob) {
-                    this.playButton.disabled = true;
-                    var req = new XMLHttpRequest();
-                    req.open("POST","http://" + utilsService.getHostname() + ":8081/melody_transcription");
-                    req.onreadystatechange = () => {
-                        var notes = JSON.parse(req.response);
-                        console.log(notes);
-
-                        this.clearMelody();
-                        for(var i = 0; i < 1/(globalSettings.noteRadius*2) && i < notes.length; i++) {
-                            notes[i]["note"] = utilsService.flatSharpExceptionsWrapper(notes[i]["note"]);
-                            this.editMelody(i, notes[i]);
-                        }
-                        this.updateMelody();
-
-                        // TODO: display notes on staff
-
-                        this.playButton.disabled = false;
-                    }
-
-                    var toSend = new File([blob], "filename.wav", {type: 'audio/wav'});
-                    req.send(toSend);
-                },
-
                 playMelody: function() {
                     if (this.melody != []) {
                         soundService.playMelody();
@@ -116,10 +92,8 @@ angular.module("mixTapeApp")
                     }
                 },
 
-                initialise: function(playButton) {
+                initialise: function() {
                     soundService.initialise();
-
-                    this.playButton = playButton;
 
                     this.chords = [];
                     this.melody = [];

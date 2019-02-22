@@ -1,6 +1,5 @@
 angular.module("mixTapeApp")
     .constant("globalSettings", {
-        encodingType: 'wav',
         debug: 1,
         toggleNumber: false,
         lineHeight: 0.12,

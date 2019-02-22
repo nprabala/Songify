@@ -16,7 +16,7 @@ html, body {
     margin: 15px;
 }
 
-#staffController, #playbackController, #recordingController {
+#staffController, #playbackController {
    text-align: center;
  }
 
