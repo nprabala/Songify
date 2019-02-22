@@ -1,6 +1,6 @@
 angular.module("mixTapeApp", [])
-    .controller("mixTapeController", ["$scope", "utilsService", "renderService", "globalSettings", "songService",
-        function($scope, utilsService, renderService, globalSettings, songService) {
+    .controller("mixTapeController", ["$scope", "utilsService", "renderService", "globalSettings", "songService", "transcriptionService",
+        function($scope, utilsService, renderService, globalSettings, songService, transcriptionService) {
         $scope.hello = "Welcome To Mixtape";
         var url = window.location;
         var hostName = url.hostname;
@@ -54,10 +54,22 @@ angular.module("mixTapeApp", [])
       globalSettings.pitchType = $scope.pitchType;
     };
 
+    $scope.startRecording = function() {
+        transcriptionService.startRecording();
+    };
+
+    $scope.stopRecording = function() {
+        transcriptionService.stopRecording();
+    };
+
+    $scope.useRecording = function() {
+        transcriptionService.sendRecording();
+    }
+
 }])
 
-    .directive("mixtapeApp", ["$interval", "renderService", "utilsService", "globalSettings", "songService",
-        function($interval, renderService, utilsService, globalSettings, songService) {
+    .directive("mixtapeApp", ["$interval", "renderService", "utilsService", "globalSettings", "songService", "transcriptionService",
+        function($interval, renderService, utilsService, globalSettings, songService, transcriptionService) {
         return {
             restrict: 'A',
             template: '<img id="logo" src="App/img/logo.png"></img><div></div>' +
@@ -83,7 +95,14 @@ angular.module("mixTapeApp", [])
             // '<div id="playbackController"><button id="" ng-click="playMelody()">Play Melody</button>' +
             // '<button id="playChords" ng-click="playChords()">Play Chords</button>' +
             // '<button id="playComplete" ng-click="playComplete()">Play Melody with Chords</button></div>' +
-            '<canvas id="musicCanvas"></canvas>',
+            '<canvas id="musicCanvas"></canvas>' +
+
+            '<button id="recordButton" ng-click="startRecording()">Record</button>' +
+            '<button id="stopButton" disabled ng-click="stopRecording()">Stop</button>' +
+            '<button id="useRecording" disabled ng-click="useRecording()">Use Melody</button>' +
+            '<audio controls id="audioControl" hidden>' +
+              '<source src="" type="audio/mp3">' +
+            '</audio>',
 
             link: function(scope, element) {
                 var toggle = document.getElementById('container');
@@ -102,6 +121,10 @@ angular.module("mixTapeApp", [])
 
                 renderService.initialise(element.find('canvas')[0]);
                 songService.initialise();
+                transcriptionService.initialise(document.getElementById("recordButton"),
+                                                document.getElementById("stopButton"),
+                                                document.getElementById("audioControl"),
+                                                document.getElementById("useRecording"));
 
                 function canvasMouseClick(e) { renderService.addNote(e.x, e.y); }
                 function canvasResize(e) { renderService.canvasResize(); }
@@ -109,6 +132,7 @@ angular.module("mixTapeApp", [])
                 window.addEventListener('resize', canvasResize, true);
 
                 renderService.draw();
+
             }
         }
     }]);

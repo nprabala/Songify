@@ -2,11 +2,13 @@ from sanic import Sanic
 from sanic.response import text, json
 from predict import Predict
 from sanic_cors import CORS, cross_origin
-
+from transcribe import Transcriber
+import os
 
 app = Sanic()
 CORS(app)
 predict = Predict()
+transcriber = Transcriber()
 IP = '0.0.0.0'
 PORT = 8081
 sixteenth = 0.25 # 16th note: 1 = quarter note, 0.5 = 8th note
@@ -76,5 +78,25 @@ async def post_chord_progressions(request):
     else:
         return json([])
 
+@app.route("/melody_transcription", methods=['POST','OPTIONS','GET'])
+async def melody_transcription(request):
+    blob = request.files['audio_data']
+
+    if blob:
+        filename = blob[0].name
+        audio = blob[0].body
+
+        f = open(filename, 'wb')
+        f.write(audio)
+        f.close()
+
+        transcribed_notes = transcriber.run(filename)
+        os.remove(filename)
+
+        return json(transcribed_notes)
+    else:
+        return json([])
+
 if __name__ == "__main__":
+    transcriber.init()
     app.run(host=IP, port=PORT)

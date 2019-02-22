@@ -18,10 +18,13 @@ angular.module("mixTapeApp")
                 req.open("POST","http://" + utilsService.getHostname() + ":8081/chord_progressions");
                 req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
                 req.onreadystatechange = function() {
-                    var chords = JSON.parse(req.response);
-                    console.log(chords);
+                    if (req.status == 200) {
+                        console.log(req.response);
+                        var chords = JSON.parse(req.response);
+                        console.log(chords);
 
-                    callback(chords);
+                        callback(chords);
+                    }
                 }
                 req.send(JSON.stringify(melody));
             };

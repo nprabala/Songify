@@ -1,5 +1,6 @@
 angular.module("mixTapeApp")
     .constant("globalSettings", {
+        encodingType: 'mp3',
         debug: 1,
         toggleNumber: false,
         lineHeight: 0.05,

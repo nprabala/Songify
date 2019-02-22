@@ -37,8 +37,8 @@ class Transcriber:
     min_pitch = 30
     acoustic_run_dir = '.'
     hparams = 'onset_overlap=False'
-    frame_threshold = 0.55
-    onset_threshold = 0.55
+    frame_threshold = 0.50
+    onset_threshold = 0.50
     log = 'INFO'
 
     TranscriptionSession = collections.namedtuple(
@@ -229,19 +229,31 @@ class Transcriber:
         default_hparams = tf_utils.merge_hparams(
             constants.DEFAULT_HPARAMS, model.get_default_hparams())
         default_hparams.parse(self.hparams)
-        print(default_hparams)
 
         self.transcription_session = self.initialize_session(acoustic_checkpoint, default_hparams)
 
 
-    def run(self, filename):
-      tf.logging.info('Starting transcription for %s...', filename)
+    def get_notes(self, sequence):
+        notes = []
+        for note_obj in sequence:
+            note = librosa.midi_to_note(note_obj.pitch)
+            octave = int(note[-1])
 
-      sequence_prediction = self.transcribe_audio(
+            if octave < 3:
+                note = note[0:-1] + '3'
+            elif octave > 4:
+                note = note[0:-1] + '4'
+
+            duration = round((note_obj.end_time - note_obj.start_time) * 4) / 4
+            notes.append({'note':note, 'duration':duration})
+        return notes
+
+    def run(self, filename):
+        tf.logging.info('Starting transcription for %s...', filename)
+
+        sequence_prediction = self.transcribe_audio(
           self.transcription_session, filename, self.frame_threshold,
           self.onset_threshold)
 
-      midi_filename = filename + '.midi'
-      midi_io.sequence_proto_to_midi_file(sequence_prediction, midi_filename)
-
-      tf.logging.info('Transcription written to %s.', midi_filename)
+        notes = self.get_notes(sequence_prediction.notes);
+        return notes
