@@ -24,6 +24,31 @@ html, body {
      text-align: center;
  }
 
+.row{
+border-color: black;
+border-bottom-width: 5px;
+border:5px;
+}
+
+
+.padding{
+	height:5%;
+}
+
+
+
+.cell{
+	height: -webkit-fill-available;
+    display: inline-block;
+    border: 0px;
+}
+
+.staff{
+	height: 30%;
+
+}
+
+
 canvas {
     height: 100vh;
     width: 100vw;

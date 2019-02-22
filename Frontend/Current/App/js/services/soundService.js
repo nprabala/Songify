@@ -21,7 +21,6 @@ angular.module("mixTapeApp")
                         var note = cleanNote(notes[i]);
                         this.melody.push(this.sounds[note]);
                     }
-
                     this.melodyDuration = duration;
                 },
 
