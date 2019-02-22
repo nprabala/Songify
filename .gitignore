@@ -11,5 +11,5 @@ Backend/Research Scripts/train/checkpoint
 *.pyc
 Backend/Server/train/checkpoint
 Backend/Model/saved
-Frontend/Demo/node_modules/*
+Frontend/Current/node_modules/*
 Backend/research_scripts/*.wav
