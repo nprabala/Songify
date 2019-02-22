@@ -1,11 +1,15 @@
 angular.module("mixTapeApp", [])
-.controller("mixTapeController", ["$scope", "utilsService", "renderService", "globalSettings", "songService",
-    function($scope, utilsService, renderService, globalSettings, songService) {
+.controller("mixTapeController", ["$scope", "utilsService", "renderService", "globalSettings", "songService","transcriptionService",
+    function($scope, utilsService, renderService, globalSettings, songService, transcriptionService) {
         $scope.hello = "Welcome To Mixtape";
         var url = window.location;
         var hostName = url.hostname;
         utilsService.setHostname(hostName);
-        songService.initialise();
+        songService.initialise(document.getElementById("playChoice"));
+        transcriptionService.initialise(document.getElementById("recordButton"),
+                                        document.getElementById("stopButton"),
+                                        document.getElementById("audioControl"),
+                                        document.getElementById("useRecording"));
 
         $scope.noteTypes = ["sixteenth","eighth","quarter","half","whole", "clear"];
         $scope.pitchAlteration = ["Sharp","Flat","Natural"]
@@ -93,15 +97,38 @@ angular.module("mixTapeApp", [])
         col.appendChild(noteHTML);
 
     };
+
+    $scope.startRecording = function() {
+        transcriptionService.startRecording();
+    };
+
+    $scope.stopRecording = function() {
+        transcriptionService.stopRecording();
+    };
+
+    $scope.useRecording = function() {
+        var blob = transcriptionService.getAudio();
+        songService.requestTranscriptionMelody(blob);
+    };
+
+
 }])
 
-.directive("mixtapeApp", ["$interval", "renderService", "utilsService", "globalSettings", "songService",
-    function($interval, renderService, utilsService, globalSettings, songService) {
+.directive("mixtapeApp", ["$interval", "renderService", "utilsService", "globalSettings", "songService", "transcriptionService",
+    function($interval, renderService, utilsService, globalSettings, songService, transcriptionService) {
         return {
             restrict: 'A',
             template: function(){
                 var menu = '<img id="logo" src="App/img/logo.png"></img><div></div>' +
                 '<div id="topMessage">{{topMessage}}</div>' +
+
+                // TODO: Wrap in DIV
+                '<div id="recordingController"> <audio controls id="audioControl" hidden>' +
+                  '<source src="" type="audio/mp3">' +
+                '</audio></div>' +
+                '<div id="recordingController"><button id="recordButton" ng-click="startRecording()">Record</button>' +
+                '<button id="stopButton" disabled ng-click="stopRecording()">Stop</button>' +
+                '<button id="useRecording" disabled ng-click="useRecording()">Use Melody</button></div>' +
 
                 '<div id="noteSelection">Current note (click to add to staff): ' +
                 '<select ng-model="currentType" ng-options="x for x in noteTypes" ng-change="updateNoteType()"></select>'+
