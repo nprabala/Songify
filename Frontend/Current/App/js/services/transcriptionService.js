@@ -12,7 +12,6 @@ angular.module("mixTapeApp")
                     navigator.mediaDevices.getUserMedia(this.constraints).then((stream) => {
                         this.gumStream = stream;
                         this.input = this.audioContext.createMediaStreamSource(stream);
-                        // this.input.connect(this.audioContext.destination)
 
                         this.recorder = new WebAudioRecorder(this.input, {
                             workerDir: "./node_modules/web-audio-recorder-js/lib/",
@@ -22,6 +21,9 @@ angular.module("mixTapeApp")
                         this.recorder.onComplete = (recorder, blob) => {
                             this.blob = blob;
                             this.useRecording.disabled = false;
+                            this.stopButton.disabled = true;
+                            this.startButton.disabled = false;
+
 
                             var url = URL.createObjectURL(this.blob);
                             this.audioControl.src = url;
@@ -30,7 +32,7 @@ angular.module("mixTapeApp")
                         }
 
                         this.recorder.setOptions({
-                            timeLimit:120,
+                            timeLimit:15,
                             encodeAfterRecord: this.encodeAfterRecord,
                             ogg: {quality: 0.5},
                             mp3: {bitRate: 160}
@@ -51,25 +53,11 @@ angular.module("mixTapeApp")
                 stopRecording: function() {
                     console.log("stopRecording() called");
                     this.gumStream.getAudioTracks()[0].stop();
-
-                    //disable the stop button
-                    this.stopButton.disabled = true;
-                    this.startButton.disabled = false;
-
                     this.recorder.finishRecording();
                 },
 
-                sendRecording: function() {
-                    var req = new XMLHttpRequest();
-                    req.open("POST","http://" + utilsService.getHostname() + ":8081/melody_transcription");
-                    req.onreadystatechange = function() {
-                        console.log(req.response);
-                    }
-
-                    var filename = new Date().toISOString() + '.' + globalSettings.encodingType;
-                    var fd = new FormData();
-                    fd.append("audio_data", this.blob, filename);
-                    req.send(fd);
+                getAudio: function() {
+                    return this.blob;
                 },
 
                 initialise: function(startButton, stopButton, audioControl, useRecording) {

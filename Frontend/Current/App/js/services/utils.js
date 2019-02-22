@@ -11,6 +11,15 @@ angular.module("mixTapeApp")
                 return this.hostname;
             },
 
+            flatSharpExceptionsWrapper: function(note) {
+                if (note.substr(1,1) == '#' || note.substr(1,1) == '-') {
+                    return this.flatSharpExceptions(note.substr(0,1) + note.substr(2,1),
+                                                    note.substr(1,1));
+                } else {
+                    return note;
+                }
+            },
+
             // Checks for all the flat sharp combos that really mean something else.
             flatSharpExceptions: function (pitch, pitchFileMod){
                 if (pitch.substr(0,1) == "A" && pitchFileMod == "-"){
@@ -51,7 +60,7 @@ angular.module("mixTapeApp")
                     for(var j = 0; j < cols.length; j++){
                         this.clearNote(cols[j],i);
                     }
-                }                
+                }
             },
 
             clearNote: function(col, i){
@@ -66,12 +75,12 @@ angular.module("mixTapeApp")
                     if(col.children.length >= 1){
                         for (var k = 0; k < col.children.length; k++){
                             col.removeChild(col.children[k]);
-                        }            
+                        }
                     }
                 }
             },
             generateStaff: function(id){
-                var idString = ' id="'+id+'" ' 
+                var idString = ' id="'+id+'" '
                 var idVar = "this." + id + "Staff";
                 var staff = '<div '+idString+' class="staff">';
                 var noteWidthPercentage = (globalSettings.noteRadius*2)*100;

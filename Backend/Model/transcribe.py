@@ -32,6 +32,10 @@ from magenta.music import sequences_lib
 from magenta.protobuf import music_pb2
 import tensorflow as tf
 
+import math
+import soundfile as sf
+import io
+
 class Transcriber:
     max_pitch = 75
     min_pitch = 30
@@ -53,6 +57,7 @@ class Transcriber:
     def create_example(self, filename, hparams):
       """Processes an audio file into an Example proto."""
       wav_data = librosa.core.load(filename, sr=hparams.sample_rate)[0]
+
       if hparams.normalize_audio:
         audio_io.normalize_wav_data(wav_data, hparams.sample_rate)
       wav_data = audio_io.samples_to_wav_data(wav_data, hparams.sample_rate)
@@ -244,7 +249,7 @@ class Transcriber:
             elif octave > 4:
                 note = note[0:-1] + '4'
 
-            duration = round((note_obj.end_time - note_obj.start_time) * 4) / 4
+            duration = math.ceil((note_obj.end_time - note_obj.start_time)*4)/4
             notes.append({'note':note, 'duration':duration})
         return notes
 

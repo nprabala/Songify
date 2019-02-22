@@ -4,6 +4,8 @@ from predict import Predict
 from sanic_cors import CORS, cross_origin
 from transcribe import Transcriber
 import os
+import random
+import string
 
 app = Sanic()
 CORS(app)
@@ -12,6 +14,10 @@ transcriber = Transcriber()
 IP = '0.0.0.0'
 PORT = 8081
 sixteenth = 0.25 # 16th note: 1 = quarter note, 0.5 = 8th note
+
+from aoiklivereload import LiveReloader
+reloader = LiveReloader()
+reloader.start_watcher_thread()
 
 def get_notes_timesteps(notes):
     ''''
@@ -80,20 +86,25 @@ async def post_chord_progressions(request):
 
 @app.route("/melody_transcription", methods=['POST','OPTIONS','GET'])
 async def melody_transcription(request):
-    blob = request.files['audio_data']
+    blob = request.body
 
     if blob:
-        filename = blob[0].name
-        audio = blob[0].body
+        try:
+            filename = ''.join(random.SystemRandom().choice(string.ascii_uppercase
+                + string.digits) for _ in range(10)) + '.wav'
 
-        f = open(filename, 'wb')
-        f.write(audio)
-        f.close()
+            f = open(filename, 'wb')
+            f.write(blob)
+            f.close()
 
-        transcribed_notes = transcriber.run(filename)
-        os.remove(filename)
+            transcribed_notes = transcriber.run(filename)
+            os.remove(filename)
 
-        return json(transcribed_notes)
+            return json(transcribed_notes)
+
+        except:
+            return json([])
+
     else:
         return json([])
 

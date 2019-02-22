@@ -27,15 +27,13 @@ angular.module("mixTapeApp")
                 updateChords: function(chords, duration) {
                     this.chords = [];
                     for (var i = 0; i < chords.length; i++) {
-                        var unsplitChord = chords[i]["chord"];
-                        var splitChord = unsplitChord.split(".");
-
                         var chordObj = [];
-                        if (splitChord[0] == "") {
+
+                        if (chords[i][0] == "") {
                             chordObj.push(this.sounds[''])
                         } else {
-                            for (var j = 0; j < splitChord.length; j++) {
-                                var note = cleanNote(splitChord[j] + '4'); // assume 4th octave
+                            for (var j = 0; j < chords[i].length; j++) {
+                                var note = cleanNote(chords[i][j] + '4'); // assume 4th octave
                                 chordObj.push(this.sounds[note]);
                             }
                         }

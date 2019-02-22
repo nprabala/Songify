@@ -16,10 +16,10 @@ html, body {
     margin: 15px;
 }
 
-#staffController, #playbackController {
+#staffController, #playbackController, #recordingController {
    text-align: center;
  }
- 
+
  #playbackControllerTest {
      text-align: center;
  }
@@ -141,4 +141,3 @@ a:hover {
 .toggle:nth-child(1) {
 	right: 0;
 }
-
