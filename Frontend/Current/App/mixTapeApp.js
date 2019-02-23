@@ -12,29 +12,10 @@ angular.module("mixTapeApp", [])
         $scope.pitchType = "Natural";
         $scope.currentType = "quarter";
         $scope.topMessage = "Welcome to Mixtape! Click anywhere on the top staff to create your melody, then select 'Get Chords' to generate the accompaniment.";
-        $scope.noteGrid = [];
-        $scope.chordGrid = [];
         $scope.melodyStaff = "melody";
         $scope.chordStaff = "chords";
 
-        for(var i = 0; i < 1/(globalSettings.noteRadius*2); i++){
-            $scope.noteGrid.push("Empty");
-        }
-
-        $scope.updateMelody = function(){
-            var compiledMelody = [];
-            var compiledDurations = [];
-            for (var j = 0; j < this.noteGrid.length; j++){
-                if (this.noteGrid[j] != "Empty"){
-                    compiledMelody.push(this.noteGrid[j]["note"]);
-                    compiledDurations.push(this.noteGrid[j]["duration"])
-                }
-            }
-            songService.updateMelody(compiledMelody, compiledDurations);
-        }
-
         $scope.playMelody = function() {
-            this.updateMelody();
             songService.playMelody();
         };
 
@@ -52,14 +33,12 @@ angular.module("mixTapeApp", [])
         };
 
         $scope.playComplete = async function() {
-            this.updateMelody();
             songService.playMelody();
             songService.playChords();
         };
 
         $scope.loadChords = function() {
-            this.updateMelody();
-            songService.updateChords();
+            songService.requestChords();
             // TODO: Flesh out drawing chords on the staff element.
             // $scope.chords = songService.chords;
             // $scope.drawChords();
@@ -67,9 +46,6 @@ angular.module("mixTapeApp", [])
 
         $scope.clear = function() {
             console.log("CLEARING");
-            for(var i = 0; i < 1/(globalSettings.noteRadius*2); i++){
-                $scope.noteGrid[i] = "Empty";
-            }
             utilsService.clearStaff("melody");
             utilsService.clearStaff("chord");
             songService.clearSong();
@@ -95,11 +71,14 @@ angular.module("mixTapeApp", [])
             for (var k = 0; k < rows.length; k++){
                 utilsService.clearNote(rows[k].children[j],k);
             }
-            if(this.currentType == "clear"){
-                this.noteGrid[j] = "Empty";
-                return;
+
+            if (this.currentType == "clear"){
+                songService.editMelody(j, "Empty");
+                songService.updateMelody();
+            } else {
+                songService.editMelody(j, note);
+                songService.updateMelody();
             }
-            this.noteGrid[j] = note;
         }
         else{
             // TODO: Enable editing of chords.
@@ -114,8 +93,6 @@ angular.module("mixTapeApp", [])
         col.appendChild(noteHTML);
 
     };
-
-
 }])
 
 .directive("mixtapeApp", ["$interval", "renderService", "utilsService", "globalSettings", "songService",
@@ -125,6 +102,7 @@ angular.module("mixTapeApp", [])
             template: function(){
                 var menu = '<img id="logo" src="App/img/logo.png"></img><div></div>' +
                 '<div id="topMessage">{{topMessage}}</div>' +
+
                 '<div id="noteSelection">Current note (click to add to staff): ' +
                 '<select ng-model="currentType" ng-options="x for x in noteTypes" ng-change="updateNoteType()"></select>'+
                 '<select ng-model="pitchType" ng-options="x for x in pitchAlteration" ng-change="updatePitchType()"></select></div>'+
@@ -141,14 +119,11 @@ angular.module("mixTapeApp", [])
                 '</div>' + //inner-container
             '</div>' + //container
             '<div id="playbackController"><button id="playChoice" ng-click="choosePlayback()">Play</button></div>';
+
             var melodyStaff = utilsService.generateStaff("melody");
             var chordStaff = utilsService.generateStaff("chord");
             var padding = '<div class="padding"></div>';
             return menu + melodyStaff + padding + chordStaff;
-
-            // '<div id="playbackController"><button id="" ng-click="playMelody()">Play Melody</button>' +
-            // '<button id="playChords" ng-click="playChords()">Play Chords</button>' +
-            // '<button id="playComplete" ng-click="playComplete()">Play Melody with Chords</button></div>' +
 
         },
 
@@ -169,8 +144,3 @@ angular.module("mixTapeApp", [])
         }
     }
 }]);
-
-
-
-
-

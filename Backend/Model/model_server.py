@@ -3,13 +3,16 @@ from sanic.response import text, json
 from predict import Predict
 from sanic_cors import CORS, cross_origin
 
-
 app = Sanic()
 CORS(app)
 predict = Predict()
 IP = '0.0.0.0'
 PORT = 8081
 sixteenth = 0.25 # 16th note: 1 = quarter note, 0.5 = 8th note
+
+from aoiklivereload import LiveReloader
+reloader = LiveReloader()
+reloader.start_watcher_thread()
 
 def get_notes_timesteps(notes):
     ''''

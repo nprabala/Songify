@@ -19,7 +19,7 @@ html, body {
 #staffController, #playbackController {
    text-align: center;
  }
- 
+
  #playbackControllerTest {
      text-align: center;
  }
@@ -141,4 +141,3 @@ a:hover {
 .toggle:nth-child(1) {
 	right: 0;
 }
-
