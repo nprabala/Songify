@@ -3,13 +3,10 @@ angular.module("mixTapeApp")
         function(globalSettings, utilsService, soundService) {
             return {
 
-                requestChords: function() {
-                    if (this.melody == []) return;
-
+                requestChords: function(callback) {
                     var toSend = [];
                     for (var i = 0; i < this.melody.length; i++){
                         if (this.melody[i] != "Empty") {
-                            console.log(this.melody[i]["note"])
                             if (this.melody[i]["note"].length == 3) {
                                 toSend.push({"note":this.melody[i]["note"].substr(0, 2), "duration":this.melody[i]["duration"]});
                             }
@@ -17,6 +14,12 @@ angular.module("mixTapeApp")
                                 toSend.push({"note":this.melody[i]["note"].charAt(0), "duration":this.melody[i]["duration"]});
                             }
                         }
+                    }
+
+                    // just call callback and return
+                    if (toSend.length == 0) {
+                        callback();
+                        return;
                     }
 
                     var req = new XMLHttpRequest();
@@ -40,11 +43,7 @@ angular.module("mixTapeApp")
 
                             // update sounds
                             soundService.updateChords(compiledChords, compiledDurations);
-
-                            // update chords on display
-                            // TODO: Reconfigure to work with div format
-                            // renderService.clearChords();
-                            // renderService.addChords(this.chords);
+                            callback();
                         }
                     }
                     req.send(JSON.stringify(toSend));
@@ -65,6 +64,14 @@ angular.module("mixTapeApp")
                     }
 
                     soundService.updateMelody(compiledMelody, compiledDurations);
+                },
+
+                getChords: function() {
+                    return this.chords;
+                },
+
+                getMelody: function() {
+                    return this.melody;
                 },
 
                 playMelody: function() {

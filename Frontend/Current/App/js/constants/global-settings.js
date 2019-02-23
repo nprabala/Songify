@@ -1,5 +1,6 @@
 angular.module("mixTapeApp")
     .constant("globalSettings", {
+        scoreHeight: 150, 
         debug: 1,
         toggleNumber: false,
         lineHeight: 0.12,
