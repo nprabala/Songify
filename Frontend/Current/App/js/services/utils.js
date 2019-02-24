@@ -51,6 +51,7 @@ angular.module("mixTapeApp")
                 }
                 return pitch.substr(0,1) + pitchFileMod + pitch.substr(1,1);
             },
+
             clearStaff: function(staff){
                 var staffElem = $("#" + staff)[0];
                 var rows = staffElem.children
@@ -85,11 +86,16 @@ angular.module("mixTapeApp")
                 var staff = '<div '+idString+' class="staff">';
                 var noteWidthPercentage = (globalSettings.noteRadius*2)*100;
                 var notePercentage = (globalSettings.lineHeight/2) *100;
+                var curLines = 0;
+
                 for (var i = 0; i < globalSettings.trebleStaff.length; i++){
                     var line = "";
-                    if (i % 2 == 0 && i >= 2 && i < globalSettings.trebleStaff.length -1){
+
+                    if (i % 2 == 0 && i >= 4 && curLines < globalSettings.maxLines){
                         line = '<line x1="0%" y1="50%" x2="100%" y2="50%" style="stroke:rgb(0,0,0);stroke-width:2"/>';
+                        curLines += 1;
                     }
+
                     staff += '<div id="'+String(i)+'" class="row" style="height:' + String(notePercentage)+'%;">';
                     for (var j = 0; j < 1/(globalSettings.noteRadius*2); j++){
                         staff += '<svg id="'+String(j)+'" style="width:' + noteWidthPercentage + '%;"ng-click="drawNote('+i+','+j+','+idVar+')" class="cell"'+
