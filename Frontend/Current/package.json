@@ -321,6 +321,7 @@
       "resolved": "https://registry.npmjs.org/vary/-/vary-1.1.2.tgz",
       "version": "1.1.2"
     },
+    "vexflow": "^1.2.88",
     "web-audio-recorder-js": "0.0.2"
   }
 }
