@@ -29,7 +29,8 @@ angular.module("mixTapeApp")
                     return "B" + "-" + pitch.substr(1,1);
                 }
                 if (pitch.substr(0,1) == "B" && pitchFileMod == "#"){
-                    return "C" + pitch.substr(1,1);
+                    // need to go up to C so also increase the octave
+                    return "C" + (parseInt(pitch.substr(1,1)) + 1).toString();
                 }
                 if (pitch.substr(0,1) == "D" && pitchFileMod == "-"){
                     return "C" + "#" + pitch.substr(1,1);
