@@ -1,12 +1,13 @@
 angular.module("mixTapeApp", [])
-.controller("mixTapeController", ["$scope", "utilsService", "renderService", "globalSettings", "songService", "scoreService",
-function($scope, utilsService, renderService, globalSettings, songService, scoreService) {
+.controller("mixTapeController", ["$scope", "utilsService", "renderService", "globalSettings", "songService",
+function($scope, utilsService, renderService, globalSettings, songService) {
     $scope.hello = "Welcome To Mixtape";
     var url = window.location;
     var hostName = url.hostname;
     utilsService.setHostname(hostName);
     songService.initialise();
-    scoreService.initialise();
+    renderService.initialise(document.getElementById('scoreMelody'),
+                            document.getElementById('scoreChords'));
 
     $scope.noteTypes = ["sixteenth","eighth","quarter","half","whole", "clear"];
     $scope.pitchAlteration = ["Sharp","Flat","Natural"]
@@ -39,7 +40,7 @@ function($scope, utilsService, renderService, globalSettings, songService, score
 
     $scope.clear = function() {
         console.log("CLEARING");
-        utilsService.clearStaff("melody");
+        renderService.clearStaff("melody");
         songService.clearSong();
     };
 
@@ -57,11 +58,11 @@ function($scope, utilsService, renderService, globalSettings, songService, score
         var rows = staffElem.children
         var row = rows[i];
         var col = row.children[j];
-        var noteHTML = utilsService.generateNoteHTML(this.currentType);
-        var note = utilsService.convertToNote(i);
+        var noteHTML = renderService.generateNoteHTML(this.currentType);
+        var note = renderService.convertToNote(i);
         if (staff == "melody"){
             for (var k = 0; k < rows.length; k++){
-                utilsService.clearNote(rows[k].children[j],k);
+                renderService.clearNote(rows[k].children[j],k);
             }
 
             if (this.currentType == "clear"){
@@ -77,8 +78,8 @@ function($scope, utilsService, renderService, globalSettings, songService, score
     };
 }])
 
-.directive("mixtapeApp", ["$interval", "renderService", "utilsService", "globalSettings", "songService", "scoreService",
-function($interval, renderService, utilsService, globalSettings, songService, scoreService) {
+.directive("mixtapeApp", ["$interval", "renderService", "utilsService", "globalSettings", "songService",
+function($interval, renderService, utilsService, globalSettings, songService) {
     return {
         restrict: 'A',
         template: function(){
@@ -101,7 +102,7 @@ function($interval, renderService, utilsService, globalSettings, songService, sc
             '</div>' + //container
             '<div id="playbackController"><button id="playChoice" ng-click="choosePlayback()">Play</button></div>';
 
-            var melodyStaff = utilsService.generateStaff("melody");
+            var melodyStaff = renderService.generateStaff("melody");
             var score = '<div id="score" hidden><div id="scoreMelody"></div><div id="scoreChords"></div></div>';
             var padding = '<div class="padding"></div>';
             return menu + melodyStaff + score + padding;
@@ -113,12 +114,18 @@ function($interval, renderService, utilsService, globalSettings, songService, sc
             var toggleContainer = document.getElementById('toggle-container');
 
             window.addEventListener("resize", () => {
-                scoreService.resizeDisplay(window.innerWidth);
-                scoreService.drawScore(songService.getMelody(), songService.getChords())
+                renderService.resizeScore(window.innerWidth);
+
+                // only redraw if toggled for score
+                if (globalSettings.toggleNumber) {
+                    renderService.drawScore(songService.getMelody(), songService.getChords());
+                }
             });
 
             toggle.addEventListener('click', function() {
                 globalSettings.toggleNumber = !globalSettings.toggleNumber;
+
+                // show score (melody + chords)
                 if (globalSettings.toggleNumber) {
 
                     document.getElementById("playChoice").enabled = false;
@@ -127,11 +134,13 @@ function($interval, renderService, utilsService, globalSettings, songService, sc
                         document.getElementById("melody").hidden = true;
                         document.getElementById("score").hidden = false;
                         document.getElementById("playChoice").enabled = true;
-                        scoreService.drawScore(songService.getMelody(), songService.getChords());
+                        renderService.drawScore(songService.getMelody(), songService.getChords());
                     });
 
                     toggleContainer.style.clipPath = 'inset(0 0 0 50%)';
                     toggleContainer.style.backgroundColor = '#D74046';
+
+                // show just melody
                 } else {
                     document.getElementById("clear").disabled = false;
                     document.getElementById("score").hidden = true;

@@ -2,8 +2,7 @@ angular.module("mixTapeApp")
     .factory("scoreService", ["globalSettings", "utilsService",
         function(globalSettings, utilsService) {
             function setupRenderer(score) {
-                var renderer = new Vex.Flow.Renderer(document.getElementById(score),
-                                                        Vex.Flow.Renderer.Backends.SVG);
+                var renderer = new Vex.Flow.Renderer(score, Vex.Flow.Renderer.Backends.SVG);
                 renderer.resize(window.innerWidth, globalSettings.scoreHeight);
                 return renderer;
             }
@@ -96,6 +95,7 @@ angular.module("mixTapeApp")
                 return notes;
             }
 
+            // whether this is a common duration note (16th, 8th, quarter, half, whole)
             function isDurationNote(dur) {
                 return (dur == 0.25 || dur == 0.5 || dur == 1 || dur == 2 || dur == 4)
             }
@@ -203,7 +203,7 @@ angular.module("mixTapeApp")
                         this.chordContext.svg.removeChild(this.chordGroup);
                     }
 
-                    // open group
+                    // open group ... group used to easily remove score
                     this.melodyGroup = this.melodyContext.openGroup();
                     this.chordGroup = this.chordContext.openGroup();
 
@@ -226,9 +226,9 @@ angular.module("mixTapeApp")
                     this.chordRenderer.resize(width, globalSettings.scoreHeight);
                 },
 
-                initialise: function() {
-                    this.melodyRenderer = setupRenderer("scoreMelody");
-                    this.chordRenderer = setupRenderer("scoreChords");
+                initialise: function(melodyScore, chordScore) {
+                    this.melodyRenderer = setupRenderer(melodyScore);
+                    this.chordRenderer = setupRenderer(chordScore);
 
                     this.melodyContext = setupContext(this.melodyRenderer);
                     this.chordContext = setupContext(this.chordRenderer);
