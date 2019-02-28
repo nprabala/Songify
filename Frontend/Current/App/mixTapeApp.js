@@ -9,7 +9,7 @@ function($scope, utilsService, renderService, globalSettings, songService) {
     renderService.initialise(document.getElementById('scoreMelody'),
                             document.getElementById('scoreChords'));
 
-    $scope.noteTypes = ["sixteenth","eighth","quarter","half","whole", "clear"];
+    $scope.noteTypes = ["sixteenth","eighth","quarter","half","whole", globalSettings.clearNote];
     $scope.pitchAlteration = ["Sharp","Flat","Natural"]
     $scope.pitchType = "Natural";
     $scope.currentType = "quarter";
@@ -54,6 +54,7 @@ function($scope, utilsService, renderService, globalSettings, songService) {
 
 
     $scope.drawNote = function(i,j, staff){
+        console.log("Here")
         var staffElem = $("#" + staff)[0];
         var rows = staffElem.children
         var row = rows[i];
@@ -65,16 +66,15 @@ function($scope, utilsService, renderService, globalSettings, songService) {
                 renderService.clearNote(rows[k].children[j],k);
             }
 
-            if (this.currentType == "clear"){
+            if (this.currentType == globalSettings.clearNote){
                 songService.editMelody(j, "Empty");
                 songService.updateMelody();
             } else {
                 songService.editMelody(j, note);
                 songService.updateMelody();
+                col.appendChild(noteHTML);
             }
         }
-        col.appendChild(noteHTML);
-
     };
 }])
 

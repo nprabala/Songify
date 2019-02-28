@@ -1,5 +1,6 @@
 angular.module("mixTapeApp")
     .constant("globalSettings", {
+        clearNote: "*CLEAR NOTE*",
         scoreHeight: 150,
         debug: 1,
         toggleNumber: false,
