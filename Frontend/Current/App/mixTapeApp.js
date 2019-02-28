@@ -14,7 +14,6 @@ function($scope, utilsService, renderService, globalSettings, songService, score
     $scope.currentType = "quarter";
     $scope.topMessage = "Welcome to Mixtape! Click anywhere on the top staff to create your melody, then select 'Get Chords' to generate the accompaniment.";
     $scope.melodyStaff = "melody";
-    $scope.chordStaff = "chords";
 
     $scope.playMelody = function() {
         songService.playMelody();
@@ -41,7 +40,6 @@ function($scope, utilsService, renderService, globalSettings, songService, score
     $scope.clear = function() {
         console.log("CLEARING");
         utilsService.clearStaff("melody");
-        utilsService.clearStaff("chord");
         songService.clearSong();
     };
 
@@ -73,16 +71,6 @@ function($scope, utilsService, renderService, globalSettings, songService, score
                 songService.editMelody(j, note);
                 songService.updateMelody();
             }
-        }
-        else{
-            // TODO: Enable editing of chords.
-            // utilsService.clearNote(col,i);
-            // if(this.currentType == "clear"){
-            //     // TODO: Handle weird case when chord contains two of same note.
-            //     this.chordGrid[j].remove(note["note"]);
-            //     return;
-            // }
-
         }
         col.appendChild(noteHTML);
 
