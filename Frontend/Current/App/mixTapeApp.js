@@ -54,7 +54,6 @@ function($scope, utilsService, renderService, globalSettings, songService) {
 
 
     $scope.drawNote = function(i,j, staff){
-        console.log("Here")
         var staffElem = $("#" + staff)[0];
         var rows = staffElem.children
         var row = rows[i];

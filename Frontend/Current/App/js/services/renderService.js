@@ -50,7 +50,7 @@ angular.module("mixTapeApp")
                 },
 
                 clearNote: function(col, i){
-                    if (i % 2 == 0 && i >= 2 && i < globalSettings.trebleStaff.length - 1){
+                    if (i % 2 == 0 && i >= globalSettings.topLineIndex && i < globalSettings.trebleStaff.length - 1){
                         if(col.children.length >= 2){
                             for (var k = 1; k < col.children.length; k++){
                                 col.removeChild(col.children[k]);
@@ -76,7 +76,7 @@ angular.module("mixTapeApp")
                     for (var i = 0; i < globalSettings.trebleStaff.length; i++){
                         var line = "";
 
-                        if (i % 2 == 0 && i >= 4 && curLines < globalSettings.numLines){
+                        if (i % 2 == 0 && i >= globalSettings.topLineIndex && curLines < globalSettings.numLines){
                             line = '<line x1="0%" y1="50%" x2="100%" y2="50%" style="stroke:rgb(0,0,0);stroke-width:2"/>';
                             curLines += 1;
                         }
