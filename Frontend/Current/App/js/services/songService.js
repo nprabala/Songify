@@ -26,9 +26,7 @@ function(globalSettings, utilsService, soundService) {
             req.open("POST","http://" + this.hostName + ":8081/chord_progressions");
             req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             req.onreadystatechange = () => {
-
-                // TODO: checking for 200 still doesn't deal with error
-                if (req.status == 200) {
+                if (req.readyState == 4 && req.status == 200) {
                     var chords = JSON.parse(req.response);
                     console.log(chords);
                     this.chords = chords;
@@ -43,8 +41,9 @@ function(globalSettings, utilsService, soundService) {
 
                     // update sounds
                     soundService.updateChords(compiledChords, compiledDurations);
-                    callback();
                 }
+
+                callback();
             }
             req.send(JSON.stringify(toSend));
         },
