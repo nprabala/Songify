@@ -8,6 +8,12 @@ angular.module("mixTapeApp").constant("globalSettings", {
     LINE_HEIGHT: 0.12,
     STAFF_LINES: 5, // Number of lines in a staff
     NOTE_RADIUS: 0.01,
+    CHORDS_OCTAVE: '3',
+
+    clefType: {
+        TREBLE: "treble",
+        BASS: "bass"
+    },
 
     trebleStaff: ["C6", "B5", "A5", "G5", "F5", "E5", "D5", "C5", "B4", "A4", "G4", "F4", "E4", "D4", "C4"],
 

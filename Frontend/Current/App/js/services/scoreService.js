@@ -14,9 +14,9 @@ function(globalSettings, utilsService) {
         return context;
     }
 
-    function drawStave(notes, context) {
+    function drawStave(notes, context, clef) {
         var stave = new Vex.Flow.Stave(0, 0, window.innerWidth);
-        stave.addClef("treble").addKeySignature('C');
+        stave.addClef(clef).addKeySignature('C');
         stave.setContext(context).draw();
 
         var voice = new Vex.Flow.Voice().setMode('soft');
@@ -72,8 +72,8 @@ function(globalSettings, utilsService) {
     }
 
     // cleaner way to create new stave note
-    function newStaveNote(notes, dur) {
-        return new Vex.Flow.StaveNote({clef: "treble", keys: notes, duration: dur });
+    function newStaveNote(notes, dur, clef) {
+        return new Vex.Flow.StaveNote({clef: clef, keys: notes, duration: dur });
     }
 
     function buildMelodyNotes(melody) {
@@ -85,10 +85,10 @@ function(globalSettings, utilsService) {
                 dur = melody[j]["duration"];
                 if (note.includes('#') || note.includes('b')) {
                     var mod = note.substring(1, 2);
-                    notes.push(newStaveNote([note], durationMap(dur, false))
+                    notes.push(newStaveNote([note], durationMap(dur, false), globalSettings.clefType.TREBLE)
                     .addAccidental(0, new Vex.Flow.Accidental(mod)));
                 } else {
-                    notes.push(newStaveNote([note], durationMap(dur, false)));
+                    notes.push(newStaveNote([note], durationMap(dur, false), globalSettings.clefType.TREBLE));
                 }
             }
         }
@@ -121,7 +121,7 @@ function(globalSettings, utilsService) {
                 var splitChord = Array.from(new Set(inputChords[j]["chord"].split(".")));
 
                 for (var i = 0; i < splitChord.length; i++) {
-                    var note = pitchWrapper(splitChord[i] + '4');
+                    var note = pitchWrapper(splitChord[i] + globalSettings.CHORDS_OCTAVE);
                     if (note.includes('b') || note.includes('#')) {
                         needAccidentals.push([i, note.substring(1, 2)]);
                     }
@@ -135,22 +135,27 @@ function(globalSettings, utilsService) {
                 if (duration == 0) return;
 
                 if (isDurationNote(duration)) {
-                    chords.push(newStaveNote(notes, durationMap(duration, isRest)))
+                    chords.push(newStaveNote(notes, durationMap(duration, isRest),
+                                globalSettings.clefType.BASS))
                     totalNotes+=1;
                 } else {
                     var remainder = duration;
                     if (duration < 1) {
                         remainder = duration - 0.5;
-                        chords.push(newStaveNote(notes, durationMap(0.5, isRest)))
+                        chords.push(newStaveNote(notes, durationMap(0.5, isRest),
+                                    globalSettings.clefType.BASS))
                     } else if (duration < 2) {
                         remainder = duration - 1;
-                        chords.push(newStaveNote(notes, durationMap(1, isRest)))
+                        chords.push(newStaveNote(notes, durationMap(1, isRest),
+                                    globalSettings.clefType.BASS))
                     } else if (duration < 4) {
                         remainder = duration - 2;
-                        chords.push(newStaveNote(notes, durationMap(2, isRest)))
+                        chords.push(newStaveNote(notes, durationMap(2, isRest),
+                                    globalSettings.clefType.BASS))
                     } else {
                         remainder = duration - 4;
-                        chords.push(newStaveNote(notes, durationMap(4, isRest)))
+                        chords.push(newStaveNote(notes, durationMap(4, isRest),
+                                    globalSettings.clefType.BASS))
                     }
 
                     totalNotes+=1;
@@ -213,8 +218,8 @@ function(globalSettings, utilsService) {
             var chords = chordsReturn[0];
             var ties = chordsReturn[1];
 
-            drawStave(melody, this.melodyContext);
-            drawStave(chords, this.chordContext);
+            drawStave(melody, this.melodyContext, globalSettings.clefType.TREBLE);
+            drawStave(chords, this.chordContext, globalSettings.clefType.BASS);
             ties.forEach((t) => {t.setContext(this.chordContext).draw()})
 
             // close group
