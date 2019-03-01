@@ -10,6 +10,22 @@ angular.module("mixTapeApp").constant("globalSettings", {
     NOTE_RADIUS: 0.01,
     CHORDS_OCTAVE: '3',
 
+    notesEnum: {
+        'C':1,
+        'D':2,
+        'E':3,
+        'F':4,
+        'G':5,
+        'A':6,
+        'B':7
+    },
+
+    pitchModEnum: {
+        '#':1,
+        '-':2,
+        '' :3
+    },
+
     clefType: {
         TREBLE: "treble",
         BASS: "bass"

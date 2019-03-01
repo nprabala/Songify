@@ -101,6 +101,26 @@ function(globalSettings, utilsService) {
         return (dur == 0.25 || dur == 0.5 || dur == 1 || dur == 2 || dur == 4)
     }
 
+    function sortCompare(one, two) {
+        var onePitch = globalSettings.notesEnum[one[0]];
+        var oneMod = one.length > 1 ? globalSettings.pitchModEnum[one[1]]
+                                    : globalSettings.pitchModEnum[''];
+
+        var twoPitch = globalSettings.notesEnum[two[0]]
+        var twoMod = two.length > 1 ? globalSettings.pitchModEnum[two[1]]
+                                    : globalSettings.pitchModEnum[''];
+
+        if (onePitch > twoPitch) {
+            return 1;
+        } else if (onePitch < twoPitch) {
+            return -1;
+        } else if (oneMod > twoMod) {
+            return 1;
+        } else {
+            return -1;
+        }
+    }
+
     function buildChordsNotes(inputChords) {
         var chords = [];
         var needTies = [];
@@ -113,12 +133,12 @@ function(globalSettings, utilsService) {
             var totalNotes = 0;
 
             if (inputChords[j]["chord"] == '') {
-                console.log("REST");
                 isRest = true;
                 notes.push("B/4");
             } else {
                 // TODO: remove convert to set after we remove duplicates in model
                 var splitChord = Array.from(new Set(inputChords[j]["chord"].split(".")));
+                splitChord.sort(sortCompare);
 
                 for (var i = 0; i < splitChord.length; i++) {
                     var note = pitchWrapper(splitChord[i] + globalSettings.CHORDS_OCTAVE);
