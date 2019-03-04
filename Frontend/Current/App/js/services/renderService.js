@@ -96,28 +96,47 @@ function(globalSettings, scoreService) {
                 return staff
         },
 
-        generateNoteHTML : function(noteType){
+        generateNoteHTML : function(noteType, pitchType){
+            console.log("notetype!" + noteType + " " + pitchType);
             var namespace = "http://www.w3.org/2000/svg";
 
             if (noteType == globalSettings.noteType.WHOLE) {
                 var img = document.createElementNS(namespace, "image");
                 img.setAttributeNS(null, "href", "App/img/whole.png");
                 img.setAttributeNS(null, "width", "80%");
-                img.setAttributeNS(null, "x", "3");
+                img.setAttributeNS(null, "x", "3");    
                 return img;
             } 
             else if (noteType == globalSettings.noteType.HALF) {
                 var img = document.createElementNS(namespace, "image");
                 img.setAttributeNS(null, "href", "App/img/half.png");
-                img.setAttributeNS(null, "width", "130%");
+                img.setAttributeNS(null, "width", "100%");
                 img.setAttributeNS(null, "y", "-37");
+                img.setAttributeNS(null, "x", "-5");
                 return img;
             }
             else if (noteType == globalSettings.noteType.QUARTER) {
                 var img = document.createElementNS(namespace, "image");
-                img.setAttributeNS(null, "href", "App/img/quarter.png");
-                img.setAttributeNS(null, "width", "130%");
-                img.setAttributeNS(null, "y", "-37");
+                if (pitchType == globalSettings.pitchType.FLAT) {
+                    img.setAttributeNS(null, "href", "App/img/quarter_flat.png");
+                    img.setAttributeNS(null, "width", "140%");
+                    img.setAttributeNS(null, "y", "-35");
+                    img.setAttributeNS(null, "x", "-17");
+                }
+                else if (pitchType == globalSettings.pitchType.SHARP) {
+                    console.log("SHARP");
+                    img.setAttributeNS(null, "href", "App/img/quarter_sharp.png");
+                    img.setAttributeNS(null, "width", "140%");
+                    img.setAttributeNS(null, "y", "-35");
+                    img.setAttributeNS(null, "x", "-16");
+                }
+                else {
+                    console.log("else, pitch is:" + pitchType + ":");
+                    img.setAttributeNS(null, "href", "App/img/quarter.png");
+                    img.setAttributeNS(null, "width", "100%");
+                    img.setAttributeNS(null, "y", "-27");
+                    img.setAttributeNS(null, "x", "-8");
+                }
                 return img;
             } 
             else if (noteType == globalSettings.noteType.EIGHTH) {
