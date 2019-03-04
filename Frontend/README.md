@@ -1,5 +1,6 @@
 03/3/19 (lfu2)
 * Render notes by their time properly (whole note, quarter note, etc). 
+* sharps and flats are rendering properly for quarter notes
 
 02/18/19 (lfu2)
 
