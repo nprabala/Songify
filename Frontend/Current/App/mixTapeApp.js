@@ -60,7 +60,7 @@ function($scope, utilsService, renderService, globalSettings, songService) {
                 renderService.clearNote(rows[k].children[j],k);
             }
 
-            if (this.currentType == globalSettings.clearNote){
+            if (this.currentType == globalSettings.noteType.CLEAR){
                 songService.editMelody(j, globalSettings.EMPTY_NOTE);
                 songService.updateMelody();
             } else {
