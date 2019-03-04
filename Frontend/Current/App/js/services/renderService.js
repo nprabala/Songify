@@ -95,34 +95,48 @@ function(globalSettings, scoreService) {
                 staff += '</div>';
                 return staff
         },
-        // TODO: Alter to draw a particular kind of note.
+
         generateNoteHTML : function(noteType){
             var namespace = "http://www.w3.org/2000/svg";
-            var cx = "50%";
-            var cy = "50%";
-            var r= "30%";
-            var ry = "25%";
 
-            if(noteType == globalSettings.noteType.WHOLE){
-                var note = document.createElementNS(namespace, "ellipse");
-                note.setAttributeNS(null, "rx",r);
-                note.setAttributeNS(null, "ry",ry);
-            } else {
-                var note = document.createElementNS(namespace, "circle");
-                note.setAttributeNS(null, "r",r);
+            if (noteType == globalSettings.noteType.WHOLE) {
+                var img = document.createElementNS(namespace, "image");
+                img.setAttributeNS(null, "href", "App/img/whole.png");
+                img.setAttributeNS(null, "width", "80%");
+                img.setAttributeNS(null, "x", "3");
+                return img;
+            } 
+            else if (noteType == globalSettings.noteType.HALF) {
+                var img = document.createElementNS(namespace, "image");
+                img.setAttributeNS(null, "href", "App/img/half.png");
+                img.setAttributeNS(null, "width", "130%");
+                img.setAttributeNS(null, "y", "-37");
+                return img;
             }
-
-            note.setAttributeNS(null, "cx", cx);
-            note.setAttributeNS(null, "cy",cy);
-
-            if (noteType == globalSettings.noteType.HALF
-                || noteType == globalSettings.noteType.WHOLE){
-
-                    note.setAttributeNS(null, "fill","none");
-                    note.setAttributeNS(null,"stroke","black");
-                }
-                return note;
-            },
+            else if (noteType == globalSettings.noteType.QUARTER) {
+                var img = document.createElementNS(namespace, "image");
+                img.setAttributeNS(null, "href", "App/img/quarter.png");
+                img.setAttributeNS(null, "width", "130%");
+                img.setAttributeNS(null, "y", "-37");
+                return img;
+            } 
+            else if (noteType == globalSettings.noteType.EIGHTH) {
+                var img = document.createElementNS(namespace, "image");
+                img.setAttributeNS(null, "href", "App/img/eighth.png");
+                img.setAttributeNS(null, "width", "100%");
+                img.setAttributeNS(null, "y", "-30");
+                img.setAttributeNS(null, "x", "4");
+                return img;
+            } 
+            else if (noteType == globalSettings.noteType.SIXTEENTH) {
+                var img = document.createElementNS(namespace, "image");
+                img.setAttributeNS(null, "href", "App/img/sixteenth.png");
+                img.setAttributeNS(null, "width", "190%");
+                img.setAttributeNS(null, "x", "-8");
+                img.setAttributeNS(null, "y", "-33");
+                return img;
+            } 
+        },
         convertToNote : function(i, pitchType, noteType){
             var pitch = globalSettings.trebleStaff[i];
             var time_duration = 1;

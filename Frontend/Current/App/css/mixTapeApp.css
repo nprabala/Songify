@@ -3,6 +3,10 @@ html, body {
     height: 100%;
 }
 
+svg {
+	overflow: visible;
+}
+
 #logo {
     width: 300px;
     margin: 20px;
