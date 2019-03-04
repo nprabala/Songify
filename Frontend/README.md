@@ -1,3 +1,6 @@
+03/3/19 (lfu2)
+* Render notes by their time properly (whole note, quarter note, etc). 
+
 02/18/19 (lfu2)
 
 * UI updates: making all the buttons look prettier, added in logo, added in palette (pink for now)
