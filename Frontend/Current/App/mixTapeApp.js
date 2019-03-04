@@ -52,7 +52,7 @@ function($scope, utilsService, renderService, globalSettings, songService) {
         var rows = staffElem.children
         var row = rows[i];
         var col = row.children[j];
-        var noteHTML = renderService.generateNoteHTML(this.currentType);
+        var noteHTML = renderService.generateNoteHTML(this.currentType, this.pitchType);
         var note = renderService.convertToNote(i, this.pitchType, this.currentType);
 
         if (staff == "melody"){

@@ -41,6 +41,12 @@ angular.module("mixTapeApp").constant("globalSettings", {
         WHOLE: "whole",
         CLEAR: "*CLEAR NOTE*"
     },
+    
+    pitchType: {
+        FLAT: "Flat",
+        SHARP: "Sharp",
+        NATURAL: "Natural",
+    },
 
     notePitchMod: {
         SHARP: "Sharp",
