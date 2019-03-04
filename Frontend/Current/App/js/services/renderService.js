@@ -102,9 +102,23 @@ function(globalSettings, scoreService) {
 
             if (noteType == globalSettings.noteType.WHOLE) {
                 var img = document.createElementNS(namespace, "image");
-                img.setAttributeNS(null, "href", "App/img/whole.png");
-                img.setAttributeNS(null, "width", "80%");
-                img.setAttributeNS(null, "x", "3");    
+                if (pitchType == globalSettings.pitchType.SHARP) {
+                    img.setAttributeNS(null, "href", "App/img/whole_sharp.png");
+                    img.setAttributeNS(null, "width", "110%");
+                    img.setAttributeNS(null, "x", "-17"); 
+                    img.setAttributeNS(null, "y", "-4");
+                }
+                else if (pitchType == globalSettings.pitchType.FLAT) {
+                    img.setAttributeNS(null, "href", "App/img/whole_flat.png");
+                    img.setAttributeNS(null, "width", "110%");
+                    img.setAttributeNS(null, "x", "-17"); 
+                    img.setAttributeNS(null, "y", "-6"); 
+                }
+                else {
+                    img.setAttributeNS(null, "href", "App/img/whole.png");
+                    img.setAttributeNS(null, "width", "68%");
+                    img.setAttributeNS(null, "x", "-10");     
+                }
                 return img;
             } 
             else if (noteType == globalSettings.noteType.HALF) {
