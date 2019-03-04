@@ -2,6 +2,8 @@
 * Render notes by their time properly (whole note, quarter note, etc). 
 * sharps and flats are rendering properly for quarter notes
 * sharp and flats rendering for whole notes
+* sharp and flats rendering for half notes
+
 
 02/18/19 (lfu2)
 
