@@ -190,10 +190,24 @@ function(globalSettings, scoreService) {
             } 
             else if (noteType == globalSettings.noteType.SIXTEENTH) {
                 var img = document.createElementNS(namespace, "image");
-                img.setAttributeNS(null, "href", "App/img/sixteenth.png");
-                img.setAttributeNS(null, "width", "190%");
-                img.setAttributeNS(null, "x", "-8");
-                img.setAttributeNS(null, "y", "-33");
+                if (pitchType == globalSettings.pitchType.FLAT) {
+                    img.setAttributeNS(null, "href", "App/img/sixteenth_flat.png");
+                    img.setAttributeNS(null, "width", "160%");
+                    img.setAttributeNS(null, "x", "-12");
+                    img.setAttributeNS(null, "y", "-27");     
+                }
+                else if (pitchType == globalSettings.pitchType.SHARP) {
+                    img.setAttributeNS(null, "href", "App/img/sixteenth_sharp.png");
+                    img.setAttributeNS(null, "width", "160%");
+                    img.setAttributeNS(null, "x", "-12");
+                    img.setAttributeNS(null, "y", "-27");     
+                }
+                else {
+                    img.setAttributeNS(null, "href", "App/img/sixteenth.png");
+                    img.setAttributeNS(null, "width", "130%");
+                    img.setAttributeNS(null, "x", "-8");
+                    img.setAttributeNS(null, "y", "-27");    
+                }
                 return img;
             } 
         },
