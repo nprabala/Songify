@@ -97,7 +97,6 @@ function(globalSettings, scoreService) {
         },
 
         generateNoteHTML : function(noteType, pitchType){
-            console.log("notetype!" + noteType + " " + pitchType);
             var namespace = "http://www.w3.org/2000/svg";
 
             if (noteType == globalSettings.noteType.WHOLE) {
@@ -169,10 +168,24 @@ function(globalSettings, scoreService) {
             } 
             else if (noteType == globalSettings.noteType.EIGHTH) {
                 var img = document.createElementNS(namespace, "image");
-                img.setAttributeNS(null, "href", "App/img/eighth.png");
-                img.setAttributeNS(null, "width", "100%");
-                img.setAttributeNS(null, "y", "-30");
-                img.setAttributeNS(null, "x", "4");
+                if (pitchType == globalSettings.pitchType.FLAT) {
+                    img.setAttributeNS(null, "href", "App/img/eighth_flat.png");
+                    img.setAttributeNS(null, "width", "155%");
+                    img.setAttributeNS(null, "y", "-27");
+                    img.setAttributeNS(null, "x", "-16");     
+                }
+                else if (pitchType == globalSettings.pitchType.SHARP) {
+                    img.setAttributeNS(null, "href", "App/img/eighth_sharp.png");
+                    img.setAttributeNS(null, "width", "155%");
+                    img.setAttributeNS(null, "y", "-27");
+                    img.setAttributeNS(null, "x", "-16");      
+                }
+                else {
+                    img.setAttributeNS(null, "href", "App/img/eighth.png");
+                    img.setAttributeNS(null, "width", "85%");
+                    img.setAttributeNS(null, "y", "-25");
+                    img.setAttributeNS(null, "x", "-3");    
+                }
                 return img;
             } 
             else if (noteType == globalSettings.noteType.SIXTEENTH) {
