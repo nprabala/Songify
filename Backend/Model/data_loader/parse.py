@@ -11,6 +11,7 @@ all_files = []
 all_melody = []
 all_chords = []
 sixteenth = 0.25 # 16th note: 1 = quarter note, 0.5 = 8th note
+CHORD_NAME = True # use chord name instead of chord notes
 
 for file in tqdm(os.listdir(dir_)):
     try:
@@ -38,7 +39,10 @@ for file in tqdm(os.listdir(dir_)):
             if isinstance(element, note.Note):
                 cur_melody.append(str(element.pitch.name))
             elif isinstance(element, chord.Chord):
-                cur_chords.append('.'.join(sorted([str(p.name) for p in element.pitches])))
+                if CHORD_NAME:
+                    cur_chords.append(element.pitchedCommonName)
+                else:
+                    cur_chords.append('.'.join(sorted([str(p.name) for p in element.pitches])))
 
         # nothing playing at offset
         if len(cur_melody) == 0 and len(cur_chords) == 0:

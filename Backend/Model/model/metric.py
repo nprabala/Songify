@@ -81,7 +81,6 @@ def chord_accuracy_topk(output, target, extra=None):
     chord_out, chord_y = chord_preprocess(output, target, extra=extra)
     return accuracy_topk(chord_out, chord_y)
 
-
 def chord_multilabel_accuracy(output, target, extra=None, thresh=0.5):
     chord_out, chord_y = chord_preprocess(output, target, extra=extra)
     return multilabel_accuracy(chord_out, chord_y, thresh=thresh)
