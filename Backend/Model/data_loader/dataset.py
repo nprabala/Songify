@@ -11,6 +11,7 @@ from .constants import NOTES_TO_INT, INT_TO_NOTES, CHORD_TO_INT, INT_TO_CHORD, C
 '''
 TODO LOOK AT THIS
 https://www.reddit.com/r/musictheory/comments/1jd894/looking_for_an_algorithm_that_generates_chord/
+https://www.reddit.com/r/cs231n/comments/93iyxa/cs231nrepodeepubuntutargz_not_found/
 '''
 class MidiDataset(Dataset):
     """MIDI Music Dataset"""
@@ -23,6 +24,7 @@ class MidiDataset(Dataset):
     NOTES_TO_INT = NOTES_TO_INT
     INT_TO_NOTES = INT_TO_NOTES
     CHORD_TO_INT = CHORD_TO_INT
+    INT_TO_CHORD = INT_TO_CHORD
     CHORD_TO_NOTES = CHORD_TO_NOTES
     NOTES_TO_CHORD = NOTES_TO_CHORD
 
@@ -172,6 +174,10 @@ class MidiDataset(Dataset):
         chord = '.'.join(convert_int_to_note(n) for n in notes)
 
         return chord
+
+    @classmethod
+    def convert_chord_int_to_str(cls, chord_int):
+        return cls.CHORD_TO_NOTES[cls.INT_TO_CHORD[chord_int]]
 
     def __len__(self):
         return len(self.df)
