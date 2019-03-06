@@ -98,118 +98,60 @@ function(globalSettings, scoreService) {
 
         generateNoteHTML : function(noteType, pitchType){
             var namespace = "http://www.w3.org/2000/svg";
+            var img = document.createElementNS(namespace, "image");
+            var imgFile = "";
 
             if (noteType == globalSettings.noteType.WHOLE) {
-                var img = document.createElementNS(namespace, "image");
                 if (pitchType == globalSettings.pitchType.SHARP) {
-                    img.setAttributeNS(null, "href", "App/img/whole_sharp.png");
-                    img.setAttributeNS(null, "width", "110%");
-                    img.setAttributeNS(null, "x", "-17"); 
-                    img.setAttributeNS(null, "y", "-4");
+                    imgFile = "App/img/whole_sharp.png";
+                } else if (pitchType == globalSettings.pitchType.FLAT) {
+                    imgFile = "App/img/whole_flat.png";
+                } else {
+                    imgFile = "App/img/whole.png";
                 }
-                else if (pitchType == globalSettings.pitchType.FLAT) {
-                    img.setAttributeNS(null, "href", "App/img/whole_flat.png");
-                    img.setAttributeNS(null, "width", "110%");
-                    img.setAttributeNS(null, "x", "-17"); 
-                    img.setAttributeNS(null, "y", "-6"); 
-                }
-                else {
-                    img.setAttributeNS(null, "href", "App/img/whole.png");
-                    img.setAttributeNS(null, "width", "68%");
-                    img.setAttributeNS(null, "x", "-10");     
-                }
-                return img;
-            } 
+            }
             else if (noteType == globalSettings.noteType.HALF) {
-                var img = document.createElementNS(namespace, "image");
                 if (pitchType == globalSettings.pitchType.FLAT) {
-                    img.setAttributeNS(null, "href", "App/img/half_flat.png");
-                    img.setAttributeNS(null, "width", "138%");
-                    img.setAttributeNS(null, "y", "-26");
-                    img.setAttributeNS(null, "x", "-16");     
+                    imgFile = "App/img/half_flat.png";
+                } else if (pitchType == globalSettings.pitchType.SHARP) {
+                    imgFile = "App/img/half_sharp.png";
+                } else {
+                    imgFile = "App/img/half.png";
                 }
-                else if (pitchType == globalSettings.pitchType.SHARP) {
-                    img.setAttributeNS(null, "href", "App/img/half_sharp.png");
-                    img.setAttributeNS(null, "width", "128%");
-                    img.setAttributeNS(null, "y", "-27");
-                    img.setAttributeNS(null, "x", "-15");     
-                }
-                else {
-                    img.setAttributeNS(null, "href", "App/img/half.png");
-                    img.setAttributeNS(null, "width", "100%");
-                    img.setAttributeNS(null, "y", "-28");
-                    img.setAttributeNS(null, "x", "-5");    
-                }
-                return img;
             }
             else if (noteType == globalSettings.noteType.QUARTER) {
-                var img = document.createElementNS(namespace, "image");
                 if (pitchType == globalSettings.pitchType.FLAT) {
-                    img.setAttributeNS(null, "href", "App/img/quarter_flat.png");
-                    img.setAttributeNS(null, "width", "140%");
-                    img.setAttributeNS(null, "y", "-35");
-                    img.setAttributeNS(null, "x", "-17");
+                    imgFile = "App/img/quarter_flat.png";
+                } else if (pitchType == globalSettings.pitchType.SHARP) {
+                    imgFile = "App/img/quarter_sharp.png";
+                } else {
+                    imgFile = "App/img/quarter.png";
                 }
-                else if (pitchType == globalSettings.pitchType.SHARP) {
-                    console.log("SHARP");
-                    img.setAttributeNS(null, "href", "App/img/quarter_sharp.png");
-                    img.setAttributeNS(null, "width", "140%");
-                    img.setAttributeNS(null, "y", "-35");
-                    img.setAttributeNS(null, "x", "-16");
-                }
-                else {
-                    console.log("else, pitch is:" + pitchType + ":");
-                    img.setAttributeNS(null, "href", "App/img/quarter.png");
-                    img.setAttributeNS(null, "width", "100%");
-                    img.setAttributeNS(null, "y", "-27");
-                    img.setAttributeNS(null, "x", "-8");
-                }
-                return img;
-            } 
+            }
             else if (noteType == globalSettings.noteType.EIGHTH) {
-                var img = document.createElementNS(namespace, "image");
                 if (pitchType == globalSettings.pitchType.FLAT) {
-                    img.setAttributeNS(null, "href", "App/img/eighth_flat.png");
-                    img.setAttributeNS(null, "width", "155%");
-                    img.setAttributeNS(null, "y", "-27");
-                    img.setAttributeNS(null, "x", "-16");     
+                    imgFile = "App/img/eighth_flat.png";
+                } else if (pitchType == globalSettings.pitchType.SHARP) {
+                    imgFile = "App/img/eighth_sharp.png";
+                } else {
+                    imgFile = "App/img/eighth.png";
                 }
-                else if (pitchType == globalSettings.pitchType.SHARP) {
-                    img.setAttributeNS(null, "href", "App/img/eighth_sharp.png");
-                    img.setAttributeNS(null, "width", "155%");
-                    img.setAttributeNS(null, "y", "-27");
-                    img.setAttributeNS(null, "x", "-16");      
-                }
-                else {
-                    img.setAttributeNS(null, "href", "App/img/eighth.png");
-                    img.setAttributeNS(null, "width", "85%");
-                    img.setAttributeNS(null, "y", "-25");
-                    img.setAttributeNS(null, "x", "-3");    
-                }
-                return img;
-            } 
+            }
             else if (noteType == globalSettings.noteType.SIXTEENTH) {
-                var img = document.createElementNS(namespace, "image");
                 if (pitchType == globalSettings.pitchType.FLAT) {
-                    img.setAttributeNS(null, "href", "App/img/sixteenth_flat.png");
-                    img.setAttributeNS(null, "width", "160%");
-                    img.setAttributeNS(null, "x", "-12");
-                    img.setAttributeNS(null, "y", "-27");     
+                    imgFile = "App/img/sixteenth_flat.png";
+                } else if (pitchType == globalSettings.pitchType.SHARP) {
+                    imgFile = "App/img/sixteenth_sharp.png";
+                } else {
+                    imgFile = "App/img/sixteenth.png";
                 }
-                else if (pitchType == globalSettings.pitchType.SHARP) {
-                    img.setAttributeNS(null, "href", "App/img/sixteenth_sharp.png");
-                    img.setAttributeNS(null, "width", "160%");
-                    img.setAttributeNS(null, "x", "-12");
-                    img.setAttributeNS(null, "y", "-27");     
-                }
-                else {
-                    img.setAttributeNS(null, "href", "App/img/sixteenth.png");
-                    img.setAttributeNS(null, "width", "130%");
-                    img.setAttributeNS(null, "x", "-8");
-                    img.setAttributeNS(null, "y", "-27");    
-                }
-                return img;
-            } 
+            }
+
+            img.setAttributeNS(null, "href", imgFile);
+            img.setAttributeNS(null, "height", "200%");
+            img.setAttributeNS(null, "width", "100%");
+            img.setAttributeNS(null, "y", "-120%");
+            return img;
         },
         convertToNote : function(i, pitchType, noteType){
             var pitch = globalSettings.trebleStaff[i];

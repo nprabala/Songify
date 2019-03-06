@@ -80,10 +80,9 @@ function($interval, renderService, utilsService, globalSettings, songService) {
             var menu = '<img id="logo" src="App/img/logo.png"></img><div></div>' +
             '<div id="topMessage">{{topMessage}}</div>' +
 
-            '<div id="noteSelection">Current note (click to add to staff): ' +
+            '<div id="noteSelection">Select note: ' +
             '<select ng-model="currentType" ng-options="x for x in noteTypes"></select>'+
             '<select ng-model="pitchType" ng-options="x for x in pitchAlteration"></select></div>'+
-            '<div id="staffController"><button id="clear" ng-click="clear()">Clear Staff</button></div>' +
 
             '<div id="container">' +
             '<div class="inner-container">' +
@@ -94,7 +93,10 @@ function($interval, renderService, utilsService, globalSettings, songService) {
             '<div class="toggle"><p>Melody + Chords</p></div><div class="toggle"><p>Melody Only</p></div>' +
             '</div>' + //inner-container
             '</div>' + //container
-            '<div id="playbackController"><button id="playChoice" ng-click="choosePlayback()">Play</button></div>';
+            '<div id="playbackController">' +
+                '<button id="clear" ng-click="clear()">Clear Staff</button>' +
+                '<button id="playChoice" ng-click="choosePlayback()">Play</button>' +
+            '</div>';
 
             var melodyStaff = renderService.generateStaff("melody");
             var score = '<div id="score" hidden><div id="scoreMelody"></div><div id="scoreChords"></div></div>';

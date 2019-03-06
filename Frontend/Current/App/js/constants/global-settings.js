@@ -1,6 +1,6 @@
 angular.module("mixTapeApp").constant("globalSettings", {
     EMPTY_NOTE: "Empty",
-    TOP_MESSAGE: "Welcome to Mixtape! Click anywhere on the top staff to create your melody, then select 'Get Chords' to generate the accompaniment.",
+    TOP_MESSAGE: "Welcome to Mixtape! Click anywhere on the staff to create your melody, then select 'Melody + Chords' to see the accompaniment.",
     HELLO_MESSAGE: "Welcome To Mixtape",
     TOP_LINE_INDEX: 4,
     SCORE_HEIGHT: 150,
@@ -41,7 +41,7 @@ angular.module("mixTapeApp").constant("globalSettings", {
         WHOLE: "whole",
         CLEAR: "*CLEAR NOTE*"
     },
-    
+
     pitchType: {
         FLAT: "Flat",
         SHARP: "Sharp",
