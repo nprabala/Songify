@@ -64,10 +64,12 @@ function($scope, utilsService, renderService, globalSettings, songService) {
                 songService.editMelody(j, globalSettings.EMPTY_NOTE);
                 songService.updateMelody();
             } else {
+                songService.playNote(note['note']);
                 songService.editMelody(j, note);
                 songService.updateMelody();
                 col.appendChild(noteHTML);
             }
+
         }
     };
 }])

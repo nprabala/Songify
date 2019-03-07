@@ -7,18 +7,10 @@ angular.module("mixTapeApp")
         };
 
         function cleanNote(note) {
-
             // for example, replace Cb with B
             if (note.length == 3){
-                note = utilsService.flatSharpExceptions(note.substr(0,1) + note.substr(2,2), note.substr(1,1));
-            }
-
-            // Replace # with S (since files can't have sharp sign)
-            if (note.substr(1,1) == '#') {
-                return note.substr(0,1) + 'S' + note.substr(2,2);
-            } else {
-                return note;
-            }
+                return utilsService.flatSharpExceptions(note.substr(0,1) + note.substr(2,2), note.substr(1,1));
+            } else return note;
         }
 
         return {
@@ -41,7 +33,6 @@ angular.module("mixTapeApp")
                     } else {
                         for (var j = 0; j < chords[i].length; j++) {
                             var note = cleanNote(chords[i][j] + globalSettings.CHORDS_OCTAVE);
-                            console.log(note);
                             chordObj.push(this.sounds[note]);
                             chordObj[j].volume(0.2); // quieter than melody
                         }
@@ -81,10 +72,13 @@ angular.module("mixTapeApp")
                 this.chordsDuration = [];
             },
 
-            playNote: function(note) {
-                this.sounds[note].play();
-                await sleep(1000);
-                this.melody[i].stop();
+            playNote: async function(note) {
+                var note = cleanNote(note);
+                var howl = this.sounds[note];
+
+                howl.play();
+                await sleep(250);
+                howl.stop();
             },
 
             initialise: function() {
