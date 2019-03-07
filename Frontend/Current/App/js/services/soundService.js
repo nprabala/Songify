@@ -1,7 +1,7 @@
 angular.module("mixTapeApp")
-.factory("soundService", ["globalSettings",
+.factory("soundService", ["globalSettings","utilsService",
 
-    function(globalSettings) {
+    function(globalSettings, utilsService) {
         const sleep = (milliseconds) => {
             return new Promise(resolve => setTimeout(resolve, milliseconds))
         };
@@ -35,6 +35,11 @@ angular.module("mixTapeApp")
                         for (var j = 0; j < chords[i].length; j++) {
                             var note = cleanNote(chords[i][j]
                                         + globalSettings.CHORDS_OCTAVE);
+                                        console.log(note);
+                            if(note.length == 3){
+                                note = utilsService.flatSharpExceptions(note.substr(0,1) + note.substr(2,2), note.substr(1,1));
+                            }
+                            console.log(note);
                             chordObj.push(this.sounds[note]);
                             chordObj[j].volume(0.2); // quieter than melody
                         }
