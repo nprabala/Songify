@@ -91,6 +91,8 @@ angular.module("mixTapeApp")
                     'B-5' : new Howl({ src: ['App/aud/B-5.wav'], volume: 0.4}),
                     'B-4' : new Howl({ src: ['App/aud/B-4.wav'], volume: 0.4}),
                     'B-3' : new Howl({ src: ['App/aud/B-3.wav'], volume: 0.4}),
+                    'B-2' : new Howl({ src: ['App/aud/B-2.wav'], volume: 0.4}),
+
                     'B5' : new Howl({ src: ['App/aud/B5.wav'], volume: 0.4}),
                     'B4' : new Howl({ src: ['App/aud/B4.wav'], volume: 0.4}),
                     'B3' : new Howl({ src: ['App/aud/B3.wav'], volume: 0.4}),
