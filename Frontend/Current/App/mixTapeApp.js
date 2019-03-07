@@ -68,6 +68,7 @@ function($scope, utilsService, renderService, globalSettings, songService) {
                 songService.updateMelody();
                 col.appendChild(noteHTML);
             }
+            
         }
     };
 }])

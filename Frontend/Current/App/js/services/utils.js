@@ -8,7 +8,7 @@ angular.module("mixTapeApp")
         console.log(pitch)
         console.log(pitchFileMod)
         if (pitch.substr(0,1) == "A" && pitchFileMod == "-"){
-            return "G" + "#" + pitch.substr(1,1);
+            return "G" + "S" + pitch.substr(1,1);
         }
         if (pitch.substr(0,1) == "A" && pitchFileMod == "#"){
             return "B" + "-" + pitch.substr(1,1);
@@ -18,7 +18,7 @@ angular.module("mixTapeApp")
             return "C" + (parseInt(pitch.substr(1,1)) + 1).toString();
         }
         if (pitch.substr(0,1) == "D" && pitchFileMod == "-"){
-            return "C" + "#" + pitch.substr(1,1);
+            return "C" + "S" + pitch.substr(1,1);
         }
         if (pitch.substr(0,1) == "D" && pitchFileMod == "#"){
             return "E" + "-" + pitch.substr(1,1);
