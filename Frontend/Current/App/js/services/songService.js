@@ -85,6 +85,10 @@ function(globalSettings, utilsService, soundService) {
             }
         },
 
+        playNote: function(note) {
+            soundService.playNote(note);
+        },
+
 
         clearSong: function() {
             this.clearMelody();
