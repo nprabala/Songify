@@ -9,6 +9,8 @@ angular.module("mixTapeApp").constant("globalSettings", {
     STAFF_LINES: 5, // Number of lines in a staff
     NOTE_RADIUS: 0.01,
     CHORDS_OCTAVE: '3',
+    CHORD_VOLUME: 0.1,
+    MELODY_VOLUME: 0.4,
 
     notesEnum: {
         'C':1,

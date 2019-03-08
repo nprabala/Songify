@@ -7,11 +7,13 @@ function(globalSettings, utilsService, soundService) {
             var toSend = [];
             for (var i = 0; i < this.melody.length; i++){
                 if (this.melody[i] != globalSettings.EMPTY_NOTE) {
-                    if (this.melody[i]["note"].length == 3) {
-                        toSend.push({"note":this.melody[i]["note"].substr(0, 2), "duration":this.melody[i]["duration"]});
-                    }
-                    else {
-                        toSend.push({"note":this.melody[i]["note"].charAt(0), "duration":this.melody[i]["duration"]});
+                    var note = utilsService.flatSharpExceptions(this.melody[i]["note"]);
+                    var dur = this.melody[i]["duration"];
+
+                    if (note.length == 3) {
+                        toSend.push({"note": note.substr(0, 2), "duration": dur});
+                    } else {
+                        toSend.push({"note": note.charAt(0), "duration": dur});
                     }
                 }
             }

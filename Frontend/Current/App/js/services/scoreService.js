@@ -136,8 +136,7 @@ function(globalSettings, utilsService) {
                 isRest = true;
                 notes.push("E/3");
             } else {
-                // TODO: remove convert to set after we remove duplicates in model
-                var splitChord = Array.from(new Set(inputChords[j]["chord"].split(".")));
+                var splitChord = inputChords[j]["chord"].split(".");
                 splitChord.sort(sortCompare);
 
                 for (var i = 0; i < splitChord.length; i++) {
