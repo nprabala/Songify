@@ -1,25 +1,56 @@
+from math import floor
+from enum import Enum
 from sanic import Sanic
 from sanic.response import text, json
-from predict import Predict
 from sanic_cors import CORS, cross_origin
+from aoiklivereload import LiveReloader
+from predict import Predict
 
+# running sanic
 app = Sanic()
 CORS(app)
-predict = Predict()
-IP = '0.0.0.0'
-PORT = 8081
-sixteenth = 0.25 # 16th note: 1 = quarter note, 0.5 = 8th note
 
-from aoiklivereload import LiveReloader
+# live reloading
 reloader = LiveReloader()
 reloader.start_watcher_thread()
 
-def get_notes_timesteps(notes):
+# model predictor
+predict = Predict()
+
+# connection information
+IP = '0.0.0.0'
+PORT = 8081
+
+# enum of different note lengths
+class NOTE_TYPE(Enum):
+    SIXTEENTH = 0.25
+    EIGHTH = 0.5
+    QUARTER = 1
+    HALF = 2
+    WHOLE = 4
+
+# max length chord can last for before breaking it up
+MAX_DURATION = NOTE_TYPE.HALF.value
+
+def find_smallest_note(notes):
+    ''''
+    Returns the smallest note_length in the notes provided
+    '''
+
+    smallest = NOTE_TYPE.WHOLE.value
+    for n in notes:
+        duration = n['duration']
+        if duration < smallest:
+            smallest = duration
+
+    return smallest
+
+def get_notes_timesteps(notes, smallest_note):
     ''''
     Takes in list of key-value pairs indicating the note as a string
     and duration as a float.
 
-    Returns array of the notes sampled at sixteenth note intervals
+    Returns array of the notes sampled at smallest_note note intervals
     '''
 
     timesteps = []
@@ -30,7 +61,8 @@ def get_notes_timesteps(notes):
 
         while offset < duration:
             timesteps.append(note)
-            offset += sixteenth
+            offset += smallest_note
+
     return timesteps
 
 def query_model(notes_timestamps):
@@ -39,9 +71,11 @@ def query_model(notes_timestamps):
     '''
     return predict.get_prediction(notes_timestamps)
 
-def get_chord_progressions(notes_timestamps):
+def get_chord_progressions(notes):
     ''''
-    Takes in a list notes_timestamps of the notes sampled over time intervals.
+    Takes in a list of dicts containing note and duration.
+
+    Parses notes into notes_timestamps
 
     Queries the model for chords corresponding to these notes and concats
     repeated chords together.
@@ -49,22 +83,62 @@ def get_chord_progressions(notes_timestamps):
     Returns this chord progression as a list of key-value pairs mapping
     chord and duration.
     '''
+
+    smallest_note = find_smallest_note(notes)
+    notes_timestamps = get_notes_timesteps(notes, smallest_note)
     chords = query_model(notes_timestamps)
-    concated_chords = []
+    chords_to_return = []
 
-    for chord in chords:
-        if len(concated_chords) > 0:
-            # check if last_chord is the same as chord, if so, update
-            # last_chord's duration
-            last_chord = concated_chords[-1]
-            if last_chord['chord'] == chord and last_chord['duration'] < 4:
-                last_chord['duration'] += sixteenth
-                continue
+    current_chord = chords[0]
+    current_duration = smallest_note
+    current_index = 1
 
-        # last_chord wasn't chord, so make new insertion
-        concated_chords.append({'chord':chord, 'duration':sixteenth})
+    def divide_current_chord():
+        ''''
+        Divide up the chord duration into integer component and remainder.
+        Remainder might require further division. This ensures we don't tie
+        the chord into an eighth or sixteenth note which can mess with the
+        anticpated flow/beat
+        '''
 
-    return concated_chords
+        integer_component = floor(current_duration)
+        remainder = current_duration - integer_component
+
+        if integer_component > 0:
+            chords_to_return.append({'chord':current_chord, 'duration':integer_component})
+
+        if remainder > 0:
+            if remainder == 0.75:
+                chords_to_return.append({'chord':current_chord, 'duration':0.5})
+                chords_to_return.append({'chord':current_chord, 'duration':0.25})
+            elif remainder == 0.5:
+                chords_to_return.append({'chord':current_chord, 'duration':0.5})
+            else:
+                chords_to_return.append({'chord':current_chord, 'duration':0.25})
+
+
+    while current_index < len(chords):
+        next_chord = chords[current_index]
+
+        # combine with last chord if less than MAX_DURATION
+        if (next_chord == current_chord) and (current_duration + smallest_note <= MAX_DURATION):
+            current_duration += smallest_note
+
+        # we will replay the chord since over MAX_DURATION
+        elif (next_chord == current_chord) and (current_duration + smallest_note > MAX_DURATION):
+            chords_to_return.append({'chord':current_chord, 'duration':current_duration})
+            current_duration = smallest_note
+
+        # divide up current chord and make next chord the new current chord
+        else:
+            divide_current_chord()
+            current_chord = next_chord
+            current_duration = smallest_note
+
+        current_index += 1
+
+    divide_current_chord()
+    return chords_to_return
 
 @app.route("/",methods=["GET","OPTIONS"])
 async def return_home(request):
@@ -74,8 +148,7 @@ async def return_home(request):
 async def post_chord_progressions(request):
     notes = request.json
     if notes:
-        notes_timestamps = get_notes_timesteps(notes)
-        return json(get_chord_progressions(notes_timestamps))
+        return json(get_chord_progressions(notes))
     else:
         return json([])
 
