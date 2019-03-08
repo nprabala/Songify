@@ -8,4 +8,3 @@ Backend/.DS_Store
 *.pyc
 Backend/saved
 Frontend/node_modules/*
-*.wav
