@@ -5,6 +5,7 @@ from sanic.response import text, json
 from sanic_cors import CORS, cross_origin
 from aoiklivereload import LiveReloader
 from predict import Predict
+from collections import defaultdict
 
 # running sanic
 app = Sanic()
@@ -37,7 +38,7 @@ def find_smallest_note(notes):
     Returns the smallest note_length in the notes provided
     '''
 
-    smallest = NOTE_TYPE.WHOLE.value
+    smallest = NOTE_TYPE.HALF.value
     for n in notes:
         duration = n['duration']
         if duration < smallest:
@@ -89,55 +90,23 @@ def get_chord_progressions(notes):
     chords = query_model(notes_timestamps)
     chords_to_return = []
 
-    current_chord = chords[0]
-    current_duration = smallest_note
-    current_index = 1
+    chord_freq = defaultdict(int)
+    current_dur = 0
+    for chord in chords:
+        chord_freq[chord] += 1
+        current_dur += smallest_note
 
-    def divide_current_chord():
-        ''''
-        Divide up the chord duration into integer component and remainder.
-        Remainder might require further division. This ensures we don't tie
-        the chord into an eighth or sixteenth note which can mess with the
-        anticpated flow/beat
-        '''
+        if current_dur == NOTE_TYPE.HALF.value:
+            # get most frequent chord
+            c = max(chord_freq, key=lambda k: chord_freq[k])
+            chords_to_return.append({'chord':c, 'duration':current_dur})
 
-        integer_component = floor(current_duration)
-        remainder = current_duration - integer_component
+            chord_freq = defaultdict(int)
+            current_dur = 0
 
-        if integer_component > 0:
-            chords_to_return.append({'chord':current_chord, 'duration':integer_component})
-
-        if remainder > 0:
-            if remainder == 0.75:
-                chords_to_return.append({'chord':current_chord, 'duration':0.5})
-                chords_to_return.append({'chord':current_chord, 'duration':0.25})
-            elif remainder == 0.5:
-                chords_to_return.append({'chord':current_chord, 'duration':0.5})
-            else:
-                chords_to_return.append({'chord':current_chord, 'duration':0.25})
-
-
-    while current_index < len(chords):
-        next_chord = chords[current_index]
-
-        # combine with last chord if less than MAX_DURATION
-        if (next_chord == current_chord) and (current_duration + smallest_note <= MAX_DURATION):
-            current_duration += smallest_note
-
-        # we will replay the chord since over MAX_DURATION
-        elif (next_chord == current_chord) and (current_duration + smallest_note > MAX_DURATION):
-            chords_to_return.append({'chord':current_chord, 'duration':current_duration})
-            current_duration = smallest_note
-
-        # divide up current chord and make next chord the new current chord
-        else:
-            divide_current_chord()
-            current_chord = next_chord
-            current_duration = smallest_note
-
-        current_index += 1
-
-    divide_current_chord()
+    if len(chord_freq) > 0:
+        c = max(chord_freq, key=lambda k: chord_freq[k])
+        chords_to_return.append({'chord':c, 'duration':current_dur})
     return chords_to_return
 
 @app.route("/",methods=["GET","OPTIONS"])
