@@ -24,7 +24,7 @@ function($scope, utilsService, renderService, globalSettings, songService) {
     };
 
     $scope.choosePlayback = function() {
-        if (globalSettings.TOGGLE_VIEW) {
+        if (globalSettings.toggleView) {
             $scope.playComplete();
         }
         else {
@@ -115,7 +115,7 @@ function($interval, renderService, utilsService, globalSettings, songService) {
                 renderService.resizeScore(window.innerWidth);
 
                 // only redraw if toggled for score
-                if (globalSettings.TOGGLE_VIEW) {
+                if (globalSettings.toggleView) {
                     renderService.drawScore(songService.getMelody(), songService.getChords());
                 }
             });
@@ -145,8 +145,8 @@ function($interval, renderService, utilsService, globalSettings, songService) {
             }
 
             toggle.addEventListener('click', function() {
-                globalSettings.TOGGLE_VIEW = !globalSettings.TOGGLE_VIEW;
-                if (globalSettings.TOGGLE_VIEW) toggleScore();
+                globalSettings.toggleView = !globalSettings.toggleView;
+                if (globalSettings.toggleView) toggleScore();
                 else toggleMelodyInput();
             });
         }

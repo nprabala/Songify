@@ -4,7 +4,6 @@ angular.module("mixTapeApp").constant("globalSettings", {
     HELLO_MESSAGE: "Welcome To Mixtape",
     TOP_LINE_INDEX: 4,
     SCORE_HEIGHT: 150,
-    TOGGLE_VIEW: false, // true = show score, false = show melody input
     LINE_HEIGHT: 0.12,
     STAFF_LINES: 5, // Number of lines in a staff
     NOTE_RADIUS: 0.01,
@@ -55,4 +54,8 @@ angular.module("mixTapeApp").constant("globalSettings", {
         FLAT: "Flat",
         NATURAL: "Natural"
     },
+    
+    // Non-constants
+    toggleView: false, // true = show score, false = show melody input
+    
 });
