@@ -1,6 +1,5 @@
 *.pkl
-*.mp3
-Backend/Research Scripts/.DS_Store
+*.mp3
 Backend/.DS_Store
 *.midi
 *.mid
@@ -8,6 +7,6 @@ Backend/.DS_Store
 *.index
 *.DS_Store
 *.pyc
-Backend/Model/saved
+Backend/saved
 Frontend/node_modules/*
 *.wav
