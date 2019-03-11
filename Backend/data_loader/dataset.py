@@ -145,6 +145,7 @@ class MidiDataset(Dataset):
         return note_list
 
     def convert_chord_to_onehot(self, chord):
+        """"Convert chord to onehot list"""
         chord_name = 'EMPTY'
         for k,v in NOTES_TO_CHORD.items():
             if len(set(chord.split('.')).intersection(set(k.split('.')))) >= self.INTERSECT_THRESH:
@@ -156,6 +157,7 @@ class MidiDataset(Dataset):
 
     @classmethod
     def convert_chord_to_binary(cls, chord):
+        """Convert chord to binary list"""
         note_list = [0] * cls.NUM_NOTES
         notes = chord.split('.')
 
@@ -166,10 +168,12 @@ class MidiDataset(Dataset):
 
     @classmethod
     def convert_int_to_note(cls, int):
+        """Convert int to the note"""
         return cls.INT_TO_NOTES[int]
 
     @classmethod
     def convert_binary_to_chord(cls, binary_list):
+        """Convert binary list to the chord"""
         notes = np.argmax(binary_list)
         chord = '.'.join(convert_int_to_note(n) for n in notes)
 
@@ -177,6 +181,7 @@ class MidiDataset(Dataset):
 
     @classmethod
     def convert_chord_int_to_str(cls, chord_int):
+        """"Convert chord to string"""
         return cls.CHORD_TO_NOTES[cls.INT_TO_CHORD[chord_int]]
 
     def __len__(self):

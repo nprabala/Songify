@@ -1,6 +1,7 @@
 '''
-Misses 1483611/4937279
+Constants.py
 
+Constants for the model
 '''
 NOTES_TO_INT = {
     'PAD':0, # padding

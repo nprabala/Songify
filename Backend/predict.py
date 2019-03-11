@@ -10,6 +10,9 @@ from data_loader.dataset import MidiDataset
 class Predict:
     MAX_LEN = 1000
     def __init__(self, data_path='./data/out.pkl', resume='./weights/Music_LSTM_big/0304_041925/model_best.pth'):
+        """
+        Initialize the predict class
+        """
         self.data_path = data_path
         self.dataset = MidiDataset(self.data_path)
         self.resume = resume
@@ -28,24 +31,20 @@ class Predict:
         self.model.eval()
 
 
-    def seqGenerateOutput(self, input, extra=None):
-        pred_output = []
-
-        output = self.model(input, extra=extra)
-
-        for i, chord in enumerate(output['chord_out']):
-            c_idx = int(torch.argmax(chord))
-            chordstr = self.dataset.convert_chord_to_onehot(c_idx)
-            if i == 0:
-                # make up for input by attaching the same chord
-                for j in range(self.dataset.SEQUENCE_LENGTH):
-                    pred_output.append(chordstr)
-            else:
-                pred_output.append(chordstr)
-
-        return pred_output
-
     def generateOutput(self, input, extra=None):
+        """
+        Parameters
+        ----------
+        input: dict
+            input into the model
+        extra: dict
+            extra information for the input
+
+        Returns
+        -------
+        pred_ouput: list
+            list of the chords to return
+        """
         pred_output = []
         output = self.model(input, extra=extra)
 
@@ -58,26 +57,21 @@ class Predict:
 
         return pred_output
 
-    def seq_process(self, input_):
-        notes = [self.dataset.convert_note_to_int(n) for n in input_]
-        x = []
-        lengths = []
-
-        for i in range(len(input_) - self.dataset.SEQUENCE_LENGTH + 1):
-            curr_x = notes[i:i + self.dataset.SEQUENCE_LENGTH]
-            x.append(curr_x)
-            lengths.append(len(curr_x))
-
-        # convert to torch tensor
-        x = torch.LongTensor(x)
-        seq_lengths = torch.LongTensor(lengths)
-
-        # store in output
-        input = {'melody_x':x}
-        extra = {'seq_lengths': seq_lengths}
-        return input, extra
 
     def process(self, input_):
+        """ Preprocess the input for prediction
+        Parameters
+        ----------
+        input_: list
+            list of notes
+
+        Returns
+        -------
+        Input: dict
+            dict of inputs to model
+        Extra: dict
+            dict of extra inputs to model
+        """
         x = [self.dataset.convert_note_to_int(n) for n in input_]
         seq_lengths = [len(x)]
 
@@ -91,6 +85,17 @@ class Predict:
         return input, extra
 
     def get_prediction(self, input_):
+        """
+        Parameters
+        ----------
+        input_: list of strings
+            List of notes
+
+        Returns
+        -------
+        list of chords
+            list of chords to play
+        """
         x, extra = self.process(input_)
         return self.generateOutput(x, extra=extra)
 
