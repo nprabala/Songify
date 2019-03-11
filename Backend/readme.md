@@ -10,11 +10,9 @@ Activate the environment with
 
 > source activate \<env name\>
 
+To help with live reloading for development, pip install livereload so it can track your changes and reload the server.
+
 To use Sanic: pip install sanic and then run python mode_server.py.
-
-To help with live reloading for development, pip install livereload
-
-so it can track your changes and reload the server.
 
 ## ModelServer
 
