@@ -4,6 +4,7 @@ function(globalSettings, scoreService) {
     "use strict";
 
     return {
+        //Clears the staff
         clearStaff: function(staff){
             var staffElem = $("#" + staff)[0];
             var rows = staffElem.children
@@ -16,6 +17,7 @@ function(globalSettings, scoreService) {
             }
         },
 
+        //Clears a note at a particular index within the div grid structure.
         clearNote: function(col, i){
             if (i % 2 == 0 && i >= globalSettings.TOP_LINE_INDEX && i < globalSettings.trebleStaff.length - 1){
                 if(col.children.length >= 2){
@@ -33,6 +35,11 @@ function(globalSettings, scoreService) {
             }
         },
 
+        // Generates HTML for the staff. Instead of using an HTML5 canvas or a table, it simulates the best of both worlds
+        // using a series of divs with svg canvases nested inside them. 
+        // Each div constitutes one half step on the staff. Each svg contains one note. The overall structure
+        // is modelled as an xy grid.
+        // Globalsettings determines the size of canvas, size of notes, and number of notes allowed as input.
         generateStaff: function(id){
             var idString = ' id="'+id+'" '
             var idVar = "this." + id + "Staff";
@@ -63,11 +70,13 @@ function(globalSettings, scoreService) {
                 return staff
         },
 
+        // Generates HTML tags for individual notes to be rendered on the svg canvases
+        // Generates different HTML depending on the type of note (half, eighth etc) and 
+        // the pitch (natural, sharp, flat).
         generateNoteHTML : function(noteType, pitchType){
             var namespace = "http://www.w3.org/2000/svg";
             var img = document.createElementNS(namespace, "image");
             var imgFile = "";
-
             if (noteType == globalSettings.noteType.WHOLE) {
                 if (pitchType == globalSettings.pitchType.SHARP) {
                     imgFile = "App/img/whole_sharp.png";
@@ -120,6 +129,9 @@ function(globalSettings, scoreService) {
             img.setAttributeNS(null, "y", "-120%");
             return img;
         },
+        // Takes in individual fields that describe note inputs
+        // and converts it into an object that references the audio file for a note
+        // and how long that file should be played.
         convertToNote : function(i, pitchType, noteType){
             var pitch = globalSettings.trebleStaff[i];
             var time_duration = 1;
@@ -147,14 +159,17 @@ function(globalSettings, scoreService) {
             return note;
         },
 
+        // Enables resizing
         resizeScore: function(width) {
             scoreService.resizeDisplay(window.innerWidth);
         },
 
+        // Calls relevant rendering functions to draw the score.
         drawScore: function(melody, chord) {
             scoreService.drawScore(melody, chord);
         },
 
+        // Initializes fields.
         initialise: function(melodyScore, chordsScore) {
             scoreService.initialise(melodyScore, chordsScore);
         }
