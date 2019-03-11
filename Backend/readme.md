@@ -10,11 +10,9 @@ Activate the environment with
 
 > source activate \<env name\>
 
-To use Sanic: pip install sanic and then run python ModelServer.py.
+To use Sanic: pip install sanic and then run python mode_server.py.
 
-To help with live reloading for development, pip install hupper and run
-
-> hupper -m \<app name\>
+To help with live reloading for development, pip install livereload
 
 so it can track your changes and reload the server.
 
@@ -30,8 +28,8 @@ and insert notes as the request body in the following format:
     {"note":"D", "duration":0.5},
     {"note":"A", "duration":1}]
 
-The server will return chords in a similar format (just with 'chords' instead
-of notes).
+The server will return chords in a similar format (just with 'chord' instead
+of 'note').
 
 ## Model
 ## Midi LSTM - generate chords and melody from input melody
