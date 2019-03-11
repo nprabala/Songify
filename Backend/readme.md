@@ -34,18 +34,19 @@ The server will return chords in a similar format (just with 'chords' instead
 of notes).
 
 ## Model
-Midi Midi - generate chords and melody from input melody
-Code template adapted from https://github.com/victoresque/pytorch-template
+## Midi LSTM - generate chords and melody from input melody
+### Code template adapted from https://github.com/victoresque/pytorch-template
 
 
-Install requirements
+Install requirements<br />
 `pip install -r requirements.txt`
 
 
-Parse through data and create pickle data file
+Parse through data and create pickle data file<br />
 `python data_loader/parse.py data/ data/output.pkl`
 
 
 
-Train the model
+Train the model using default config file<br />
 `python train.py`
+
