@@ -2,15 +2,17 @@ angular.module("mixTapeApp")
 .factory("soundService", ["globalSettings","utilsService",
 
     function(globalSettings, utilsService) {
+
+        /* Sleep function */
         const sleep = (milliseconds) => {
             return new Promise(resolve => setTimeout(resolve, milliseconds))
         };
 
+        /* Replace uncommon notes with more common notes (Cb -> B for instance)
+        since we have limited wav files. Also replaces '#' with 'S' since #
+        not allowed in file name. */
         function cleanNote(note) {
-            // for example, replace Cb with B
             note =  utilsService.flatSharpExceptions(note);
-
-            // replace # with S since can't have in file name
             if (note.includes("#")) {
                 note = note.substr(0,1) + 'S' + note.substr(2,2);
             }
@@ -18,6 +20,7 @@ angular.module("mixTapeApp")
             return note;
         }
 
+        /* Returns a map from note to howl object for playing the note. */
         function getSounds(volume) {
             return {
                 'A5' : new Howl({ src: ['App/aud/A5.wav'], volume: volume}),
@@ -66,6 +69,8 @@ angular.module("mixTapeApp")
         }
 
         return {
+            /* Update melody and melodyDuration to reflect the passed in
+            parameters. */
             updateMelody: function(notes, duration) {
                 this.melody = [];
                 for (var i = 0; i < notes.length; i++) {
@@ -75,14 +80,18 @@ angular.module("mixTapeApp")
                 this.melodyDuration = duration;
             },
 
+            /* Update chord and chordDuration to reflect the passed in
+            parameters. */
             updateChords: function(chords, duration) {
                 this.chords = [];
                 for (var i = 0; i < chords.length; i++) {
                     var chordObj = [];
 
                     if (chords[i][0] == "") {
+                        // empty chord
                         chordObj.push(this.allChordNotes[''])
                     } else {
+                        // loop through each note in the chord
                         for (var j = 0; j < chords[i].length; j++) {
                             var note = cleanNote(chords[i][j] + globalSettings.CHORDS_OCTAVE);
                             chordObj.push(this.allChordNotes[note]);
@@ -96,6 +105,11 @@ angular.module("mixTapeApp")
                 this.chordsDuration = duration;
             },
 
+            /* Loop through chords and play with the specified duration. Use
+            sleep function to sustain note for the duration and then stop it.
+            Since chords are arrays containing individual notes, have to loop
+            through chords and then the notes in each chord and call play on
+            each note individually. */
             playChords: async function() {
                 for (var i = 0; i < this.chords.length; i++) {
                     for (var j = 0; j < this.chords[i].length; j++) {
@@ -109,6 +123,8 @@ angular.module("mixTapeApp")
                 }
             },
 
+            /* Loop through melody and play with the specified duration. Use
+            sleep function to sustain note for the duration and then stop it. */
             playMelody: async function() {
                 for (var i = 0; i < this.melody.length; i++) {
                     this.melody[i].play();
@@ -117,6 +133,7 @@ angular.module("mixTapeApp")
                 }
             },
 
+            /* Clears out the melody/chord variables.  */
             clearSounds: function() {
                 this.melody = [];
                 this.chords = [];
@@ -124,23 +141,34 @@ angular.module("mixTapeApp")
                 this.chordsDuration = [];
             },
 
+            /* Play an individual note for NOTE_CLICK_PLAY_LENGTH duration. */
             playNote: async function(note) {
                 var note = cleanNote(note);
                 var howl = this.allSingleNotes[note];
 
                 howl.play();
-                await sleep(250);
+                await sleep(globalSettings.NOTE_CLICK_PLAY_DUR);
                 howl.stop();
             },
 
+            /* initialize variables for this service. Uses 3 different maps for
+            the melody, chords, and click-staff-to-play notes. This is to prevent different
+            voices from stopping notes for another voice. For instance, if melody plays
+            A5 for 4 beats and the chords comes in 1 beat after the A5 starts and plays A5 for only
+            1 beat, then it would stop both instances of the note. However, by having
+            different maps (and knowing a voice - be that melody or chord - can
+            only play a particular note once at a time) we prevent this from happening
+            since they will each have their own version of the sound. The click-staff-to-play
+            also gets its own sound for similar reasons. */
             initialise: function() {
                 this.melody = [];
                 this.chords = [];
                 this.melodyDuration = [];
                 this.chordsDuration = [];
+
                 this.allMelodyNotes = getSounds(globalSettings.MELODY_VOLUME);
                 this.allChordNotes = getSounds(globalSettings.CHORD_VOLUME);
-                this.allSingleNotes = getSounds(globalSettings.MELODY_VOLUME);
+                this.allSingleNotes = getSounds(globalSettings.MELODY_VOLUME);  // click-staff-to-play
             },
         }
     }]);

@@ -3,7 +3,9 @@ angular.module("mixTapeApp")
     function(globalSettings) {
     	"use strict"
         return {
-            // Checks for all the flat sharp combos that really mean something else.
+
+            /* Converts less common notes to more common notes (at least common
+            meaning the wave files we have). */
             flatSharpExceptions: function (note){
                 if (note.length < 3) {
                     return note;

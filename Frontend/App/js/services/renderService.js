@@ -136,10 +136,10 @@ function(globalSettings, scoreService) {
             if(noteType == globalSettings.noteType.WHOLE){
                 time_duration = 4;
             }
-            if (pitchType == globalSettings.notePitchMod.SHARP){
+            if (pitchType == globalSettings.pitchType.SHARP){
                 pitchFileMod = "#";
             }
-            if(pitchType == globalSettings.notePitchMod.FLAT){
+            if(pitchType == globalSettings.pitchType.FLAT){
                 pitchFileMod = "-";
             }
             var fileString = pitch.substr(0,1) + pitchFileMod + pitch.substr(1,1);

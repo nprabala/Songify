@@ -1,52 +1,47 @@
 angular.module("mixTapeApp", [])
 .controller("mixTapeController", ["$scope", "utilsService", "renderService", "globalSettings", "songService",
 function($scope, utilsService, renderService, globalSettings, songService) {
-    $scope.hello = globalSettings.HELLO_MESSAGE;
-    $scope.pitchType = globalSettings.notePitchMod.NATURAL;
+
+    /* Load variables/lists from global settings */
+    $scope.pitchType = globalSettings.pitchType.NATURAL;
     $scope.currentType = globalSettings.noteType.QUARTER;
     $scope.topMessage = globalSettings.TOP_MESSAGE;
-    $scope.melodyStaff = "melody";
-
-    $scope.pitchAlteration = Object.keys(globalSettings.notePitchMod).map(function(key) {
-        return globalSettings.notePitchMod[key];
+    $scope.melodyStaff = globalSettings.MELODY_STAFF;
+    $scope.pitchAlteration = Object.keys(globalSettings.pitchType).map(function(key) {
+        return globalSettings.pitchType[key];
     });
-
     $scope.noteTypes = Object.keys(globalSettings.noteType).map(function(key) {
         return globalSettings.noteType[key];
     });
 
+    /* Initialize services */
     songService.initialise(window.location.hostname);
     renderService.initialise(document.getElementById('scoreMelody'),
                              document.getElementById('scoreChords'));
 
+    /* Method for handeling user request to play melody */
     $scope.playMelody = function() {
         songService.playMelody();
     };
 
+    /* Method for handeling whether to play just melody or melody + chords */
     $scope.choosePlayback = function() {
         if (globalSettings.toggleView) {
-            $scope.playComplete();
+            songService.playMelody();
+            songService.playChords();
         }
         else {
-            $scope.playMelody();
+            songService.playMelody();
         }
     };
 
-    $scope.playChords = async function(){
-        songService.playChords();
-    };
-
-    $scope.playComplete = async function() {
-        songService.playMelody();
-        songService.playChords();
-    };
-
+    /* Method for clearing melody, chords, and display */
     $scope.clear = function() {
-        renderService.clearStaff("melody");
+        renderService.clearStaff(globalSettings.MELODY_STAFF);
         songService.clearSong();
     };
 
-
+    /* Method for drawing note on display and adding to the melody */
     $scope.drawNote = function(i,j, staff){
         var staffElem = $("#" + staff)[0];
         var rows = staffElem.children
@@ -55,18 +50,17 @@ function($scope, utilsService, renderService, globalSettings, songService) {
         var noteHTML = renderService.generateNoteHTML(this.currentType, this.pitchType);
         var note = renderService.convertToNote(i, this.pitchType, this.currentType);
 
-        if (staff == "melody"){
+        if (staff == globalSettings.MELODY_STAFF){
+            // clear any other note at this x location
             for (var k = 0; k < rows.length; k++){
                 renderService.clearNote(rows[k].children[j],k);
             }
 
             if (this.currentType == globalSettings.noteType.CLEAR){
                 songService.editMelody(j, globalSettings.EMPTY_NOTE);
-                songService.updateMelody();
             } else {
                 songService.playNote(note['note']);
                 songService.editMelody(j, note);
-                songService.updateMelody();
                 col.appendChild(noteHTML);
             }
 
@@ -100,16 +94,16 @@ function($interval, renderService, utilsService, globalSettings, songService) {
                 '<button id="playChoice" ng-click="choosePlayback()">Play</button>' +
             '</div>';
 
-            var melodyStaff = renderService.generateStaff("melody");
+            var melodyStaff = renderService.generateStaff(globalSettings.MELODY_STAFF);
             var score = '<div id="score" hidden><div id="scoreMelody"></div><div id="scoreChords"></div></div>';
             var padding = '<div class="padding"></div>';
             return menu + melodyStaff + score + padding;
-
         },
 
         link: function(scope, element) {
             var toggle = document.getElementById('container');
             var toggleContainer = document.getElementById('toggle-container');
+            var melodyStaff = document.getElementById(globalSettings.MELODY_STAFF);
 
             window.addEventListener("resize", () => {
                 renderService.resizeScore(window.innerWidth);
@@ -120,30 +114,33 @@ function($interval, renderService, utilsService, globalSettings, songService) {
                 }
             });
 
+            /* if toggle set to melody + chords (i.e. score) */
             var toggleScore = function() {
                 document.getElementById("playChoice").disabled = true;
                 document.getElementById("clear").disabled = true;
 
                 songService.requestChords(() => {
-                    document.getElementById("melody").hidden = true;
+                    melodyStaff.hidden = true;
                     document.getElementById("score").hidden = false;
                     document.getElementById("playChoice").disabled = false;
                     renderService.drawScore(songService.getMelody(), songService.getChords());
                 });
 
                 toggleContainer.style.clipPath = 'inset(0 0 0 50%)';
-                toggleContainer.style.backgroundColor = '#D74046';
+                toggleContainer.style.backgroundColor = globalSettings.SCORE_TOGGLE_COLOR;
             };
 
+            /* if toggle set to melody only (i.e. melody input) */
             var toggleMelodyInput = function() {
                 document.getElementById("clear").disabled = false;
                 document.getElementById("score").hidden = true;
-                document.getElementById("melody").hidden = false;
+                melodyStaff.hidden = false;
 
                 toggleContainer.style.clipPath = 'inset(0 50% 0 0)';
-                toggleContainer.style.backgroundColor = 'dodgerblue';
+                toggleContainer.style.backgroundColor = globalSettings.MELODY_TOGGLE_COLOR;
             }
 
+            /* adjusting toggle*/
             toggle.addEventListener('click', function() {
                 globalSettings.toggleView = !globalSettings.toggleView;
                 if (globalSettings.toggleView) toggleScore();

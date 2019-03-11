@@ -2,18 +2,21 @@ angular.module("mixTapeApp")
 .factory("scoreService", ["globalSettings", "utilsService",
 function(globalSettings, utilsService) {
 
+    /* Init renderer for vexflow using the id score. */
     function setupRenderer(score) {
         var renderer = new Vex.Flow.Renderer(score, Vex.Flow.Renderer.Backends.SVG);
         renderer.resize(window.innerWidth, globalSettings.SCORE_HEIGHT);
         return renderer;
     }
 
+    /* Init context for the specified renderer. */
     function setupContext(renderer) {
         var context = renderer.getContext();
         context.setFont("Arial", 10, "").setBackgroundFillStyle("#eed");
         return context;
     }
 
+    /* Draw a stave using the provided parameters. */
     function drawStave(notes, context, clef) {
         var stave = new Vex.Flow.Stave(0, 0, window.innerWidth);
         stave.addClef(clef).addKeySignature('C');
@@ -22,34 +25,36 @@ function(globalSettings, utilsService) {
         var voice = new Vex.Flow.Voice().setMode('soft');
         voice.addTickables(notes);
 
+        // connect nearby notes (a technicality for 8th and 16th notes)
         var beams = Vex.Flow.Beam.generateBeams(notes);
         Vex.Flow.Formatter.FormatAndDraw(context, stave, notes);
         beams.forEach((b) => {b.setContext(context).draw()})
     }
 
-    // format duration for vexflow
+    /* Reformat dur for vexflow */
     function durationMap(dur, isRest) {
         var toReturn = '';
         switch(dur) {
-            case 0.25:
-            toReturn += '16';
-            break;
-            case 0.5:
-            toReturn += '8d';
-            break;
-            case 1:
-            toReturn += 'q';
-            break;
-            case 2:
-            toReturn += 'h';
-            break;
-            case 4:
-            toReturn += 'w';
-            break;
+            case globalSettings.noteDur.SIXTEENTH:
+                toReturn += '16';
+                break;
+            case globalSettings.noteDur.EIGHTH:
+                toReturn += '8d';
+                break;
+            case globalSettings.noteDur.QUARTER:
+                toReturn += 'q';
+                break;
+            case globalSettings.noteDur.HALF:
+                toReturn += 'h';
+                break;
+            case globalSettings.noteDur.WHOLE:
+                toReturn += 'w';
+                break;
             default:
-            toReturn += 'q';
+                toReturn += 'q';
         }
 
+        // if rest, add r to the duration string
         if (isRest) {
             return toReturn + 'r';
         } else {
@@ -57,7 +62,7 @@ function(globalSettings, utilsService) {
         }
     }
 
-    // format pitch for vexflow
+    /* format pitch for vexflow */
     function pitchWrapper(pitch) {
         var len = pitch.length;
 
@@ -71,22 +76,26 @@ function(globalSettings, utilsService) {
 
     }
 
-    // cleaner way to create new stave note
+    /* Wrapper for creating a new staveNote for vexflow*/
     function newStaveNote(notes, dur, clef) {
         return new Vex.Flow.StaveNote({clef: clef, keys: notes, duration: dur });
     }
 
+    /* Take the melody and convert it to an array of notes readable by vexflow. */
     function buildMelodyNotes(melody) {
         var notes = [];
 
         for (var j = 0; j < melody.length; j++){
+            // skip empty notes
             if (melody[j] != globalSettings.EMPTY_NOTE){
                 note = pitchWrapper(melody[j]["note"]);
                 dur = melody[j]["duration"];
+
                 if (note.includes('#') || note.includes('b')) {
+                    // have to add accidental to show the sharp/flat on the display
                     var mod = note.substring(1, 2);
                     notes.push(newStaveNote([note], durationMap(dur, false), globalSettings.clefType.TREBLE)
-                    .addAccidental(0, new Vex.Flow.Accidental(mod)));
+                        .addAccidental(0, new Vex.Flow.Accidental(mod)));
                 } else {
                     notes.push(newStaveNote([note], durationMap(dur, false), globalSettings.clefType.TREBLE));
                 }
@@ -96,11 +105,19 @@ function(globalSettings, utilsService) {
         return notes;
     }
 
-    // whether this is a common duration note (16th, 8th, quarter, half, whole)
+    /* whether this is a normal duration note
+    (16th, 8th, quarter, half, whole) */
     function isDurationNote(dur) {
-        return (dur == 0.25 || dur == 0.5 || dur == 1 || dur == 2 || dur == 4)
+        return (dur == globalSettings.noteDur.SIXTEENTH
+                || dur == globalSettings.noteDur.EIGHTH
+                || dur == globalSettings.noteDur.QUARTER
+                || dur == globalSettings.noteDur.HALF
+                || dur == globalSettings.noteDur.WHOLE)
     }
 
+    /* compare for music notes. Rank first by note
+    and break ties by note pitch mod (sharp, flat, natural) using
+    enums in globalSettings for rankings.  */
     function sortCompare(one, two) {
         var onePitch = globalSettings.notesEnum[one[0]];
         var oneMod = one.length > 1 ? globalSettings.pitchModEnum[one[1]]
@@ -121,70 +138,90 @@ function(globalSettings, utilsService) {
         }
     }
 
+    /* Take the inputChords and convert it to an array that is readable
+    by vexflow. */
     function buildChordsNotes(inputChords) {
         var chords = [];
-        var needTies = [];
+        var needTies = [];                          // holds which notes need ties: (list of pairs: [first note, second note]
+                                                    // where first needs tied to second)
 
         for (var j = 0; j < inputChords.length; j++){
-            var dur = inputChords[j]["duration"]
-            var notes = [];
-            var isRest = false;
-            var needAccidentals = [];
-            var totalNotes = 0;
+            var dur = inputChords[j]["duration"]    // duration of this chord
+            var notes = [];                         // array for the notes in this chord
+            var isRest = false;                     // this chord is a rest
+            var needAccidentals = [];               // which notes in the chord needs sharps/flats (list of pairs: [note, pitch mod])
+            var totalNotes = 0;                     // number of note lengths needed to account for dur
 
             if (inputChords[j]["chord"] == '') {
                 isRest = true;
-                notes.push("E/3");
+                notes.push("E/3"); // push on a note that is located in the middle of the staff
             } else {
+                // chord comes as C.E.G (for instance) and therefore needs to be split
                 var splitChord = inputChords[j]["chord"].split(".");
                 splitChord.sort(sortCompare);
 
                 for (var i = 0; i < splitChord.length; i++) {
                     var note = pitchWrapper(splitChord[i] + globalSettings.CHORDS_OCTAVE);
+
+                    // indicate that this note needs an accidental
                     if (note.includes('b') || note.includes('#')) {
                         needAccidentals.push([i, note.substring(1, 2)]);
                     }
+
                     notes.push(note);
                 }
             }
 
             // sometimes note durations have to be constructed by other
-            // notes (ie 3.5 takes half note, quater note, and eighth note)
+            // notes (ie 3.5 takes half note, quarter note, and eighth note)
             var makeDuration = function(duration) {
-                if (duration == 0) return;
+                if (duration == 0) return; // base case
 
+                // duration can be made by a note we have without remainder
                 if (isDurationNote(duration)) {
                     chords.push(newStaveNote(notes, durationMap(duration, isRest),
                                 globalSettings.clefType.BASS))
                     totalNotes+=1;
+
+                // try to make duration with notes we have
                 } else {
                     var remainder = duration;
-                    if (duration < 1) {
-                        remainder = duration - 0.5;
-                        chords.push(newStaveNote(notes, durationMap(0.5, isRest),
+                    if (duration < globalSettings.noteDur.QUARTER) {
+                        remainder = duration - globalSettings.noteDur.EIGHTH;
+                        chords.push(newStaveNote(notes,
+                                    durationMap(globalSettings.noteDur.EIGHTH, isRest),
                                     globalSettings.clefType.BASS))
-                    } else if (duration < 2) {
-                        remainder = duration - 1;
-                        chords.push(newStaveNote(notes, durationMap(1, isRest),
+
+                    } else if (duration < globalSettings.noteDur.HALF) {
+                        remainder = duration - globalSettings.noteDur.QUARTER;
+                        chords.push(newStaveNote(notes,
+                                    durationMap(globalSettings.noteDur.QUARTER, isRest),
                                     globalSettings.clefType.BASS))
-                    } else if (duration < 4) {
-                        remainder = duration - 2;
-                        chords.push(newStaveNote(notes, durationMap(2, isRest),
+
+                    } else if (duration < globalSettings.noteDur.WHOLE) {
+                        remainder = duration - globalSettings.noteDur.HALF;
+                        chords.push(newStaveNote(notes,
+                                    durationMap(globalSettings.noteDur.HALF, isRest),
                                     globalSettings.clefType.BASS))
+
                     } else {
-                        remainder = duration - 4;
-                        chords.push(newStaveNote(notes, durationMap(4, isRest),
+                        remainder = duration - globalSettings.noteDur.WHOLE;
+                        chords.push(newStaveNote(notes,
+                                    durationMap(globalSettings.noteDur.WHOLE, isRest),
                                     globalSettings.clefType.BASS))
                     }
 
-                    totalNotes+=1;
-                    makeDuration(remainder);
+                    totalNotes+=1; // update total number of note lengths
+                    makeDuration(remainder); // recurse
                 }
             }
 
             makeDuration(dur);
 
-            // don't tie rests and only tie if there is more than 1 chord structure involved
+            /* Indicate which notes need ties (don't tie rests). For instance,
+            if we needed 5 note lengths to achieve the specified duration, then
+            we would tie the first note to the second, second to the third,
+            third to the fourth, and the fourth to the fifth.*/
             if (!isRest && totalNotes > 1) {
                 for (var i = 1; i < totalNotes; i++) {
                     var startNote = chords.length - totalNotes + i;
@@ -193,11 +230,14 @@ function(globalSettings, utilsService) {
                 }
             }
 
-            // add flats/sharps to be rendered
+            // Add flat/sharp accidentals to be rendered. Loop through list
+            // of accidentals we kept track of
             for (var k = 0; k < needAccidentals.length; k++) {
-                var noteIndex = needAccidentals[k][0];
-                var mod = needAccidentals[k][1];
+                var noteIndex = needAccidentals[k][0]; // get the note
+                var mod = needAccidentals[k][1];        // get the pitch modification
 
+                // add it to every chord structure we had to create in order
+                // to reach duration
                 var start = chords.length - totalNotes;
                 for (var i = 0; i < totalNotes; i++) {
                     var cur = start + i;
@@ -207,7 +247,8 @@ function(globalSettings, utilsService) {
 
         }
 
-        // add ties for notes
+        // Use needTies to create vexFlow tie object to return with the chords.
+        // caller will use ties to render on screen.
         var ties = [];
         for (var i = 0; i < needTies.length; i++) {
             ties.push(new Vex.Flow.StaveTie({
@@ -222,7 +263,13 @@ function(globalSettings, utilsService) {
     }
 
     return {
+        /* Draws the score given the melody and input chords.
+        Group is used to combine everything into
+        one object so that it can be easily removed. There is a separate group
+        for the chords and melodies since they require different renderers. */
         drawScore: function(melody, inputChords) {
+
+            // if we already have groups on the display, remove them
             if (this.melodyGroup != null) {
                 this.melodyContext.svg.removeChild(this.melodyGroup);
                 this.chordContext.svg.removeChild(this.chordGroup);
@@ -235,10 +282,12 @@ function(globalSettings, utilsService) {
             var melody = buildMelodyNotes(melody);
             var chordsReturn = buildChordsNotes(inputChords);
             var chords = chordsReturn[0];
-            var ties = chordsReturn[1];
+            var ties = chordsReturn[1]; // tie for the chord notes
 
             drawStave(melody, this.melodyContext, globalSettings.clefType.TREBLE);
             drawStave(chords, this.chordContext, globalSettings.clefType.BASS);
+
+            // render the ties
             ties.forEach((t) => {t.setContext(this.chordContext).draw()})
 
             // close group
@@ -246,11 +295,13 @@ function(globalSettings, utilsService) {
             this.chordContext.closeGroup();
         },
 
+        /* Resize the melody and chord renderers to fit width of display. */
         resizeDisplay: function(width) {
             this.melodyRenderer.resize(width, globalSettings.SCORE_HEIGHT);
             this.chordRenderer.resize(width, globalSettings.SCORE_HEIGHT);
         },
 
+        /* Initialize the variables for this service. */
         initialise: function(melodyScore, chordScore) {
             this.melodyRenderer = setupRenderer(melodyScore);
             this.chordRenderer = setupRenderer(chordScore);
