@@ -55,7 +55,7 @@ angular.module("mixTapeApp").constant("globalSettings", {
         CLEAR: "*CLEAR NOTE*"
     },
 
-    // enum for note type
+    // enum for note durations
     noteDur: {
         SIXTEENTH: 0.25,
         EIGHTH: 0.5,
