@@ -1,11 +1,9 @@
-from math import floor
 from enum import Enum
 from sanic import Sanic
 from sanic.response import text, json
 from sanic_cors import CORS, cross_origin
 from aoiklivereload import LiveReloader
 from predict import Predict
-from collections import defaultdict
 
 # running sanic
 app = Sanic()
@@ -21,6 +19,9 @@ predict = Predict()
 # connection information
 IP = '0.0.0.0'
 PORT = 8081
+
+# sample interval
+INTERVAL = 8 # 8 eighth notes or one half note
 
 # enum of different note lengths
 class NOTE_TYPE(Enum):
@@ -72,7 +73,7 @@ def get_chord_progressions(notes):
     chords = query_model(notes_timestamps)
     chords_to_return = []
 
-    for c in range(0, len(chords), 8):
+    for c in range(0, len(chords), INTERVAL):
         chord = chords[c]
         chords_to_return.append({'chord':chord, 'duration':NOTE_TYPE.HALF.value})
 
