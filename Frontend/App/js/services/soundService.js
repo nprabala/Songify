@@ -111,25 +111,33 @@ angular.module("mixTapeApp")
             through chords and then the notes in each chord and call play on
             each note individually. */
             playChords: async function() {
-                for (var i = 0; i < this.chords.length; i++) {
-                    for (var j = 0; j < this.chords[i].length; j++) {
-                        this.chords[i][j].play();
-                    }
+                try {
+                    for (var i = 0; i < this.chords.length; i++) {
+                        for (var j = 0; j < this.chords[i].length; j++) {
+                            this.chords[i][j].play();
+                        }
 
-                    await sleep(this.chordsDuration[i] * 1000);
-                    for (var j = 0; j < this.chords[i].length; j++) {
-                        this.chords[i][j].stop();
+                        await sleep(this.chordsDuration[i] * 1000);
+                        for (var j = 0; j < this.chords[i].length; j++) {
+                            this.chords[i][j].stop();
+                        }
                     }
+                } catch(error) {
+                    console.log(error);
                 }
             },
 
             /* Loop through melody and play with the specified duration. Use
             sleep function to sustain note for the duration and then stop it. */
             playMelody: async function() {
-                for (var i = 0; i < this.melody.length; i++) {
-                    this.melody[i].play();
-                    await sleep(this.melodyDuration[i]*1000);
-                    this.melody[i].stop();
+                try {
+                    for (var i = 0; i < this.melody.length; i++) {
+                        this.melody[i].play();
+                        await sleep(this.melodyDuration[i]*1000);
+                        this.melody[i].stop();
+                    }
+                } catch(error) {
+                    console.log(error);
                 }
             },
 
@@ -146,9 +154,13 @@ angular.module("mixTapeApp")
                 var note = cleanNote(note);
                 var howl = this.allSingleNotes[note];
 
-                howl.play();
-                await sleep(globalSettings.NOTE_CLICK_PLAY_DUR);
-                howl.stop();
+                try {
+                    howl.play();
+                    await sleep(globalSettings.NOTE_CLICK_PLAY_DUR);
+                    howl.stop();
+                } catch(error) {
+                    console.log(error);
+                }
             },
 
             /* initialize variables for this service. Uses 3 different maps for
