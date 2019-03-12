@@ -30,28 +30,12 @@ class NOTE_TYPE(Enum):
     HALF = 2
     WHOLE = 4
 
-# max length chord can last for before breaking it up
-MAX_DURATION = NOTE_TYPE.HALF.value
-
-def find_smallest_note(notes):
-    ''''
-    Returns the smallest note_length in the notes provided
-    '''
-
-    smallest = NOTE_TYPE.HALF.value
-    for n in notes:
-        duration = n['duration']
-        if duration < smallest:
-            smallest = duration
-
-    return smallest
-
-def get_notes_timesteps(notes, smallest_note):
+def get_notes_timesteps(notes):
     ''''
     Takes in list of key-value pairs indicating the note as a string
     and duration as a float.
 
-    Returns array of the notes sampled at smallest_note note intervals
+    Returns array of the notes sampled at NOTE_TYPE.SIXTEENTH.value note intervals
     '''
 
     timesteps = []
@@ -62,7 +46,7 @@ def get_notes_timesteps(notes, smallest_note):
 
         while offset < duration:
             timesteps.append(note)
-            offset += smallest_note
+            offset += NOTE_TYPE.SIXTEENTH.value
 
     return timesteps
 
@@ -78,35 +62,20 @@ def get_chord_progressions(notes):
 
     Parses notes into notes_timestamps
 
-    Queries the model for chords corresponding to these notes and concats
-    repeated chords together.
+    Queries the model for chords corresponding to these notes.
 
-    Returns this chord progression as a list of key-value pairs mapping
-    chord and duration.
+    Returns these chords sampled at half note intervals as a
+    list of key-value pairs mapping chord and duration.
     '''
 
-    smallest_note = find_smallest_note(notes)
-    notes_timestamps = get_notes_timesteps(notes, smallest_note)
+    notes_timestamps = get_notes_timesteps(notes)
     chords = query_model(notes_timestamps)
     chords_to_return = []
 
-    chord_freq = defaultdict(int)
-    current_dur = 0
-    for chord in chords:
-        chord_freq[chord] += 1
-        current_dur += smallest_note
+    for c in range(0, len(chords), 8):
+        chord = chords[c]
+        chords_to_return.append({'chord':chord, 'duration':NOTE_TYPE.HALF.value})
 
-        if current_dur == NOTE_TYPE.HALF.value:
-            # get most frequent chord
-            c = max(chord_freq, key=lambda k: chord_freq[k])
-            chords_to_return.append({'chord':c, 'duration':current_dur})
-
-            chord_freq = defaultdict(int)
-            current_dur = 0
-
-    if len(chord_freq) > 0:
-        c = max(chord_freq, key=lambda k: chord_freq[k])
-        chords_to_return.append({'chord':c, 'duration':current_dur})
     return chords_to_return
 
 @app.route("/",methods=["GET","OPTIONS"])
