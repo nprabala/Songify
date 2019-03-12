@@ -123,6 +123,8 @@ class MidiLSTM(BaseModel):
         chord_out = output['chord_out'].detach().numpy() > thresh
 
 class SmallMidiLSTM(MidiLSTM):
+    """Smaller version of the Midi LSTM
+    """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.hidden_network = nn.Sequential()
@@ -143,6 +145,8 @@ class SmallMidiLSTM(MidiLSTM):
 
 
 class BigMidiLSTM(MidiLSTM):
+    """Bigger version of the Midi LSTM
+    """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.hidden_network =  nn.Sequential()

@@ -3,6 +3,9 @@ import torch.nn.functional as F
 from data_loader.dataset import MidiDataset
 
 def midi_loss(output, target, extra=None):
+    """Loss for the midi lstm model
+    Has loss for both the chord and the melody
+    """
     melody_out = output['melody_out']
     chord_out = output['chord_out']
     melody_y = target['melody_y']
@@ -44,6 +47,8 @@ def midi_loss(output, target, extra=None):
     return F.nll_loss(flat_melody_out, flat_melody_y) + chord_loss(flat_chord_out, flat_chord_y)
 
 def midi_loss_chord_only(output, target, extra=None):
+    """Midi model loss for the chord only (no melody)
+    """
     melody_out = output['melody_out']
     chord_out = output['chord_out']
     melody_y = target['melody_y']
