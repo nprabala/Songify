@@ -1,4 +1,4 @@
-# Server
+## Server
 
 You will need Python 3.6 for this project. We recommend downloading conda (https://conda.io/en/master/) and setting up a conda virtual environment (https://uoa-eresearch.github.io/eresearch-cookbook/recipe/2014/11/20/conda/):
 
