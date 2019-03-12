@@ -65,7 +65,7 @@ def get_chord_progressions(notes):
 
     Queries the model for chords corresponding to these notes.
 
-    Returns these chords sampled at half note intervals as a
+    Returns these chords sampled at INTERVAL (half note offsets) as a
     list of key-value pairs mapping chord and duration.
     '''
 
