@@ -21,7 +21,7 @@ IP = '0.0.0.0'
 PORT = 8081
 
 # sample interval
-INTERVAL = 8 # 8 eighth notes or one half note
+INTERVAL = 4 # num sixteenth notes... total of a quarter note
 
 # enum of different note lengths
 class NOTE_TYPE(Enum):
@@ -65,7 +65,8 @@ def get_chord_progressions(notes):
 
     Queries the model for chords corresponding to these notes.
 
-    Returns these chords sampled at INTERVAL (half note offsets) as a
+    Returns these chords sampled at INTERVAL offsets (with similar chords
+    combined up to a whole note value) as a
     list of key-value pairs mapping chord and duration.
     '''
 
@@ -75,7 +76,16 @@ def get_chord_progressions(notes):
 
     for c in range(0, len(chords), INTERVAL):
         chord = chords[c]
-        chords_to_return.append({'chord':chord, 'duration':NOTE_TYPE.HALF.value})
+
+        if len(chords_to_return) > 0:
+            # check if last_chord is the same as chord, if so, update
+            # last_chord's duration (if less than whole note duration)
+            last_chord = chords_to_return[-1]
+            if last_chord['chord'] == chord and last_chord['duration'] < NOTE_TYPE.WHOLE.value:
+                last_chord['duration'] += NOTE_TYPE.QUARTER.value
+                continue
+
+        chords_to_return.append({'chord':chord, 'duration':NOTE_TYPE.QUARTER.value})
 
     return chords_to_return
 
