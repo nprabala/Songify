@@ -46,7 +46,8 @@ class Predict:
             list of the chords to return
         """
         pred_output = []
-        output = self.model(input, extra=extra)
+        with torch.no_grad():
+            output = self.model(input, extra=extra)
 
         output_chords = output['chord_out'].squeeze()
 
