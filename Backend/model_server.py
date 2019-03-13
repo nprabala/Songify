@@ -1,25 +1,42 @@
+from enum import Enum
 from sanic import Sanic
 from sanic.response import text, json
-from predict import Predict
 from sanic_cors import CORS, cross_origin
+from aoiklivereload import LiveReloader
+from predict import Predict
 
+# running sanic
 app = Sanic()
 CORS(app)
-predict = Predict()
-IP = '0.0.0.0'
-PORT = 8081
-sixteenth = 0.25 # 16th note: 1 = quarter note, 0.5 = 8th note
 
-from aoiklivereload import LiveReloader
+# live reloading
 reloader = LiveReloader()
 reloader.start_watcher_thread()
+
+# model predictor
+predict = Predict()
+
+# connection information
+IP = '0.0.0.0'
+PORT = 8081
+
+# sample interval
+INTERVAL = 4 # num sixteenth notes... total of a quarter note
+
+# enum of different note lengths
+class NOTE_TYPE(Enum):
+    SIXTEENTH = 0.25
+    EIGHTH = 0.5
+    QUARTER = 1
+    HALF = 2
+    WHOLE = 4
 
 def get_notes_timesteps(notes):
     ''''
     Takes in list of key-value pairs indicating the note as a string
     and duration as a float.
 
-    Returns array of the notes sampled at sixteenth note intervals
+    Returns array of the notes sampled at NOTE_TYPE.SIXTEENTH.value note intervals
     '''
 
     timesteps = []
@@ -30,7 +47,8 @@ def get_notes_timesteps(notes):
 
         while offset < duration:
             timesteps.append(note)
-            offset += sixteenth
+            offset += NOTE_TYPE.SIXTEENTH.value
+
     return timesteps
 
 def query_model(notes_timestamps):
@@ -39,32 +57,37 @@ def query_model(notes_timestamps):
     '''
     return predict.get_prediction(notes_timestamps)
 
-def get_chord_progressions(notes_timestamps):
+def get_chord_progressions(notes):
     ''''
-    Takes in a list notes_timestamps of the notes sampled over time intervals.
+    Takes in a list of dicts containing note and duration.
 
-    Queries the model for chords corresponding to these notes and concats
-    repeated chords together.
+    Parses notes into notes_timestamps
 
-    Returns this chord progression as a list of key-value pairs mapping
-    chord and duration.
+    Queries the model for chords corresponding to these notes.
+
+    Returns these chords sampled at INTERVAL offsets (with similar chords
+    combined up to a whole note value) as a
+    list of key-value pairs mapping chord and duration.
     '''
-    chords = query_model(notes_timestamps)
-    concated_chords = []
 
-    for chord in chords:
-        if len(concated_chords) > 0:
+    notes_timestamps = get_notes_timesteps(notes)
+    chords = query_model(notes_timestamps)
+    chords_to_return = []
+
+    for c in range(0, len(chords), INTERVAL):
+        chord = chords[c]
+
+        if len(chords_to_return) > 0:
             # check if last_chord is the same as chord, if so, update
-            # last_chord's duration
-            last_chord = concated_chords[-1]
-            if last_chord['chord'] == chord and last_chord['duration'] < 4:
-                last_chord['duration'] += sixteenth
+            # last_chord's duration (if less than whole note duration)
+            last_chord = chords_to_return[-1]
+            if last_chord['chord'] == chord and last_chord['duration'] < NOTE_TYPE.WHOLE.value:
+                last_chord['duration'] += NOTE_TYPE.QUARTER.value
                 continue
 
-        # last_chord wasn't chord, so make new insertion
-        concated_chords.append({'chord':chord, 'duration':sixteenth})
+        chords_to_return.append({'chord':chord, 'duration':NOTE_TYPE.QUARTER.value})
 
-    return concated_chords
+    return chords_to_return
 
 @app.route("/",methods=["GET","OPTIONS"])
 async def return_home(request):
@@ -74,8 +97,7 @@ async def return_home(request):
 async def post_chord_progressions(request):
     notes = request.json
     if notes:
-        notes_timestamps = get_notes_timesteps(notes)
-        return json(get_chord_progressions(notes_timestamps))
+        return json(get_chord_progressions(notes))
     else:
         return json([])
 
