@@ -85,14 +85,14 @@ function(globalSettings, utilsService, soundService) {
 
         /* Methods for playing melody, chords, and single note. */
 
-        playMelody: function() {
+        playMelody: function(bpm) {
             if (this.melody != []) {
-                soundService.playMelody();
+                soundService.playMelody(bpm);
             }
         },
-        playChords: function() {
+        playChords: function(bpm) {
             if (this.chords != []) {
-                soundService.playChords();
+                soundService.playChords(bpm);
             }
         },
         playNote: function(note) {

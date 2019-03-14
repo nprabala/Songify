@@ -4,6 +4,7 @@ function($scope, utilsService, renderService, globalSettings, songService) {
 
     /* Load variables/lists from global settings */
     $scope.pitchType = globalSettings.pitchType.NATURAL;
+    $scope.bpm = globalSettings.bpm.SLOW;
     $scope.currentType = globalSettings.noteType.QUARTER;
     $scope.topMessage = globalSettings.TOP_MESSAGE;
     $scope.melodyStaff = globalSettings.MELODY_STAFF;
@@ -13,25 +14,23 @@ function($scope, utilsService, renderService, globalSettings, songService) {
     $scope.noteTypes = Object.keys(globalSettings.noteType).map(function(key) {
         return globalSettings.noteType[key];
     });
+    $scope.bpmOptions = Object.keys(globalSettings.bpm).map(function(key) {
+        return globalSettings.bpm[key];
+    });
 
     /* Initialize services */
     songService.initialise(window.location.hostname);
     renderService.initialise(document.getElementById('scoreMelody'),
                              document.getElementById('scoreChords'));
 
-    /* Method for handeling user request to play melody */
-    $scope.playMelody = function() {
-        songService.playMelody();
-    };
-
     /* Method for handeling whether to play just melody or melody + chords */
     $scope.choosePlayback = function() {
         if (globalSettings.toggleView) {
-            songService.playMelody();
-            songService.playChords();
+            songService.playMelody($scope.bpm);
+            songService.playChords($scope.bpm);
         }
         else {
-            songService.playMelody();
+            songService.playMelody($scope.bpm);
         }
     };
 
@@ -74,11 +73,13 @@ function($interval, renderService, utilsService, globalSettings, songService) {
         restrict: 'A',
         template: function(){
             var menu = '<img id="logo" src="App/img/logo.png"></img><div></div>' +
-            '<div id="topMessage">{{topMessage}}</div>' +
+            '<div id="topMessage">{{topMessage}}' +
+            ' Please leave any feedback <a href=' + globalSettings.FEEDBACK_LINK + ' target="_blank"> here</a>.</div>'+
 
             '<div id="noteSelection">Select note: ' +
             '<select ng-model="currentType" ng-options="x for x in noteTypes"></select>'+
-            '<select ng-model="pitchType" ng-options="x for x in pitchAlteration"></select></div>'+
+            '<select ng-model="pitchType" ng-options="x for x in pitchAlteration"></select>'+
+            '<select ng-model="bpm" ng-options="x for x in bpmOptions"></select></div>'+
 
             '<div id="container">' +
             '<div class="inner-container">' +

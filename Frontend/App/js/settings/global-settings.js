@@ -5,6 +5,7 @@ angular.module("songifyApp").constant("globalSettings", {
                     your melody, then select 'Melody + Chords' to see the \
                     accompaniment.",         // top message displayed on page
 
+    ONE_SEC: 1000,                          // 1000ms in 1s
     TOP_LINE_INDEX: 4,                       // index of F5 in the trebleStaff (top line on staff)
     SCORE_HEIGHT: 150,                      // height of the score
     LINE_HEIGHT: 0.12,                      // staff line spacing
@@ -17,6 +18,7 @@ angular.module("songifyApp").constant("globalSettings", {
     SCORE_TOGGLE_COLOR: '#D74046',          // color for melody+chords toggle
     MELODY_TOGGLE_COLOR: 'dodgerblue',      // color for melody toggle
     NOTE_CLICK_PLAY_DUR: 250,               // when user clicks on staff, play that note for this long
+    FEEDBACK_LINK: "https://docs.google.com/forms/d/e/1FAIpQLSfDzcagQexDrkSgBXNArMylQuoaUbY6ojhOWUCrt7jeHCH4dA/viewform?usp=sf_link", // Feedback link
 
     // enum for notes
     notesEnum: {
@@ -69,6 +71,12 @@ angular.module("songifyApp").constant("globalSettings", {
         FLAT: "Flat",
         SHARP: "Sharp",
         NATURAL: "Natural",
+    },
+    
+    // enum for how fast to play back... fast is half tempo of slow
+    bpm: {
+        SLOW: "Slow",    // ~60bpm  
+        FAST: "Fast",   //~120 bpm
     },
 
     // Non-constants

@@ -110,14 +110,19 @@ angular.module("songifyApp")
             Since chords are arrays containing individual notes, have to loop
             through chords and then the notes in each chord and call play on
             each note individually. */
-            playChords: async function() {
+            playChords: async function(bpm) {
                 try {
                     for (var i = 0; i < this.chords.length; i++) {
                         for (var j = 0; j < this.chords[i].length; j++) {
                             this.chords[i][j].play();
                         }
+                        
+                         if (bpm === globalSettings.bpm.SLOW) {
+                            await sleep(this.chordsDuration[i] * globalSettings.ONE_SEC);
+                        } else {
+                            await sleep(this.chordsDuration[i] * globalSettings.ONE_SEC / 2);
+                        }
 
-                        await sleep(this.chordsDuration[i] * 1000);
                         for (var j = 0; j < this.chords[i].length; j++) {
                             this.chords[i][j].stop();
                         }
@@ -129,11 +134,17 @@ angular.module("songifyApp")
 
             /* Loop through melody and play with the specified duration. Use
             sleep function to sustain note for the duration and then stop it. */
-            playMelody: async function() {
+            playMelody: async function(bpm) {
                 try {
                     for (var i = 0; i < this.melody.length; i++) {
                         this.melody[i].play();
-                        await sleep(this.melodyDuration[i]*1000);
+                        
+                        if (bpm === globalSettings.bpm.SLOW) {
+                            await sleep(this.melodyDuration[i] * globalSettings.ONE_SEC);
+                        } else {
+                            await sleep(this.melodyDuration[i] * globalSettings.ONE_SEC / 2);
+                        }
+                        
                         this.melody[i].stop();
                     }
                 } catch(error) {
