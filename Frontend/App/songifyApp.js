@@ -78,7 +78,9 @@ function($interval, renderService, utilsService, globalSettings, songService) {
 
             '<div id="noteSelection">Select note: ' +
             '<select ng-model="currentType" ng-options="x for x in noteTypes"></select>'+
-            '<select ng-model="pitchType" ng-options="x for x in pitchAlteration"></select>'+
+            '<select ng-model="pitchType" ng-options="x for x in pitchAlteration"></select></div>'+
+
+            '<div id="noteSelection">Select playback speed: ' +
             '<select ng-model="bpm" ng-options="x for x in bpmOptions"></select></div>'+
 
             '<div id="container">' +
