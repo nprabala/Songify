@@ -1,4 +1,4 @@
-angular.module("mixTapeApp")
+angular.module("songifyApp")
 .factory("renderService", ["globalSettings", "scoreService",
 function(globalSettings, scoreService) {
     "use strict";
@@ -36,7 +36,7 @@ function(globalSettings, scoreService) {
         },
 
         // Generates HTML for the staff. Instead of using an HTML5 canvas or a table, it simulates the best of both worlds
-        // using a series of divs with svg canvases nested inside them. 
+        // using a series of divs with svg canvases nested inside them.
         // Each div constitutes one half step on the staff. Each svg contains one note. The overall structure
         // is modelled as an xy grid.
         // Globalsettings determines the size of canvas, size of notes, and number of notes allowed as input.
@@ -71,7 +71,7 @@ function(globalSettings, scoreService) {
         },
 
         // Generates HTML tags for individual notes to be rendered on the svg canvases
-        // Generates different HTML depending on the type of note (half, eighth etc) and 
+        // Generates different HTML depending on the type of note (half, eighth etc) and
         // the pitch (natural, sharp, flat).
         generateNoteHTML : function(noteType, pitchType){
             var namespace = "http://www.w3.org/2000/svg";

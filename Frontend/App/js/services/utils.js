@@ -1,4 +1,4 @@
-angular.module("mixTapeApp")
+angular.module("songifyApp")
 .factory("utilsService", ["globalSettings",
     function(globalSettings) {
     	"use strict"

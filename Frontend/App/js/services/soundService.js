@@ -1,4 +1,4 @@
-angular.module("mixTapeApp")
+angular.module("songifyApp")
 .factory("soundService", ["globalSettings","utilsService",
 
     function(globalSettings, utilsService) {

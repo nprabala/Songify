@@ -1,7 +1,7 @@
-angular.module("mixTapeApp").constant("globalSettings", {
+angular.module("songifyApp").constant("globalSettings", {
 
     EMPTY_NOTE: "Empty",                     // marks empty note in melody
-    TOP_MESSAGE: "Welcome to Mixtape! Click anywhere on the staff to create \
+    TOP_MESSAGE: "Welcome to Songify! Click anywhere on the staff to create \
                     your melody, then select 'Melody + Chords' to see the \
                     accompaniment.",         // top message displayed on page
 

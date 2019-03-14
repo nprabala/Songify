@@ -1,5 +1,5 @@
-angular.module("mixTapeApp", [])
-.controller("mixTapeController", ["$scope", "utilsService", "renderService", "globalSettings", "songService",
+angular.module("songifyApp", [])
+.controller("songifyController", ["$scope", "utilsService", "renderService", "globalSettings", "songService",
 function($scope, utilsService, renderService, globalSettings, songService) {
 
     /* Load variables/lists from global settings */
@@ -68,7 +68,7 @@ function($scope, utilsService, renderService, globalSettings, songService) {
     };
 }])
 
-.directive("mixtapeApp", ["$interval", "renderService", "utilsService", "globalSettings", "songService",
+.directive("songifyApp", ["$interval", "renderService", "utilsService", "globalSettings", "songService",
 function($interval, renderService, utilsService, globalSettings, songService) {
     return {
         restrict: 'A',
