@@ -19,7 +19,7 @@ function(globalSettings, scoreService) {
 
         //Clears a note at a particular index within the div grid structure.
         clearNote: function(col, i){
-            if (i % 2 == 0 && i >= globalSettings.TOP_LINE_INDEX && i < globalSettings.trebleStaff.length - 1){
+            if (i % 2 == 0){
                 if(col.children.length >= 2){
                     for (var k = 1; k < col.children.length; k++){
                         col.removeChild(col.children[k]);
@@ -51,23 +51,28 @@ function(globalSettings, scoreService) {
             for (var i = 0; i < globalSettings.trebleStaff.length; i++){
                 var line = "";
 
-                if (i % 2 == 0 && i >= globalSettings.TOP_LINE_INDEX
-                    && curLines < globalSettings.STAFF_LINES){
+                // lines for main staff
+                if (i % 2 == 0 && i >= globalSettings.TOP_LINE_INDEX && curLines < globalSettings.STAFF_LINES){
 
-                        line = '<line x1="0%" y1="50%" x2="100%" y2="50%" style="stroke:rgb(0,0,0);stroke-width:2"/>';
-                        curLines += 1;
-                    }
+                    line = '<line x1="0%" y1="50%" x2="100%" y2="50%" style="stroke:rgb(0,0,0);stroke-width:2"/>';
+                    curLines += 1;
+                
+                        
+                // faint lines for notes above and below staff   
+                } else if (i % 2 == 0 && (curLines >= globalSettings.STAFF_LINES || i < globalSettings.TOP_LINE_INDEX)) {
+                    line = '<line x1="0%" y1="50%" x2="100%" y2="50%" style="stroke:rgb(0,0,0);stroke-width:0.1"/>';
+                }
 
-                    staff += '<div id="'+String(i)+'" class="row" style="height:' + String(notePercentage)+'%;">';
-                    for (var j = 0; j < 1/(globalSettings.NOTE_RADIUS*2); j++){
-                        staff += '<svg id="'+String(j)+'" style="width:' + noteWidthPercentage + '%;"ng-click="drawNote('+i+','+j+','+idVar+')" class="cell"'+
-                        '>' + line + '</svg>';
+                staff += '<div id="'+String(i)+'" class="row" style="height:' + String(notePercentage)+'%;">';
+                for (var j = 0; j < 1/(globalSettings.NOTE_RADIUS*2); j++){
+                    staff += '<svg id="'+String(j)+'" style="width:' + noteWidthPercentage + '%;"ng-click="drawNote('+i+','+j+','+idVar+')" class="cell"'+
+                    '>' + line + '</svg>';
 
-                    }
-                    staff += '</div>';
                 }
                 staff += '</div>';
-                return staff
+            }
+            staff += '</div>';
+            return staff
         },
 
         // Generates HTML tags for individual notes to be rendered on the svg canvases

@@ -83,13 +83,6 @@ button:hover {
 
 a {
 	text-decoration: none;
-	opacity: .6;
-	padding: 60px;
-	font-weight: bolder;
-	position: absolute;
-	right: 0px;
-	bottom: 0px;
-	font-size: 1.4em;
 }
 
 a:hover {
