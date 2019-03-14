@@ -72,10 +72,10 @@ angular.module("songifyApp").constant("globalSettings", {
         SHARP: "Sharp",
         NATURAL: "Natural",
     },
-    
-    // enum for how fast to play back... fast is half tempo of slow
+
+    // enum for how fast to play back
     bpm: {
-        SLOW: "Slow",    // ~60bpm  
+        SLOW: "Slow",    // ~60bpm
         FAST: "Fast",   //~120 bpm
     },
 
