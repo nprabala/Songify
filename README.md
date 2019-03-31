@@ -1,5 +1,5 @@
 # Songify
-An app that lets anyone become a songwriter.
+An app that lets anyone become a songwriter. Check it out at www.songify.me
 
 ## Overview
 
